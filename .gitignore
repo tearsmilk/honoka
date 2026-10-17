@@ -1,0 +1,6 @@
+# The isolated lab holds controlled probe inputs and run artifacts.
+# NEVER commit vulnerability inputs or canary captures.
+lab/
+*.log
+__pycache__/
+*.pyc

@@ -1,0 +1,53 @@
+# Public, already-patched Minecraft-related CVEs for regression verification.
+# Each entry describes HOW to observe the fix holding — not how to exploit it.
+# `input_ref` points at the public advisory; the controlled input itself is
+# supplied locally in the isolated lab (lab/inputs/<id>/) and is never committed.
+#
+# indicator: network | crash | filesystem
+# affected:  a version known to be vulnerable (control)
+# fixed_in:  first version carrying the fix
+# target:    the current version under regression
+
+defaults:
+  target: "1.21.11"
+  canary_host: "127.0.0.1"
+  canary_port: 18444
+
+cves:
+  - id: CVE-2021-44228
+    name: "Log4Shell (Log4j JNDI lookup)"
+    component: "log4j-core bundled in client/server logging"
+    indicator: network
+    affected: "1.17"
+    fixed_in: "1.18.1 / launcher hotfix"
+    input_ref: "NVD CVE-2021-44228; Mojang 2021-12 launcher advisory"
+    expectation: "patched client treats the known marker string as inert text; no connect to canary"
+
+  - id: CVE-2021-45046
+    name: "Log4j follow-up (incomplete 2.15 fix)"
+    component: "log4j-core"
+    indicator: network
+    affected: "1.18 (pre-hotfix)"
+    fixed_in: "log4j 2.16 / client hotfix"
+    input_ref: "NVD CVE-2021-45046"
+    expectation: "no outbound resolve to canary"
+
+  - id: CVE-2021-45105
+    name: "Log4j uncontrolled recursion (DoS)"
+    component: "log4j-core"
+    indicator: crash
+    affected: "log4j 2.16-"
+    fixed_in: "log4j 2.17"
+    input_ref: "NVD CVE-2021-45105"
+    expectation: "process stays alive on the known recursive pattern"
+
+  # Template for a resource-pack path-traversal class regression.
+  # Fill affected/fixed_in from the specific public advisory before use.
+  - id: PACK-TRAVERSAL-TEMPLATE
+    name: "Resource/data pack extraction path traversal (class)"
+    component: "pack loader"
+    indicator: filesystem
+    affected: "TBD-from-advisory"
+    fixed_in: "TBD-from-advisory"
+    input_ref: "public advisory ID for the specific traversal bug"
+    expectation: "no file written outside the pack sandbox dir"
