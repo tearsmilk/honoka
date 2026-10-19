@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Honoka — Minecraft сервер</title>
+  <meta name="description" content="Honoka — уютный русскоязычный Minecraft сервер. Выживание, экономика, кланы, ивенты и дружное комьюнити.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="#top">
+    <img src="assets/logo.svg" alt="" width="36" height="36">
+    <span>HONOKA</span>
+  </a>
+  <nav class="nav">
+    <a href="#about">О сервере</a>
+    <a href="#features">Фичи</a>
+    <a href="#join">Как зайти</a>
+    <a href="#rules">Правила</a>
+    <a href="#community">Комьюнити</a>
+  </nav>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__sky">
+      <div class="cloud cloud--1"></div>
+      <div class="cloud cloud--2"></div>
+      <div class="cloud cloud--3"></div>
+    </div>
+    <div class="hero__content">
+      <p class="hero__splash" data-splash>Теперь с кланами!</p>
+      <h1 class="hero__title">HONOKA</h1>
+      <p class="hero__sub">Русскоязычный Minecraft сервер<br>Выживание · Экономика · Кланы · Ивенты</p>
+
+      <div class="status" data-status>
+        <span class="status__dot"></span>
+        <span class="status__text">Проверяем статус…</span>
+      </div>
+
+      <div class="ip-box">
+        <code class="ip-box__ip" data-ip>play.honoka.ru</code>
+        <button class="btn btn--green" data-copy>Скопировать IP</button>
+      </div>
+
+      <div class="hero__actions">
+        <a class="btn btn--big btn--green" href="#join">Начать играть</a>
+        <a class="btn btn--big" href="#community">Discord</a>
+      </div>
+      <p class="hero__version">Версия: 1.20 – 1.21 · Java Edition · Без лицензии</p>
+    </div>
+    <div class="hero__ground"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2 class="section__title">О сервере</h2>
+    <div class="about">
+      <div class="about__text">
+        <p>Honoka — это небольшой, но живой сервер, где нет доната «на победу», нет токсичности и нет гриферов. Просто ваниль с приятными дополнениями, нормальные люди и админы, которые реально играют.</p>
+        <p>Мы запустились как сервер для друзей, а теперь принимаем всех, кому хочется спокойно строить, торговать и тусоваться по вечерам.</p>
+      </div>
+      <ul class="stats">
+        <li class="stat"><span class="stat__num" data-count="1200">0</span><span class="stat__label">игроков всего</span></li>
+        <li class="stat"><span class="stat__num" data-count="40">0</span><span class="stat__label">онлайн вечером</span></li>
+        <li class="stat"><span class="stat__num" data-count="2">0</span><span class="stat__label">года без вайпа</span></li>
+        <li class="stat"><span class="stat__num" data-count="20">0</span><span class="stat__label">TPS стабильно</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section section--dark" id="features">
+    <h2 class="section__title">Что у нас есть</h2>
+    <div class="cards">
+      <article class="card">
+        <div class="card__icon card__icon--grass"></div>
+        <h3>Выживание</h3>
+        <p>Классический survival без приватных ограничений на весь мир. Регионы, шалкеры, элитры — всё честно добывается.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--gold"></div>
+        <h3>Экономика</h3>
+        <p>Игровая валюта, аукцион, магазины игроков и торговый квартал на спавне. Никакого доната на валюту.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--iron"></div>
+        <h3>Кланы</h3>
+        <p>Собирай команду, захватывай территории, участвуй в клановых войнах по субботам.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--diamond"></div>
+        <h3>Ивенты</h3>
+        <p>Каждые выходные: паркур, бед-варс, охота за сокровищами, постройки на время. Призы — реальные игровые.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--redstone"></div>
+        <h3>Технический мир</h3>
+        <p>Отдельный мир для фермеров и редстоунеров. Чанки грузятся, фермы работают, лаги не трогают основной мир.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--obsidian"></div>
+        <h3>Защита</h3>
+        <p>Приват регионов, бэкапы раз в час, откат гриферства. Анти-чит и живые модеры.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section class="section" id="join">
+    <h2 class="section__title">Как зайти</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step__num">1</span>
+        <div>
+          <h3>Запусти Minecraft</h3>
+          <p>Подойдёт любая версия Java Edition от 1.20 до 1.21. Лицензия не обязательна.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">2</span>
+        <div>
+          <h3>Добавь сервер</h3>
+          <p>Сетевая игра → Добавить сервер → в поле адреса вставь <code>play.honoka.ru</code></p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">3</span>
+        <div>
+          <h3>Зарегистрируйся</h3>
+          <p>При первом входе напиши <code>/reg пароль пароль</code>, потом <code>/login пароль</code>. Всё, ты в игре.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">4</span>
+        <div>
+          <h3>Залетай в Discord</h3>
+          <p>Там объявления, ивенты, помощь новичкам и просто общение. Без него тоже можно, но с ним веселее.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- RULES -->
+  <section class="section section--dark" id="rules">
+    <h2 class="section__title">Правила</h2>
+    <div class="rules">
+      <div class="rule"><span class="rule__n">§1</span><p>Без гриферства, воровства и читов. Поймали — бан, без обсуждений.</p></div>
+      <div class="rule"><span class="rule__n">§2</span><p>Уважай других. Оскорбления, травля и политика в чате — мут.</p></div>
+      <div class="rule"><span class="rule__n">§3</span><p>Не строй лагающие фермы в основном мире — для этого есть техмир.</p></div>
+      <div class="rule"><span class="rule__n">§4</span><p>Реклама других серверов и продажа аккаунтов запрещены.</p></div>
+      <div class="rule"><span class="rule__n">§5</span><p>Баги репортим админам, а не абузим. За репорт — награда.</p></div>
+      <div class="rule"><span class="rule__n">§6</span><p>Не оставляй уродливые постройки у спавна и чужих баз. Чистим.</p></div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="section" id="community">
+    <h2 class="section__title">Комьюнити</h2>
+    <div class="socials">
+      <a class="social" href="https://discord.gg/honoka" target="_blank" rel="noopener">
+        <span class="social__title">Discord</span>
+        <span class="social__sub">Главный чат и объявления</span>
+      </a>
+      <a class="social" href="https://t.me/honoka_mc" target="_blank" rel="noopener">
+        <span class="social__title">Telegram</span>
+        <span class="social__sub">Новости и анонсы ивентов</span>
+      </a>
+      <a class="social" href="https://vk.com/honoka_mc" target="_blank" rel="noopener">
+        <span class="social__title">ВКонтакте</span>
+        <span class="social__sub">Скриншоты и голосования</span>
+      </a>
+      <a class="social" href="https://youtube.com/@honoka_mc" target="_blank" rel="noopener">
+        <span class="social__title">YouTube</span>
+        <span class="social__sub">Обзоры ивентов и таймлапсы</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>© <span data-year></span> Honoka. Не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang/Microsoft.</p>
+</footer>
+
+<div class="toast" data-toast>IP скопирован!</div>
+
+<script src="script.js"></script>
+</body>
+</html>
