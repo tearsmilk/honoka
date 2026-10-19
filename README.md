@@ -1,6 +1,6 @@
-# Honoka — фейм-страница Minecraft сервера
+# mc-ru.org — фейм-страница сообщества
 
-Статичный сайт: `index.html` + `style.css` + `script.js`. Никакой сборки.
+Статичный сайт русскоязычного Minecraft-комьюнити: `index.html` + `style.css` + `script.js`. Никакой сборки.
 
 ## Деплой
 Закинь содержимое репы в корень веб-сервера (nginx / apache / любой хостинг со статикой).
@@ -9,13 +9,12 @@
 ```nginx
 server {
     listen 80;
-    server_name honoka.ru www.honoka.ru;
-    root /var/www/honoka;
+    server_name mc-ru.org www.mc-ru.org;
+    root /var/www/mc-ru;
     index index.html;
 }
 ```
 
 ## Что поменять под себя
-- `script.js` → `SERVER_IP` (адрес сервера) и `SPLASHES` (жёлтые надписи как в меню майна).
-- `index.html` → ссылки на Discord / Telegram / VK / YouTube в блоке `#community`, тексты, правила.
-- Онлайн тянется с `api.mcsrvstat.us` по IP — ничего настраивать не нужно.
+- `index.html` → ссылки на Discord / Telegram / VK / YouTube (в хиро и в блоке `#community`), цифры в блоке «О нас», тексты, правила.
+- `script.js` → `SPLASHES` (жёлтые надписи как в меню майна).

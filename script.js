@@ -1,59 +1,21 @@
 // ===== НАСТРОЙКИ — поменяй под себя =====
-const SERVER_IP = 'play.honoka.ru';
 const SPLASHES = [
-  'Теперь с кланами!',
-  'Без доната на победу!',
+  'Привет, крафтер!',
+  'Без срачей ваниль vs моды!',
   'Крипер, ау, минул!',
-  '2 года без вайпа!',
+  'Гайды пишут люди!',
   'Заходи, не бойся!',
-  'TPS 20, как в сказке!',
+  'Новичкам тут рады!',
   'Алмазы ещё остались!',
   'Жми F3 + A если лагает!',
 ];
 // =========================================
 
-// IP везде
-document.querySelectorAll('[data-ip]').forEach(el => el.textContent = SERVER_IP);
-
 // Случайный сплэш
 const splash = document.querySelector('[data-splash]');
 if (splash) splash.textContent = SPLASHES[Math.floor(Math.random() * SPLASHES.length)];
 
-// Копирование IP
-const toast = document.querySelector('[data-toast]');
-document.querySelectorAll('[data-copy]').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(SERVER_IP);
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = SERVER_IP; document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); ta.remove();
-    }
-    toast.classList.add('toast--show');
-    setTimeout(() => toast.classList.remove('toast--show'), 1800);
-  });
-});
-
-// Статус сервера (mcsrvstat.us — бесплатный публичный API)
-const status = document.querySelector('[data-status]');
-if (status) {
-  const text = status.querySelector('.status__text');
-  fetch(`https://api.mcsrvstat.us/3/${SERVER_IP}`)
-    .then(r => r.json())
-    .then(d => {
-      if (d.online) {
-        status.classList.add('status--online');
-        text.textContent = `Онлайн: ${d.players?.online ?? 0} / ${d.players?.max ?? '?'}`;
-      } else {
-        status.classList.add('status--offline');
-        text.textContent = 'Сервер оффлайн';
-      }
-    })
-    .catch(() => { text.textContent = 'Статус недоступен'; });
-}
-
-// Счётчики в "О сервере"
+// Счётчики в "О нас"
 const counters = document.querySelectorAll('[data-count]');
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => {
