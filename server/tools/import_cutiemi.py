@@ -37,9 +37,13 @@ def sanitize(name, fallback):
 
 
 def main():
-    if len(sys.argv) < 2:
-        sys.exit("Использование: import_cutiemi.py cutiemi-export.json")
-    data = json.loads(Path(sys.argv[1]).read_text("utf-8"))
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    only_cosmetics = "--only-cosmetics" in sys.argv
+    if not args:
+        sys.exit("Использование: import_cutiemi.py cutiemi-export.json [--only-cosmetics]")
+    data = json.loads(Path(args[0]).read_text("utf-8"))
+    if only_cosmetics:
+        data["users"], data["ownership"] = [], []
     if data.get("format") != "cutiemi-export-1":
         sys.exit("Это не файл export_cutiemi.py")
     nicks = {}
