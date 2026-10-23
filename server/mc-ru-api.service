@@ -1,0 +1,16 @@
+[Unit]
+Description=mc-ru.org API (аккаунты, скины, Yggdrasil)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/mc-ru-api/server
+Environment=MCRU_DATA=/var/lib/mc-ru
+Environment=MCRU_PUBLIC_URL=https://mc-ru.org
+ExecStart=/opt/mc-ru-api/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8787 --proxy-headers --forwarded-allow-ips=127.0.0.1
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

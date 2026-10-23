@@ -1,10 +1,77 @@
 # mc-ru.org — фейм-страница сообщества
 
-Статичный сайт русскоязычного Minecraft-комьюнити: `index.html` + `style.css` + `script.js` + `assets/`. Никакой сборки, никакого бэкенда.
+Сайт русскоязычного Minecraft-комьюнити: статика (`index.html`, `account.html`, `style.css`, `script.js`, `account.js`, `assets/`) + небольшой бэкенд `server/` для аккаунтов, скинов и плащей.
 
 ## Что поменять под себя
 - `index.html` → ссылки на Telegram / VK / YouTube в блоке `#community`, цифры в блоке «О нас», тексты, правила. Discord уже проставлен.
 - `script.js` → `SPLASHES` (жёлтые надписи как в меню майна).
+
+---
+
+# Аккаунты, скины и плащи (бэкенд)
+
+`server/` — FastAPI + SQLite. Регистрация/вход на сайте, личный кабинет `/account` с 3D-превью (skinview3d), загрузка скина и плаща:
+- **HD**: скин 64…1024 px по ширине (квадрат; старый 64×32 конвертируется в 64×64), плащ 64…2048 px (2:1, старый 22×17 тоже принимается).
+- **Анимация**: GIF, APNG или PNG-полоса кадров (кадры друг под другом), до 64 кадров, 1–30 fps.
+- Модель `classic` / `slim`.
+
+Для игры отдаётся два варианта: обычное 64×64 / 64×32 (первый кадр) — через **Yggdrasil** для `authlib-injector`, и полное HD + полоса кадров — через **CustomSkinLoader API** (и лаунчер Эта).
+
+## API (кратко)
+
+| Метод | Путь | Что |
+|---|---|---|
+| POST | `/api/auth/register` | `{username, email, password}` → `{token, user}` |
+| POST | `/api/auth/login` | `{login, password}` (ник или e-mail) → `{token, user}` |
+| GET | `/api/auth/me` | профиль (Bearer-токен) |
+| POST | `/api/auth/password` | `{old, new}` |
+| POST / DELETE | `/api/account/skin` | multipart `file`, `model`, `fps` |
+| POST / DELETE | `/api/account/cape` | multipart `file`, `fps` |
+| POST | `/api/account/model` | `{model: classic\|slim}` |
+| GET | `/api/users/{ник}` | публичный профиль |
+| GET | `/api/users/{ник}/skin.png?frame=0&size=64` | кадр скина (`size=full` — вся полоса); без скина — Стив |
+| GET | `/api/users/{ник}/cape.png` | то же для плаща |
+| GET | `/api/textures/{hash}.png` | 64×64 первый кадр (Yggdrasil) |
+| GET | `/api/textures/{hash}/full.png` | полная полоса кадров |
+| GET | `/api/csl/{ник}.json`, `/api/csl/textures/{hash}` | CustomSkinLoader (CustomSkinAPI) |
+| * | `/api/yggdrasil/...` | authlib-injector: `authserver/authenticate|refresh|validate|invalidate|signout`, `sessionserver/session/minecraft/join|hasJoined|profile/{uuid}`, `api/profiles/minecraft` |
+
+Подключение лаунчеров: Эта — вкладка «mc-ru.org» при добавлении аккаунта; остальные — `-javaagent:authlib-injector.jar=https://mc-ru.org/api/yggdrasil`; HD/анимация в игре — CustomSkinLoader с корнем `https://mc-ru.org/api/csl/`.
+
+## Локально
+```bash
+cd server
+python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt
+uvicorn app:app --reload --port 8787
+```
+Данные (`mcru.db`, `textures/`, ключи) — в `server/data/` (или `$MCRU_DATA`). Публичный адрес для ссылок на текстуры — `$MCRU_PUBLIC_URL` (по умолчанию `https://mc-ru.org`). Статику открывай через любой сервер, который проксирует `/api/` на 8787 и отдаёт `account.html` по `/account`.
+
+## На VPS, где сайт уже стоит (root /opt/minesite, конфиг /etc/nginx/sites-available/mc-ru.org)
+Один раз:
+```bash
+apt install -y python3-venv rsync
+mkdir -p /opt/mc-ru-api /var/lib/mc-ru
+rsync -a --delete /opt/minesite/server/ /opt/mc-ru-api/server/
+python3 -m venv /opt/mc-ru-api/venv
+/opt/mc-ru-api/venv/bin/pip install -r /opt/mc-ru-api/server/requirements.txt
+chown -R www-data:www-data /var/lib/mc-ru
+cp /opt/mc-ru-api/server/mc-ru-api.service /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now mc-ru-api
+curl -s 127.0.0.1:8787/api/health
+```
+В nginx внутри блока `server { listen 443 ... }` для mc-ru.org добавь содержимое `server/nginx-api.conf` (`location /api/` → `127.0.0.1:8787`, `location = /account` → `account.html`), затем:
+```bash
+nginx -t && systemctl reload nginx
+```
+Обновление после `git pull` / распаковки нового zip в `/opt/minesite`:
+```bash
+rsync -a --delete /opt/minesite/server/ /opt/mc-ru-api/server/
+/opt/mc-ru-api/venv/bin/pip install -q -r /opt/mc-ru-api/server/requirements.txt
+systemctl restart mc-ru-api
+```
+Логи: `journalctl -u mc-ru-api -f`. Бэкап = папка `/var/lib/mc-ru` (база, текстуры, ключ подписи — его терять нельзя, иначе клиенты перестанут верить скинам).
+
+`deploy.sh` на чистом сервере делает всё это сам (включая крон-обновление, которое перезапускает API при изменении `server/`).
 
 ---
 
@@ -21,7 +88,7 @@ Pterodactyl-панель (где Velocity, Lobby и т.п.) под сайт не
 ```bash
 curl -fsSL https://raw.githubusercontent.com/tearsmilk/honoka/main/deploy.sh | bash
 ```
-Скрипт `deploy.sh` ставит nginx и certbot, клонирует сайт в `/var/www/mc-ru`, пишет конфиг, выпускает HTTPS и вешает автообновление из GitHub на крон. Если DNS ещё не доехал, скрипт поднимет сайт по http и скажет, какую команду запустить для HTTPS позже.
+Скрипт `deploy.sh` ставит nginx и certbot, клонирует сайт в `/var/www/mc-ru`, поднимает API аккаунтов в `/opt/mc-ru-api` (systemd `mc-ru-api`), пишет конфиг, выпускает HTTPS и вешает автообновление из GitHub на крон. Если DNS ещё не доехал, скрипт поднимет сайт по http и скажет, какую команду запустить для HTTPS позже.
 
 ### Ручной путь
 
@@ -84,6 +151,8 @@ cd /var/www/mc-ru && git pull
 ```bash
 echo "*/5 * * * * cd /var/www/mc-ru && git pull -q" | crontab -
 ```
+
+Для аккаунтов и скинов нужен ещё бэкенд — см. раздел выше; на вариантах B и C (без своего сервера) он работать не будет, сайт останется просто страницей.
 
 ## Вариант B. Обычный веб-хостинг (панель ISPmanager / cPanel / Beget / Timeweb и т.п.)
 

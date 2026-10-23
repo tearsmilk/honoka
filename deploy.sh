@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Разворачивает mc-ru.org на чистом Ubuntu/Debian VPS: nginx + сайт + HTTPS.
+# Разворачивает mc-ru.org на чистом Ubuntu/Debian VPS: nginx + сайт + API (аккаунты, скины) + HTTPS.
 # Запуск от root:  bash deploy.sh
 set -euo pipefail
 
@@ -7,13 +7,15 @@ DOMAIN="mc-ru.org"
 REPO="https://github.com/tearsmilk/honoka.git"
 BRANCH="${BRANCH:-main}"
 WEBROOT="/var/www/mc-ru"
+APIDIR="/opt/mc-ru-api"
+APIDATA="/var/lib/mc-ru"
 EMAIL="${EMAIL:-}"   # для Let's Encrypt, можно оставить пустым
 
 [ "$(id -u)" = 0 ] || { echo "Запусти от root: sudo bash deploy.sh"; exit 1; }
 
 echo "==> Ставлю nginx, git, certbot"
 apt-get update -q
-DEBIAN_FRONTEND=noninteractive apt-get install -y -q nginx git certbot python3-certbot-nginx
+DEBIAN_FRONTEND=noninteractive apt-get install -y -q nginx git rsync certbot python3-certbot-nginx python3-venv python3-pip
 
 echo "==> Клонирую сайт в $WEBROOT"
 if [ -d "$WEBROOT/.git" ]; then
@@ -23,6 +25,18 @@ else
   git clone -q -b "$BRANCH" "$REPO" "$WEBROOT"
 fi
 chown -R www-data:www-data "$WEBROOT"
+
+echo "==> Ставлю API (аккаунты, скины, плащи) в $APIDIR"
+mkdir -p "$APIDIR" "$APIDATA"
+rsync -a --delete "$WEBROOT/server/" "$APIDIR/server/" 2>/dev/null || { rm -rf "$APIDIR/server"; cp -r "$WEBROOT/server" "$APIDIR/server"; }
+[ -d "$APIDIR/venv" ] || python3 -m venv "$APIDIR/venv"
+"$APIDIR/venv/bin/pip" install -q --upgrade pip
+"$APIDIR/venv/bin/pip" install -q -r "$APIDIR/server/requirements.txt"
+chown -R www-data:www-data "$APIDATA"
+cp "$APIDIR/server/mc-ru-api.service" /etc/systemd/system/mc-ru-api.service
+systemctl daemon-reload
+systemctl enable --now mc-ru-api
+systemctl restart mc-ru-api
 
 echo "==> Пишу конфиг nginx"
 cat > /etc/nginx/sites-available/$DOMAIN <<NGINX
@@ -37,12 +51,27 @@ server {
         try_files \$uri \$uri/ =404;
     }
 
+    location = /account {
+        try_files /account.html =404;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8787/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        client_max_body_size 8m;
+    }
+
     location ~* \.(css|js|svg|png|jpg|webp|woff2)\$ {
         expires 7d;
         add_header Cache-Control "public";
     }
 
     location ~ /\.(git|github) { deny all; }
+    location /server/ { deny all; }
 }
 NGINX
 ln -sf /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/$DOMAIN
@@ -69,8 +98,20 @@ else
   certbot --nginx -n --agree-tos --register-unsafely-without-email --redirect -d "$DOMAIN" -d "www.$DOMAIN"
 fi
 
-echo "==> Автообновление сайта из GitHub раз в 5 минут"
-( crontab -l 2>/dev/null | grep -v "$WEBROOT"; echo "*/5 * * * * git -C $WEBROOT pull -q" ) | crontab -
+echo "==> Автообновление сайта из GitHub раз в 5 минут (API перезапускается, если изменился server/)"
+cat > /usr/local/bin/mc-ru-update <<UPD
+#!/usr/bin/env bash
+cd $WEBROOT || exit 1
+before=\$(git rev-parse HEAD)
+git pull -q || exit 1
+if ! git diff --quiet "\$before" HEAD -- server/; then
+  rsync -a --delete $WEBROOT/server/ $APIDIR/server/
+  $APIDIR/venv/bin/pip install -q -r $APIDIR/server/requirements.txt
+  systemctl restart mc-ru-api
+fi
+UPD
+chmod +x /usr/local/bin/mc-ru-update
+( crontab -l 2>/dev/null | grep -v "$WEBROOT" | grep -v mc-ru-update; echo "*/5 * * * * /usr/local/bin/mc-ru-update" ) | crontab -
 
 echo
 echo "Готово: https://$DOMAIN"
