@@ -973,6 +973,12 @@ async def launcher_version():
             "macos": d["macos"]["url"] if d["macos"] else None}
 
 
+@app.get("/api/launcher/mod")
+async def launcher_mod():
+    """Системный мод rurukaSuka для лаунчера: версия, поддерживаемые версии игры, ссылка на jar."""
+    return JSONResponse(launcher.mod_latest(), headers={"Cache-Control": "public, max-age=300"})
+
+
 @app.get("/api/launcher/download/{platform}")
 async def launcher_download(platform: str):
     if platform not in config.LAUNCHER_FILES:
