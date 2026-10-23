@@ -3,6 +3,7 @@
 (скин) / 64×32 (плащ) для ванильного клиента через Yggdrasil."""
 import hashlib
 import io
+import json
 
 from PIL import Image, ImageSequence
 
@@ -158,6 +159,47 @@ def store_server_icon(data: bytes, owner_id: int):
     (config.TEXTURES / f"{h}.std.png").write_bytes(raw)
     db.save_texture(h, "server_icon", owner_id, 64, 64, 1, 1, False)
     return h
+
+
+def store_bbmodel(data: bytes, owner_id: int) -> str:
+    """Модель косметики Blockbench (.bbmodel = JSON) → textures/<sha256>.bbmodel."""
+    if len(data) > config.MAX_UPLOAD:
+        raise TextureError("Файл больше 8 МБ")
+    try:
+        doc = json.loads(data.decode("utf-8"))
+        if not isinstance(doc, dict) or "elements" not in doc and "outliner" not in doc:
+            raise ValueError
+    except (ValueError, UnicodeDecodeError) as e:
+        raise TextureError("Модель должна быть файлом .bbmodel из Blockbench") from e
+    h = hashlib.sha256(data).hexdigest()
+    config.ensure_dirs()
+    (config.TEXTURES / f"{h}.bbmodel").write_bytes(data)
+    db.save_texture(h, "bbmodel", owner_id, 0, 0, 1, 1, False)
+    return h
+
+
+def store_png(data: bytes, kind: str, owner_id: int) -> str:
+    """Произвольный PNG как есть (текстура варианта косметики) → textures/<sha256>.png."""
+    if len(data) > config.MAX_UPLOAD:
+        raise TextureError("Файл больше 8 МБ")
+    try:
+        im = Image.open(io.BytesIO(data))
+        im.load()
+    except Exception as e:
+        raise TextureError("Не удалось прочитать изображение — нужен PNG") from e
+    if im.format != "PNG":
+        raise TextureError("Текстура варианта должна быть PNG")
+    h = hashlib.sha256(data).hexdigest()
+    config.ensure_dirs()
+    (config.TEXTURES / f"{h}.png").write_bytes(data)
+    (config.TEXTURES / f"{h}.std.png").write_bytes(data)
+    db.save_texture(h, kind, owner_id, im.width, im.height, 1, 1, False)
+    return h
+
+
+def bbmodel_path(h: str):
+    p = config.TEXTURES / f"{h}.bbmodel"
+    return p if h and p.exists() else None
 
 
 _default = {}

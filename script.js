@@ -73,6 +73,13 @@ const mcru = {
     flush();
     return out;
   },
+  // валюта гардероба: 1 рур, 2 рура, 5 руров
+  rurs(n) {
+    n = Math.abs(Math.trunc(+n || 0));
+    const m10 = n % 10, m100 = n % 100;
+    const w = (m100 >= 11 && m100 <= 14) ? 'руров' : m10 === 1 ? 'рур' : (m10 >= 2 && m10 <= 4) ? 'рура' : 'руров';
+    return `${n.toLocaleString('ru-RU')} ${w}`;
+  },
   userChip(user) {
     const admin = user.is_admin ? `<a class="btn btn--small btn--admin" href="/admin" title="Админка">Админка</a>` : '';
     return `${admin}<a class="userchip" href="/account" title="Личный кабинет">${headHtml(user.username, 28)}<span>${user.username}</span></a>`;

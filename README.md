@@ -53,8 +53,56 @@
 | PUT / DELETE | `/api/admin/servers/{id}` | изменить (любое подмножество полей) / удалить |
 | POST / DELETE | `/api/admin/servers/{id}/icon` | multipart `file` → иконка / убрать |
 | POST | `/api/admin/servers/reorder` | `{ids:[…]}` — новый порядок |
-| GET | `/api/admin/users?q=&limit=` | поиск пользователей |
+| GET | `/api/admin/users?q=&limit=` | поиск пользователей (с балансом руров и номером в моде) |
 | POST | `/api/admin/users/{ник}/admin` | `{is_admin: true\|false}` |
+
+## Косметика rurukaSuka (гардероб, руры, друзья)
+
+Бэкенд клиентского Fabric-мода **rurukaSuka** (бывший сайт onii.ink) живёт здесь же: мод ходит на `https://mc-ru.org`. Аккаунт один на сайт, лаунчер Эта и мод — лаунчер при запуске сам кладёт мод в сборку и записывает токен входа, так что в игре гардероб уже открыт.
+
+- **Руры** — валюта гардероба (1 рур, 2 рура, 5 руров), поле `balance` у пользователя; начисляют админы (`/admin` → «Руры»).
+- **Косметика** (`/admin` → «Косметика»): название, категория (`hats wings back pets arms legs auras costumes`), цена, модель `.bbmodel` (Blockbench), масштаб и сдвиг X/Y/Z, порядок, флаг «показывать»; **варианты** — PNG-перекраски. Файлы хранятся в `textures/` по sha256 (`.bbmodel` и `.png`).
+- В кабинете (`/account` → «Руры и гардероб») игрок видит баланс, свой номер в моде и купленное; покупка/примерка — в игре.
+
+API мода (контракт `SiteApi.java`; ссылки **относительные** — мод подставляет `SITE_URL`; ошибки `{"error": код}`: `invalid_credentials`, `insufficient_funds`, `already_owned`, `unauthorized`, `not_found`, `not_owned`, `bad_variant`):
+
+| Метод | Путь | Что |
+|---|---|---|
+| POST | `/api/login` | `{email, password}` (e-mail или ник) → `{token, uuid, nick, balance, skin, skin_model, owned, equipped, variants}`; токен тот же JWT, что у сайта и лаунчера |
+| GET | `/api/me` | то же без `token` (Bearer) |
+| GET | `/api/cosmetics` | `{cosmetics:[{id,name,category,price,scale,off_x,off_y,off_z,variants:[{id,name,texture_url}]}]}` — только включённые |
+| GET | `/api/cosmetics/{id}/model`, `/api/variants/{id}/texture` | `.bbmodel` / PNG |
+| POST | `/api/purchase` | `{cosmetic_id}` → `{balance, owned}` |
+| POST | `/api/equip` | `{cosmetic_id, equipped}` → `{equipped}` (один слот на категорию) |
+| POST | `/api/variant` | `{cosmetic_id, variant_id?}` → `{variants}` |
+| GET | `/api/equipped/{ник}` | что надето у игрока (ник сайта или ник лицензии): `{nick, uuid, skin, skin_model, equipped:[{id,category,variant_id,model_url}]}` |
+| GET | `/api/friends` | `{friends, incoming, outgoing}` — `[{id, nick}]` |
+| POST | `/api/friends/request` / `accept` / `remove` | `{nick}` / `{user_id}` / `{user_id}` |
+| GET / POST | `/api/messages?with=&after=` / `/api/messages` | `{messages:[{id, from, text, ts}]}` / `{to, text}` → `{id}` (только между друзьями, до 500 символов) |
+| GET | `/api/account/wardrobe` | для кабинета: `{balance, public_id, owned:[{id,name,category,equipped,variant_id}]}` |
+| GET / POST | `/api/admin/cosmetics` | каталог целиком / создать (`{name, category, price, scale, off_x, off_y, off_z, sort, enabled}`) |
+| PUT / DELETE | `/api/admin/cosmetics/{id}` | изменить / удалить (вместе с покупками) |
+| POST | `/api/admin/cosmetics/{id}/model`, `/api/admin/cosmetics/{id}/variants` | multipart `file` (+ `name` для варианта) |
+| DELETE | `/api/admin/variants/{id}` | убрать вариант |
+| POST | `/api/admin/cosmetics/reorder` | `{ids:[…]}` |
+| POST | `/api/admin/users/{ник}/balance` | `{delta}` — начислить / списать руры |
+
+`id` игрока в API мода (`uuid` = семь цифр, `from`, `user_id`) — старый номер с onii.ink для переехавших и обычный id для новых.
+
+### Переезд с onii.ink (rurukaSuka)
+
+1. На **старом** сервере, в папке сайта (`/opt/cutiemi`), с его `DATABASE_URL`:
+   ```bash
+   DATABASE_URL=postgresql+psycopg://cutiemi:ПАРОЛЬ@localhost/cutiemi python3 /opt/minesite/server/tools/export_cutiemi.py --data /opt/cutiemi/data --out /root/cutiemi-export.json
+   ```
+   (скрипт — один файл, stdlib + psycopg, который у сайта уже есть; скопируй его на старый сервер любым способом). Получится JSON с пользователями, паролями (старые pbkdf2-хэши), скинами, косметикой, вариантами и покупками.
+2. Перенеси файл на mc-ru.org и импортируй:
+   ```bash
+   systemctl stop mc-ru-api
+   MCRU_DATA=/var/lib/mc-ru /opt/mc-ru-api/venv/bin/python /opt/mc-ru-api/server/tools/import_cutiemi.py /root/cutiemi-export.json
+   chown -R www-data:www-data /var/lib/mc-ru && systemctl start mc-ru-api
+   ```
+   Ник на сайте = «свой» ник со старого сайта (иначе ник лицензии, иначе `user<номер>`); e-mail, баланс, скин, номер, купленное и надетое сохраняются; старый пароль работает и при первом входе перехэшируется. Повторный запуск ничего не дублирует.
 
 ## Лаунчер на сайте
 

@@ -6,7 +6,7 @@ import re
 import time
 import uuid
 
-from fastapi import Depends, FastAPI, File, Form, Header, Request, Response, UploadFile
+from fastapi import Depends, FastAPI, File, Form, Header, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
@@ -56,6 +56,9 @@ def user_json(u, private=False):
     if private:
         d["email"] = u["email"]
         d["is_admin"] = db.is_admin(u)
+        d["balance"] = u["balance"]
+        d["public_id"] = db.public_id(u)
+        d["mc_license_nick"] = u["mc_license_nick"]
     return d
 
 
@@ -114,7 +117,16 @@ async def register(req: Request):
 
 def _login(login, pw):
     u = db.user_by_login((login or "").strip())
-    if not u or not security.check_password(pw or "", u["password_hash"]):
+    if not u:
+        return None
+    pw = pw or ""
+    if u["password_hash"]:
+        if not security.check_password(pw, u["password_hash"]):
+            return None
+    elif security.check_legacy_password(pw, u["legacy_password"]):
+        # аккаунт переехал с onii.ink: первый вход — пароль перехэшируем в bcrypt
+        db.update_user(u["id"], password_hash=security.hash_password(pw), legacy_password=None)
+    else:
         return None
     db.update_user(u["id"], last_login=time.time())
     return u
@@ -540,8 +552,24 @@ async def admin_server_icon_delete(sid: int, _=Depends(admin_user)):
 async def admin_users(q: str = "", limit: int = 50, _=Depends(admin_user)):
     return {"users": [{"username": x["username"], "email": x["email"], "created": x["created"],
                        "last_login": x["last_login"], "has_skin": bool(x["skin_hash"]), "has_cape": bool(x["cape_hash"]),
-                       "is_admin": db.is_admin(x), "env_admin": x["username"].lower() in config.ADMINS}
+                       "is_admin": db.is_admin(x), "env_admin": x["username"].lower() in config.ADMINS,
+                       "balance": x["balance"], "public_id": db.public_id(x), "mc_license_nick": x["mc_license_nick"]}
                       for x in db.search_users(q.strip(), limit)]}
+
+
+@app.post("/api/admin/users/{name}/balance")
+async def admin_user_balance(name: str, req: Request, _=Depends(admin_user)):
+    target = _user_or_404(name)
+    d = await body(req)
+    try:
+        delta = int(d.get("delta"))
+    except (TypeError, ValueError):
+        raise ApiError("delta: целое число руров (отрицательное — списать)")
+    if abs(delta) > 1_000_000:
+        raise ApiError("За раз — не больше миллиона руров")
+    if target["balance"] + delta < 0:
+        raise ApiError(f"У игрока только {target['balance']} руров, в минус нельзя")
+    return {"username": target["username"], "balance": db.add_balance(target["id"], delta)}
 
 
 @app.post("/api/admin/users/{name}/admin")
@@ -553,6 +581,371 @@ async def admin_user_flag(name: str, req: Request, me=Depends(admin_user)):
         raise ApiError("Нельзя снять права с самого себя")
     db.update_user(target["id"], is_admin=flag)
     return {"username": target["username"], "is_admin": db.is_admin(db.user_by_id(target["id"]))}
+
+
+# ============================================================ rurukaSuka: косметика, гардероб, друзья (API мода)
+# Формы ответов — контракт SiteApi.java мода: ссылки относительные (мод сам подставляет SITE_URL), коды ошибок
+# invalid_credentials / insufficient_funds / already_owned / unauthorized / not_found.
+
+class ModError(Exception):
+    def __init__(self, code, status=400, **extra):
+        self.code, self.status, self.extra = code, status, extra
+
+
+@app.exception_handler(ModError)
+async def _mod_err(_, e: ModError):
+    return JSONResponse({"error": e.code, **e.extra}, status_code=e.status)
+
+
+def _mod_user_or_401(authorization):
+    if not authorization.lower().startswith("bearer "):
+        raise ModError("unauthorized", 401)
+    uid = security.read_jwt(authorization[7:].strip())
+    u = db.user_by_id(uid) if uid else None
+    if not u:
+        raise ModError("unauthorized", 401)
+    return u
+
+
+async def mod_user(authorization: str = Header(default="")):
+    return _mod_user_or_401(authorization)
+
+
+def mod_uuid(u):
+    return f"{db.public_id(u):07d}"
+
+
+def _skin_rel(u):
+    return f"/api/users/{u['username']}/skin.png?frame=0" if u["skin_hash"] else None
+
+
+def mod_profile(u):
+    own = db.ownership(u["id"])
+    return {"uuid": mod_uuid(u), "nick": u["username"], "balance": u["balance"], "skin": _skin_rel(u),
+            "skin_model": "slim" if u["model"] == "slim" else "wide",
+            "owned": [o["cosmetic_id"] for o in own], "equipped": [o["cosmetic_id"] for o in own if o["equipped"]],
+            "variants": {str(o["cosmetic_id"]): o["variant_id"] for o in own if o["variant_id"]}}
+
+
+def cosmetic_json(c, admin=False):
+    d = {"id": c["id"], "name": c["name"], "category": c["category"], "price": c["price"], "scale": c["scale"],
+         "off_x": c["off_x"], "off_y": c["off_y"], "off_z": c["off_z"],
+         "variants": [{"id": v["id"], "name": v["name"], "texture_url": f"/api/variants/{v['id']}/texture"}
+                      for v in db.variants(c["id"])]}
+    if admin:
+        d.update(sort=c["sort"], enabled=bool(c["enabled"]), has_model=bool(c["model_hash"]),
+                 model_url=f"/api/cosmetics/{c['id']}/model" if c["model_hash"] else None, legacy_id=c["legacy_id"])
+    return d
+
+
+@app.post("/api/login")
+async def mod_login(req: Request):
+    if not auth_limit.hit(("login", _ip(req))):
+        raise ModError("Слишком много попыток, подождите 10 минут", 429)
+    d = await body(req)
+    u = _login(d.get("email") or d.get("login") or d.get("username"), d.get("password"))
+    if not u:
+        raise ModError("invalid_credentials", 401)
+    return {"token": security.make_jwt(u["id"]), **mod_profile(u)}
+
+
+@app.get("/api/me")
+async def mod_me(u=Depends(mod_user)):
+    return mod_profile(u)
+
+
+@app.get("/api/cosmetics")
+async def mod_cosmetics():
+    return {"cosmetics": [cosmetic_json(c) for c in db.cosmetics(only_enabled=True)]}
+
+
+@app.get("/api/cosmetics/{cid}/model")
+async def mod_cosmetic_model(cid: int):
+    c = db.cosmetic(cid)
+    p = textures.bbmodel_path(c["model_hash"]) if c else None
+    if not p:
+        raise ModError("not_found", 404)
+    return FileResponse(p, media_type="application/json", filename=f"{cid}.bbmodel",
+                        headers={"Cache-Control": "public, max-age=3600"})
+
+
+@app.get("/api/variants/{vid}/texture")
+async def mod_variant_texture(vid: int):
+    v = db.variant(vid)
+    p = textures.path(v["texture_hash"]) if v else None
+    if not p:
+        raise ModError("not_found", 404)
+    return _png(p.read_bytes(), cache=3600)
+
+
+def _cid(d):
+    try:
+        return int(d.get("cosmetic_id"))
+    except (TypeError, ValueError):
+        raise ModError("not_found", 404)
+
+
+def _owned_or_403(u, cid):
+    o = db.owned(u["id"], cid)
+    if not o:
+        raise ModError("not_owned", 403)
+    return o
+
+
+@app.post("/api/purchase")
+async def mod_purchase(req: Request, u=Depends(mod_user)):
+    d = await body(req)
+    c = db.cosmetic(_cid(d))
+    if not c or not c["enabled"]:
+        raise ModError("not_found", 404)
+    if db.owned(u["id"], c["id"]):
+        raise ModError("already_owned", 409, balance=u["balance"])
+    if u["balance"] < c["price"]:
+        raise ModError("insufficient_funds", 402, balance=u["balance"])
+    balance = db.add_balance(u["id"], -c["price"])
+    db.add_ownership(u["id"], c["id"])
+    return {"ok": True, "balance": balance, "owned": [o["cosmetic_id"] for o in db.ownership(u["id"])]}
+
+
+@app.post("/api/equip")
+async def mod_equip(req: Request, u=Depends(mod_user)):
+    d = await body(req)
+    cid = _cid(d)
+    _owned_or_403(u, cid)
+    db.set_equipped(u["id"], cid, bool(d.get("equipped")))
+    return {"ok": True, "equipped": [o["cosmetic_id"] for o in db.ownership(u["id"]) if o["equipped"]]}
+
+
+@app.post("/api/variant")
+async def mod_variant(req: Request, u=Depends(mod_user)):
+    d = await body(req)
+    cid = _cid(d)
+    _owned_or_403(u, cid)
+    try:
+        vid = int(d.get("variant_id") or 0) or None
+    except (TypeError, ValueError):
+        raise ModError("bad_variant", 400)
+    if vid:
+        v = db.variant(vid)
+        if not v or v["cosmetic_id"] != cid:
+            raise ModError("bad_variant", 400)
+    db.set_variant(u["id"], cid, vid)
+    return {"ok": True, "variants": mod_profile(u)["variants"]}
+
+
+@app.get("/api/equipped/{nick}")
+async def mod_equipped(nick: str):
+    """Что надето у игрока — чтобы другие игроки с модом видели его косметику."""
+    u = db.user_by_any_nick(nick.strip())
+    if not u:
+        return {"nick": nick, "equipped": []}
+    eq = [o for o in db.ownership(u["id"]) if o["equipped"]]
+    return {"nick": u["username"], "uuid": mod_uuid(u), "skin": _skin_rel(u),
+            "skin_model": "slim" if u["model"] == "slim" else "wide",
+            "equipped": [{"id": o["cosmetic_id"], "category": o["category"], "variant_id": o["variant_id"],
+                          "model_url": f"/api/cosmetics/{o['cosmetic_id']}/model"} for o in eq]}
+
+
+# ---- друзья и чат
+
+def _friend_json(x):
+    return {"id": db.public_id(x), "nick": x["username"]}
+
+
+def _other_or_404(d):
+    o = db.user_by_public_id(d.get("user_id"))
+    if not o:
+        raise ModError("not_found", 404)
+    return o
+
+
+@app.get("/api/friends")
+async def mod_friends(u=Depends(mod_user)):
+    acc, inc, out = db.friends_of(u["id"])
+    return {"friends": [_friend_json(x) for x in acc], "incoming": [_friend_json(x) for x in inc],
+            "outgoing": [_friend_json(x) for x in out]}
+
+
+@app.post("/api/friends/request")
+async def mod_friend_request(req: Request, u=Depends(mod_user)):
+    d = await body(req)
+    o = db.user_by_any_nick(str(d.get("nick", "")).strip())
+    if not o:
+        raise ModError("Игрок с таким ником не найден", 404)
+    if o["id"] == u["id"]:
+        raise ModError("Себя в друзья добавить нельзя", 400)
+    r = db.friend_row(u["id"], o["id"])
+    if r and r["status"] == "accepted":
+        raise ModError("Вы уже друзья", 409)
+    if r and r["user_id"] == o["id"]:   # он уже звал нас — принимаем
+        db.accept_friend(u["id"], o["id"])
+    elif not r:
+        db.request_friend(u["id"], o["id"])
+    return {"ok": True}
+
+
+@app.post("/api/friends/accept")
+async def mod_friend_accept(req: Request, u=Depends(mod_user)):
+    o = _other_or_404(await body(req))
+    r = db.friend_row(u["id"], o["id"])
+    if not r or r["status"] != "pending" or r["friend_id"] != u["id"]:
+        raise ModError("Заявки от этого игрока нет", 404)
+    db.accept_friend(u["id"], o["id"])
+    return {"ok": True}
+
+
+@app.post("/api/friends/remove")
+async def mod_friend_remove(req: Request, u=Depends(mod_user)):
+    o = _other_or_404(await body(req))
+    db.remove_friend(u["id"], o["id"])
+    return {"ok": True}
+
+
+def _message_json(m):
+    sender = db.user_by_id(m["from_id"])
+    return {"id": m["id"], "from": db.public_id(sender) if sender else m["from_id"], "text": m["text"], "ts": m["ts"]}
+
+
+@app.get("/api/messages")
+async def mod_messages(with_: str = Query(default="", alias="with"), after: int = 0, u=Depends(mod_user)):
+    o = db.user_by_public_id(with_)
+    if not o:
+        raise ModError("not_found", 404)
+    if not db.are_friends(u["id"], o["id"]):
+        raise ModError("Писать можно только друзьям", 403)
+    return {"messages": [_message_json(m) for m in db.messages(u["id"], o["id"], after)]}
+
+
+@app.post("/api/messages")
+async def mod_message_send(req: Request, u=Depends(mod_user)):
+    d = await body(req)
+    o = db.user_by_public_id(d.get("to"))
+    if not o:
+        raise ModError("not_found", 404)
+    if not db.are_friends(u["id"], o["id"]):
+        raise ModError("Писать можно только друзьям", 403)
+    text = str(d.get("text", "")).strip()
+    if not text:
+        raise ModError("Пустое сообщение", 400)
+    if len(text) > 500:
+        raise ModError("Сообщение длиннее 500 символов", 400)
+    return {"id": db.add_message(u["id"], o["id"], text)["id"]}
+
+
+# ---- кабинет: гардероб (только посмотреть; надевают в игре)
+
+@app.get("/api/account/wardrobe")
+async def account_wardrobe(u=Depends(current_user)):
+    own = db.ownership(u["id"])
+    return {"balance": u["balance"], "public_id": db.public_id(u),
+            "owned": [{"id": o["cosmetic_id"], "name": o["name"], "category": o["category"],
+                       "equipped": bool(o["equipped"]), "variant_id": o["variant_id"]} for o in own]}
+
+
+# ---- админка: каталог косметики
+
+def _cosmetic_fields(d, partial=False):
+    out = {}
+    if "name" in d or not partial:
+        name = str(d.get("name", "")).strip()
+        if not 1 <= len(name) <= 64:
+            raise ApiError("Название: от 1 до 64 символов")
+        out["name"] = name
+    if "category" in d or not partial:
+        cat = str(d.get("category", "")).strip().lower()
+        if cat not in db.CATEGORIES:
+            raise ApiError("Категория: " + ", ".join(db.CATEGORIES))
+        out["category"] = cat
+    if "price" in d or not partial:
+        try:
+            price = int(d.get("price") or 0)
+        except (TypeError, ValueError):
+            raise ApiError("Цена должна быть числом")
+        if not 0 <= price <= 1_000_000:
+            raise ApiError("Цена: от 0 до 1 000 000 руров")
+        out["price"] = price
+    for k, lo, hi in (("scale", 0.05, 20.0), ("off_x", -64.0, 64.0), ("off_y", -64.0, 64.0), ("off_z", -64.0, 64.0)):
+        if k in d:
+            try:
+                v = float(d.get(k))
+            except (TypeError, ValueError):
+                raise ApiError(f"{k}: число")
+            out[k] = max(lo, min(hi, v))
+    if "sort" in d:
+        try:
+            out["sort"] = int(d.get("sort") or 0)
+        except (TypeError, ValueError):
+            raise ApiError("Порядок должен быть числом")
+    if "enabled" in d:
+        out["enabled"] = 1 if d.get("enabled") in (True, 1, "1", "true", "on") else 0
+    return out
+
+
+def _cosmetic_or_404(cid):
+    c = db.cosmetic(cid)
+    if not c:
+        raise ApiError("Косметика не найдена", 404)
+    return c
+
+
+@app.get("/api/admin/cosmetics")
+async def admin_cosmetics(_=Depends(admin_user)):
+    return {"cosmetics": [cosmetic_json(c, admin=True) for c in db.cosmetics(only_enabled=False)]}
+
+
+@app.post("/api/admin/cosmetics")
+async def admin_cosmetic_create(req: Request, _=Depends(admin_user)):
+    return cosmetic_json(db.create_cosmetic(**_cosmetic_fields(await body(req))), admin=True)
+
+
+@app.put("/api/admin/cosmetics/{cid}")
+async def admin_cosmetic_update(cid: int, req: Request, _=Depends(admin_user)):
+    _cosmetic_or_404(cid)
+    return cosmetic_json(db.update_cosmetic(cid, **_cosmetic_fields(await body(req), partial=True)), admin=True)
+
+
+@app.delete("/api/admin/cosmetics/{cid}")
+async def admin_cosmetic_delete(cid: int, _=Depends(admin_user)):
+    _cosmetic_or_404(cid)
+    db.delete_cosmetic(cid)
+    return {"ok": True}
+
+
+@app.post("/api/admin/cosmetics/{cid}/model")
+async def admin_cosmetic_model(cid: int, file: UploadFile = File(...), u=Depends(admin_user)):
+    _cosmetic_or_404(cid)
+    h = textures.store_bbmodel(await file.read(), u["id"])
+    return cosmetic_json(db.update_cosmetic(cid, model_hash=h), admin=True)
+
+
+@app.post("/api/admin/cosmetics/{cid}/variants")
+async def admin_variant_create(cid: int, file: UploadFile = File(...), name: str = Form(default=""),
+                               u=Depends(admin_user)):
+    _cosmetic_or_404(cid)
+    name = name.strip()[:64] or "variant"
+    h = textures.store_png(await file.read(), "variant", u["id"])
+    db.create_variant(cid, name, h)
+    return cosmetic_json(db.cosmetic(cid), admin=True)
+
+
+@app.delete("/api/admin/variants/{vid}")
+async def admin_variant_delete(vid: int, _=Depends(admin_user)):
+    v = db.variant(vid)
+    if not v:
+        raise ApiError("Вариант не найден", 404)
+    db.delete_variant(vid)
+    return cosmetic_json(db.cosmetic(v["cosmetic_id"]), admin=True)
+
+
+@app.post("/api/admin/cosmetics/reorder")
+async def admin_cosmetics_reorder(req: Request, _=Depends(admin_user)):
+    d = await body(req)
+    ids = d.get("ids")
+    if not isinstance(ids, list) or not all(isinstance(i, int) for i in ids):
+        raise ApiError("ids: список чисел")
+    for i, cid in enumerate(ids):
+        db.update_cosmetic(cid, sort=i)
+    return {"cosmetics": [cosmetic_json(c, admin=True) for c in db.cosmetics(only_enabled=False)]}
 
 
 # ============================================================ launcher downloads
@@ -596,4 +989,5 @@ async def launcher_download(platform: str):
 @app.get("/api/health")
 async def health():
     return {"ok": True, "users": db.one("SELECT COUNT(*) AS n FROM users")["n"],
-            "servers": db.one("SELECT COUNT(*) AS n FROM servers WHERE enabled=1")["n"]}
+            "servers": db.one("SELECT COUNT(*) AS n FROM servers WHERE enabled=1")["n"],
+            "cosmetics": db.one("SELECT COUNT(*) AS n FROM cosmetics WHERE enabled=1")["n"]}

@@ -112,6 +112,22 @@
   }
   render();
 
+  // ---------- гардероб ----------
+  const CATS = { hats: 'Шапки', wings: 'Крылья', back: 'Спина', pets: 'Питомцы', arms: 'Руки', legs: 'Ноги', auras: 'Ауры', costumes: 'Костюмы' };
+  async function loadWardrobe() {
+    try {
+      const w = await mcru.api('/account/wardrobe');
+      $('[data-balance]').textContent = mcru.rurs(w.balance);
+      $('[data-public-id]').textContent = String(w.public_id).padStart(7, '0');
+      const lic = $('[data-license-nick]');
+      if (user.mc_license_nick) { lic.hidden = false; lic.querySelector('b').textContent = user.mc_license_nick; }
+      $('[data-wardrobe]').innerHTML = w.owned.length ? w.owned.map(c => `<div class="ward__item ${c.equipped ? 'ward__item--on' : ''}">
+        <span class="ward__cat">${mcru.esc(CATS[c.category] || c.category)}</span><b>${mcru.esc(c.name)}</b>${c.equipped ? '<span class="badge badge--anim">надето</span>' : ''}</div>`).join('')
+        : '<p class="form__hint">Косметики пока нет — загляни в гардероб в игре.</p>';
+    } catch (ex) { $('[data-wardrobe]').innerHTML = `<p class="form__err">${mcru.esc(ex.message)}</p>`; }
+  }
+  loadWardrobe();
+
   // ---------- загрузка файлов ----------
   const picked = { skin: null, cape: null };
 

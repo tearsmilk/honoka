@@ -1,4 +1,6 @@
 import base64
+import hashlib
+import hmac
 import os
 import threading
 import time
@@ -19,6 +21,16 @@ def check_password(pw: str, h: str) -> bool:
     try:
         return bcrypt.checkpw(pw.encode("utf-8"), h.encode())
     except ValueError:
+        return False
+
+
+def check_legacy_password(pw: str, stored: str | None) -> bool:
+    """Пароли со старого сайта onii.ink (rurukaSuka): hex(соль):hex(pbkdf2_sha256, 200 000 итераций)."""
+    try:
+        salt_hex, dk_hex = (stored or "").split(":")
+        dk = hashlib.pbkdf2_hmac("sha256", pw.encode("utf-8"), bytes.fromhex(salt_hex), 200_000)
+        return hmac.compare_digest(dk.hex(), dk_hex)
+    except (ValueError, AttributeError):
         return False
 
 

@@ -52,10 +52,62 @@ CREATE TABLE IF NOT EXISTS servers (
   created REAL NOT NULL,
   updated REAL NOT NULL
 );
+CREATE TABLE IF NOT EXISTS cosmetics (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('hats','wings','back','pets','arms','legs','auras','costumes')),
+  price INTEGER NOT NULL DEFAULT 0,
+  model_hash TEXT,
+  scale REAL NOT NULL DEFAULT 1.0,
+  off_x REAL NOT NULL DEFAULT 0,
+  off_y REAL NOT NULL DEFAULT 0,
+  off_z REAL NOT NULL DEFAULT 0,
+  sort INTEGER NOT NULL DEFAULT 0,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  legacy_id INTEGER,
+  created REAL NOT NULL
+);
+CREATE TABLE IF NOT EXISTS cosmetic_variants (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cosmetic_id INTEGER NOT NULL,
+  name TEXT NOT NULL,
+  texture_hash TEXT NOT NULL,
+  legacy_id INTEGER,
+  created REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS variants_cosmetic ON cosmetic_variants(cosmetic_id);
+CREATE TABLE IF NOT EXISTS ownership (
+  user_id INTEGER NOT NULL,
+  cosmetic_id INTEGER NOT NULL,
+  equipped INTEGER NOT NULL DEFAULT 0,
+  variant_id INTEGER,
+  created REAL NOT NULL,
+  UNIQUE(user_id, cosmetic_id)
+);
+CREATE TABLE IF NOT EXISTS friends (
+  user_id INTEGER NOT NULL,
+  friend_id INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pending','accepted')),
+  created REAL NOT NULL,
+  UNIQUE(user_id, friend_id)
+);
+CREATE INDEX IF NOT EXISTS friends_friend ON friends(friend_id);
+CREATE TABLE IF NOT EXISTS messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  from_id INTEGER NOT NULL,
+  to_id INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  ts INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS messages_pair ON messages(from_id, to_id, id);
 """
 
 # колонки, добавленные после первого релиза: (таблица, колонка, DDL)
-MIGRATIONS = [("users", "is_admin", "INTEGER NOT NULL DEFAULT 0")]
+MIGRATIONS = [("users", "is_admin", "INTEGER NOT NULL DEFAULT 0"),
+              ("users", "balance", "INTEGER NOT NULL DEFAULT 0"),
+              ("users", "legacy_password", "TEXT"),
+              ("users", "mc_license_nick", "TEXT"),
+              ("users", "legacy_id", "INTEGER")]
 
 _lock = threading.Lock()
 _conn = None
@@ -135,6 +187,172 @@ def search_users(text="", limit=50):
     like = f"%{text}%"
     return q("SELECT * FROM users WHERE username LIKE ? OR email LIKE ? ORDER BY created DESC LIMIT ?",
              (like, like, max(1, min(200, int(limit)))))
+
+
+def public_id(u) -> int:
+    """Число, под которым игрока видит мод (старый id с onii.ink, если он переехал)."""
+    return int(u["legacy_id"] or u["id"])
+
+
+def user_by_public_id(pid):
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return None
+    return one("SELECT * FROM users WHERE legacy_id=?", (pid,)) or \
+        one("SELECT * FROM users WHERE id=? AND legacy_id IS NULL", (pid,))
+
+
+def user_by_any_nick(nick):
+    """Ник сайта либо привязанный ник лицензии (из старого сайта)."""
+    return user_by_name(nick) or one("SELECT * FROM users WHERE mc_license_nick=? COLLATE NOCASE", (nick,))
+
+
+# ---- cosmetics (гардероб мода rurukaSuka)
+
+CATEGORIES = ("hats", "wings", "back", "pets", "arms", "legs", "auras", "costumes")
+COSMETIC_FIELDS = ("name", "category", "price", "model_hash", "scale", "off_x", "off_y", "off_z", "sort", "enabled",
+                   "legacy_id")
+
+
+def cosmetics(only_enabled=True):
+    where = "WHERE enabled=1" if only_enabled else ""
+    return q(f"SELECT * FROM cosmetics {where} ORDER BY sort, id")
+
+
+def cosmetic(cid):
+    return one("SELECT * FROM cosmetics WHERE id=?", (cid,))
+
+
+def create_cosmetic(cid=None, **fields):
+    cols = [k for k in COSMETIC_FIELDS if k in fields]
+    vals = [fields[k] for k in cols]
+    if cid is not None:
+        cols.append("id")
+        vals.append(int(cid))
+    if "sort" not in fields:
+        cols.append("sort")
+        vals.append((one("SELECT COALESCE(MAX(sort), -1) AS m FROM cosmetics")["m"] or 0) + 1)
+    q(f"INSERT INTO cosmetics({','.join(cols)},created) VALUES({','.join('?' * len(cols))},?)", (*vals, time.time()))
+    return one("SELECT * FROM cosmetics ORDER BY id DESC LIMIT 1") if cid is None else cosmetic(cid)
+
+
+def update_cosmetic(cid, **fields):
+    fields = {k: v for k, v in fields.items() if k in COSMETIC_FIELDS}
+    if fields:
+        sets = ", ".join(f"{k}=?" for k in fields)
+        q(f"UPDATE cosmetics SET {sets} WHERE id=?", (*fields.values(), cid))
+    return cosmetic(cid)
+
+
+def delete_cosmetic(cid):
+    q("DELETE FROM ownership WHERE cosmetic_id=?", (cid,))
+    q("DELETE FROM cosmetic_variants WHERE cosmetic_id=?", (cid,))
+    q("DELETE FROM cosmetics WHERE id=?", (cid,))
+
+
+def variants(cid):
+    return q("SELECT * FROM cosmetic_variants WHERE cosmetic_id=? ORDER BY id", (cid,))
+
+
+def variant(vid):
+    return one("SELECT * FROM cosmetic_variants WHERE id=?", (vid,))
+
+
+def create_variant(cid, name, texture_hash, vid=None, legacy_id=None):
+    if vid is None:
+        q("INSERT INTO cosmetic_variants(cosmetic_id,name,texture_hash,legacy_id,created) VALUES(?,?,?,?,?)",
+          (cid, name, texture_hash, legacy_id, time.time()))
+        return one("SELECT * FROM cosmetic_variants ORDER BY id DESC LIMIT 1")
+    q("INSERT INTO cosmetic_variants(id,cosmetic_id,name,texture_hash,legacy_id,created) VALUES(?,?,?,?,?,?)",
+      (vid, cid, name, texture_hash, legacy_id, time.time()))
+    return variant(vid)
+
+
+def delete_variant(vid):
+    q("UPDATE ownership SET variant_id=NULL WHERE variant_id=?", (vid,))
+    q("DELETE FROM cosmetic_variants WHERE id=?", (vid,))
+
+
+def ownership(uid):
+    return q("""SELECT o.*, c.category, c.name FROM ownership o JOIN cosmetics c ON c.id=o.cosmetic_id
+                WHERE o.user_id=? ORDER BY c.sort, c.id""", (uid,))
+
+
+def owned(uid, cid):
+    return one("SELECT * FROM ownership WHERE user_id=? AND cosmetic_id=?", (uid, cid))
+
+
+def add_ownership(uid, cid, equipped=0, variant_id=None):
+    q("INSERT OR IGNORE INTO ownership(user_id,cosmetic_id,equipped,variant_id,created) VALUES(?,?,?,?,?)",
+      (uid, cid, int(equipped), variant_id, time.time()))
+
+
+def set_equipped(uid, cid, flag):
+    if flag:   # один слот — одна косметика той же категории
+        q("""UPDATE ownership SET equipped=0 WHERE user_id=? AND cosmetic_id!=? AND cosmetic_id IN
+             (SELECT id FROM cosmetics WHERE category=(SELECT category FROM cosmetics WHERE id=?))""", (uid, cid, cid))
+    q("UPDATE ownership SET equipped=? WHERE user_id=? AND cosmetic_id=?", (1 if flag else 0, uid, cid))
+
+
+def set_variant(uid, cid, vid):
+    q("UPDATE ownership SET variant_id=? WHERE user_id=? AND cosmetic_id=?", (vid, uid, cid))
+
+
+def add_balance(uid, delta):
+    q("UPDATE users SET balance=balance+? WHERE id=?", (int(delta), uid))
+    return user_by_id(uid)["balance"]
+
+
+# ---- friends / messages
+
+def friend_row(a, b):
+    return one("SELECT * FROM friends WHERE (user_id=? AND friend_id=?) OR (user_id=? AND friend_id=?)", (a, b, b, a))
+
+
+def friends_of(uid):
+    """(accepted, incoming, outgoing) — списки пользователей."""
+    rows = q("""SELECT f.*, u.id AS uid FROM friends f JOIN users u ON u.id = CASE WHEN f.user_id=? THEN f.friend_id ELSE f.user_id END
+                WHERE f.user_id=? OR f.friend_id=? ORDER BY f.created""", (uid, uid, uid))
+    acc, inc, out = [], [], []
+    for r in rows:
+        other = user_by_id(r["uid"])
+        if not other:
+            continue
+        if r["status"] == "accepted":
+            acc.append(other)
+        elif r["user_id"] == uid:
+            out.append(other)
+        else:
+            inc.append(other)
+    return acc, inc, out
+
+
+def are_friends(a, b):
+    r = friend_row(a, b)
+    return bool(r) and r["status"] == "accepted"
+
+
+def request_friend(uid, other):
+    q("INSERT OR IGNORE INTO friends(user_id,friend_id,status,created) VALUES(?,?,'pending',?)", (uid, other, time.time()))
+
+
+def accept_friend(uid, other):
+    q("UPDATE friends SET status='accepted' WHERE user_id=? AND friend_id=? AND status='pending'", (other, uid))
+
+
+def remove_friend(uid, other):
+    q("DELETE FROM friends WHERE (user_id=? AND friend_id=?) OR (user_id=? AND friend_id=?)", (uid, other, other, uid))
+
+
+def messages(uid, other, after=0, limit=200):
+    return q("""SELECT * FROM messages WHERE id>? AND ((from_id=? AND to_id=?) OR (from_id=? AND to_id=?))
+                ORDER BY id LIMIT ?""", (int(after), uid, other, other, uid, limit))
+
+
+def add_message(uid, other, text):
+    q("INSERT INTO messages(from_id,to_id,text,ts) VALUES(?,?,?,?)", (uid, other, text, int(time.time())))
+    return one("SELECT * FROM messages ORDER BY id DESC LIMIT 1")
 
 
 # ---- servers (список серверов для лаунчера)
