@@ -41,6 +41,42 @@ const mcru = {
     try { return await mcru.api('/auth/me'); } catch { return null; }
   },
   headUrl(name, size = 64) { return `${API}/users/${encodeURIComponent(name)}/skin.png?frame=0&size=${size}`; },
+  esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); },
+  // MOTD с §-кодами Minecraft → HTML (цвета §0–§f, §l §o §n §m §k, §r сброс); текст сначала экранируется
+  motdHtml(text) {
+    const colors = { 0: '#000', 1: '#0000aa', 2: '#00aa00', 3: '#00aaaa', 4: '#aa0000', 5: '#aa00aa', 6: '#ffaa00', 7: '#aaa',
+      8: '#555', 9: '#5555ff', a: '#55ff55', b: '#55ffff', c: '#ff5555', d: '#ff55ff', e: '#ffff55', f: '#fff' };
+    let color = '', styles = new Set(), out = '', buf = '';
+    const flush = () => {
+      if (!buf) return;
+      const st = [];
+      if (color) st.push(`color:${color}`);
+      if (styles.has('l')) st.push('font-weight:700');
+      if (styles.has('o')) st.push('font-style:italic');
+      if (styles.has('n')) st.push('text-decoration:underline');
+      if (styles.has('m')) st.push('text-decoration:line-through');
+      if (styles.has('k')) st.push('opacity:.5');
+      out += st.length ? `<span style="${st.join(';')}">${mcru.esc(buf)}</span>` : mcru.esc(buf);
+      buf = '';
+    };
+    const s = String(text ?? '');
+    for (let i = 0; i < s.length; i++) {
+      if ((s[i] === '§' || s[i] === '&') && i + 1 < s.length && /[0-9a-fk-or]/i.test(s[i + 1])) {
+        const code = s[++i].toLowerCase();
+        flush();
+        if (code === 'r') { color = ''; styles.clear(); }
+        else if (colors[code]) { color = colors[code]; styles.clear(); }
+        else styles.add(code);
+      } else if (s[i] === '\n') { flush(); out += '<br>'; }
+      else buf += s[i];
+    }
+    flush();
+    return out;
+  },
+  userChip(user) {
+    const admin = user.is_admin ? `<a class="btn btn--small btn--admin" href="/admin" title="Админка">Админка</a>` : '';
+    return `${admin}<a class="userchip" href="/account" title="Личный кабинет">${headHtml(user.username, 28)}<span>${user.username}</span></a>`;
+  },
 };
 window.mcru = mcru;
 
@@ -90,7 +126,7 @@ window.headHtml = headHtml;
 function renderAuth(user) {
   if (!authBox) return;
   if (user) {
-    authBox.innerHTML = `<a class="userchip" href="/account" title="Личный кабинет">${headHtml(user.username, 28)}<span>${user.username}</span></a>`;
+    authBox.innerHTML = mcru.userChip(user);
   } else {
     authBox.innerHTML = `<button class="btn btn--small" data-open-login>Войти</button>`;
   }
@@ -152,6 +188,10 @@ if (modal) {
   });
 
   mcru.me().then(renderAuth);
+  // кнопки, ведущие на страницы «только для вошедших» (кабинет, админка)
+  document.querySelectorAll('[data-need-login]').forEach(a => a.addEventListener('click', e => {
+    if (!mcru.token()) { e.preventDefault(); sessionStorage.setItem('mcru_next', a.getAttribute('href')); openModal('login'); }
+  }));
   if (location.hash === '#login') openModal('login');
   if (location.hash === '#register') openModal('register');
   window.addEventListener('hashchange', () => {

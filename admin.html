@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админка — mc-ru.org</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="acc-body">
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img src="/assets/logo.svg" alt="" width="36" height="36">
+    <span>MC-RU.ORG</span>
+  </a>
+  <nav class="nav nav--acc">
+    <a href="/">На главную</a>
+    <a href="/account">Кабинет</a>
+    <a href="/launcher">Лаунчер</a>
+  </nav>
+  <div class="topbar__auth" data-auth></div>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<p class="adm__msg" data-loading>Загружаем админку…</p>
+<p class="adm__msg" data-denied hidden>Нет доступа. Админка только для администраторов сообщества. <a href="/">На главную</a></p>
+
+<main class="adm" data-adm hidden>
+  <h1 class="adm__title">Админка</h1>
+  <div class="adm__tabs">
+    <button class="tab tab--on" data-atab="servers">Серверы</button>
+    <button class="tab" data-atab="users">Пользователи</button>
+  </div>
+
+  <!-- SERVERS -->
+  <section data-apane="servers">
+    <p class="form__hint" style="margin-bottom:14px">Этот список видят игроки в лаунчере Эта (раздел «Серверы» внизу главного меню). Выключенные серверы остаются здесь, но в лаунчер не попадают. Порядок — стрелками.</p>
+    <div class="srv" data-servers></div>
+    <p class="form__err" data-err="list"></p>
+
+    <div class="adm__form">
+      <h2 class="panel__title" data-form-title>Добавить сервер</h2>
+      <form class="form" data-server-form>
+        <input type="hidden" name="id">
+        <label>Название<input name="name" maxlength="48" required placeholder="Ферма mc-ru"></label>
+        <label>Адрес (ip или домен, можно с :портом)<input name="ip" required placeholder="play.mc-ru.org"></label>
+        <label>Порт<input name="port" type="number" min="1" max="65535" value="25565"></label>
+        <label>Версия<input name="version" maxlength="32" placeholder="1.21.1 · Fabric"></label>
+        <label class="span2">Описание (MOTD, можно §-коды цвета)<textarea name="motd" maxlength="300" placeholder="§aВыживание §7без приватов · §eивенты по выходным"></textarea></label>
+        <label>Иконка (PNG/JPG/WEBP, станет 64×64)<input name="icon" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <label class="radio" style="align-self:end"><input type="checkbox" name="enabled" checked> Показывать в лаунчере</label>
+        <div class="span2 preview">
+          <p class="preview__label">Так увидят в лаунчере</p>
+          <div class="dl__row">
+            <img class="srv__icon" data-prev-icon alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+            <div><b data-prev-name>Название сервера</b><small data-prev-motd>Описание</small></div>
+            <span class="dl__play">Играть</span>
+          </div>
+        </div>
+        <p class="form__err span2" data-err="form"></p>
+        <div class="form__row span2">
+          <button class="btn btn--green" type="submit" data-submit>Добавить</button>
+          <button class="btn" type="button" data-cancel hidden>Отмена</button>
+          <button class="btn" type="button" data-icon-delete hidden>Убрать иконку</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- USERS -->
+  <section data-apane="users" hidden>
+    <div class="adm__search">
+      <input data-usearch placeholder="Поиск по нику или e-mail" autocomplete="off">
+      <button class="btn btn--small" data-usearch-btn>Найти</button>
+    </div>
+    <div class="usr" data-users></div>
+    <p class="form__err" data-err="users"></p>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>© <span data-year></span> mc-ru.org</p>
+</footer>
+
+<script src="/script.js"></script>
+<script src="/admin.js"></script>
+</body>
+</html>

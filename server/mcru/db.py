@@ -39,10 +39,34 @@ CREATE TABLE IF NOT EXISTS sessions (
   server_time REAL
 );
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);
+CREATE TABLE IF NOT EXISTS servers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  ip TEXT NOT NULL,
+  port INTEGER NOT NULL DEFAULT 25565,
+  version TEXT NOT NULL DEFAULT '',
+  motd TEXT NOT NULL DEFAULT '',
+  icon_hash TEXT,
+  sort INTEGER NOT NULL DEFAULT 0,
+  enabled INTEGER NOT NULL DEFAULT 1,
+  created REAL NOT NULL,
+  updated REAL NOT NULL
+);
 """
+
+# колонки, добавленные после первого релиза: (таблица, колонка, DDL)
+MIGRATIONS = [("users", "is_admin", "INTEGER NOT NULL DEFAULT 0")]
 
 _lock = threading.Lock()
 _conn = None
+
+
+def _migrate(c):
+    for table, col, ddl in MIGRATIONS:
+        have = {r["name"] for r in c.execute(f"PRAGMA table_info({table})")}
+        if col not in have:
+            c.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+    c.commit()
 
 
 def conn() -> sqlite3.Connection:
@@ -53,6 +77,7 @@ def conn() -> sqlite3.Connection:
         c.row_factory = sqlite3.Row
         c.execute("PRAGMA journal_mode=WAL")
         c.executescript(SCHEMA)
+        _migrate(c)
         _conn = c
     return _conn
 
@@ -100,6 +125,59 @@ def update_user(uid, **fields):
         return
     sets = ", ".join(f"{k}=?" for k in fields)
     q(f"UPDATE users SET {sets} WHERE id=?", (*fields.values(), uid))
+
+
+def is_admin(u) -> bool:
+    return bool(u) and (bool(u["is_admin"]) or u["username"].lower() in config.ADMINS)
+
+
+def search_users(text="", limit=50):
+    like = f"%{text}%"
+    return q("SELECT * FROM users WHERE username LIKE ? OR email LIKE ? ORDER BY created DESC LIMIT ?",
+             (like, like, max(1, min(200, int(limit)))))
+
+
+# ---- servers (список серверов для лаунчера)
+
+SERVER_FIELDS = ("name", "ip", "port", "version", "motd", "icon_hash", "sort", "enabled")
+
+
+def servers(only_enabled=True):
+    where = "WHERE enabled=1" if only_enabled else ""
+    return q(f"SELECT * FROM servers {where} ORDER BY sort, name COLLATE NOCASE, id")
+
+
+def server(sid):
+    return one("SELECT * FROM servers WHERE id=?", (sid,))
+
+
+def create_server(**fields):
+    now = time.time()
+    cols = [k for k in SERVER_FIELDS if k in fields]
+    if "sort" not in fields:
+        cols.append("sort")
+        fields["sort"] = (one("SELECT COALESCE(MAX(sort), -1) AS m FROM servers")["m"] or 0) + 1
+    q(f"INSERT INTO servers({','.join(cols)},created,updated) VALUES({','.join('?' * len(cols))},?,?)",
+      (*[fields[k] for k in cols], now, now))
+    return one("SELECT * FROM servers ORDER BY id DESC LIMIT 1")
+
+
+def update_server(sid, **fields):
+    fields = {k: v for k, v in fields.items() if k in SERVER_FIELDS}
+    if not fields:
+        return server(sid)
+    sets = ", ".join(f"{k}=?" for k in fields)
+    q(f"UPDATE servers SET {sets}, updated=? WHERE id=?", (*fields.values(), time.time(), sid))
+    return server(sid)
+
+
+def delete_server(sid):
+    q("DELETE FROM servers WHERE id=?", (sid,))
+
+
+def reorder_servers(ids):
+    for i, sid in enumerate(ids):
+        q("UPDATE servers SET sort=?, updated=? WHERE id=?", (i, time.time(), sid))
 
 
 # ---- textures

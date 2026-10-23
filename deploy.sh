@@ -55,6 +55,14 @@ server {
         try_files /account.html =404;
     }
 
+    location = /admin {
+        try_files /admin.html =404;
+    }
+
+    location = /launcher {
+        try_files /launcher.html =404;
+    }
+
     location /api/ {
         proxy_pass http://127.0.0.1:8787/api/;
         proxy_http_version 1.1;

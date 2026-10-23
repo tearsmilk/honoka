@@ -8,9 +8,9 @@ import uuid
 
 from fastapi import Depends, FastAPI, File, Form, Header, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
-from mcru import config, db, security, textures
+from mcru import config, db, launcher, security, textures
 
 app = FastAPI(title="mc-ru.org API", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -55,6 +55,7 @@ def user_json(u, private=False):
          "skin": textures.info(u["skin_hash"]), "cape": textures.info(u["cape_hash"]), "created": u["created"]}
     if private:
         d["email"] = u["email"]
+        d["is_admin"] = db.is_admin(u)
     return d
 
 
@@ -65,6 +66,12 @@ async def current_user(authorization: str = Header(default="")):
     u = db.user_by_id(uid) if uid else None
     if not u:
         raise ApiError("Сессия истекла, войдите заново", 401)
+    return u
+
+
+async def admin_user(u=Depends(current_user)):
+    if not db.is_admin(u):
+        raise ApiError("Только для администраторов", 403)
     return u
 
 
@@ -407,6 +414,186 @@ async def ygg_profiles(req: Request):
     return out
 
 
+# ============================================================ servers (список серверов в лаунчере)
+
+HOST_RE = re.compile(r"^(?=.{1,253}$)([A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)(\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$")
+
+
+def server_json(s):
+    return {"id": s["id"], "name": s["name"], "ip": s["ip"], "port": s["port"], "version": s["version"],
+            "motd": s["motd"], "sort": s["sort"], "enabled": bool(s["enabled"]),
+            "icon_url": f"{config.PUBLIC_URL}/api/textures/{s['icon_hash']}.png" if s["icon_hash"] else None}
+
+
+def _server_fields(d, partial=False):
+    out = {}
+    if "name" in d or not partial:
+        name = str(d.get("name", "")).strip()
+        if not 1 <= len(name) <= 48:
+            raise ApiError("Название: от 1 до 48 символов")
+        out["name"] = name
+    if "ip" in d or not partial:
+        ip = str(d.get("ip", "")).strip().lower()
+        if "://" in ip or "/" in ip:
+            raise ApiError("Адрес без http:// и путей, например play.mc-ru.org или 1.2.3.4:25566")
+        port = None
+        if ":" in ip:
+            ip, p = ip.rsplit(":", 1)
+            if not p.isdigit():
+                raise ApiError("Порт после двоеточия должен быть числом")
+            port = int(p)
+        if not HOST_RE.match(ip):
+            raise ApiError("Некорректный адрес сервера")
+        out["ip"] = ip
+        if port is not None and "port" not in d:
+            d = dict(d, port=port)
+    if "port" in d or not partial:
+        try:
+            port = int(d.get("port") or 25565)
+        except (TypeError, ValueError):
+            raise ApiError("Порт должен быть числом")
+        if not 1 <= port <= 65535:
+            raise ApiError("Порт: от 1 до 65535")
+        out["port"] = port
+    if "version" in d or not partial:
+        v = str(d.get("version", "")).strip()
+        if len(v) > 32:
+            raise ApiError("Версия: до 32 символов")
+        out["version"] = v
+    if "motd" in d or not partial:
+        m = str(d.get("motd", "")).replace("\r", "").strip()
+        if len(m) > 300:
+            raise ApiError("Описание: до 300 символов")
+        out["motd"] = m
+    if "sort" in d:
+        try:
+            out["sort"] = int(d.get("sort") or 0)
+        except (TypeError, ValueError):
+            raise ApiError("Порядок должен быть числом")
+    if "enabled" in d:
+        out["enabled"] = 1 if d.get("enabled") in (True, 1, "1", "true", "on") else 0
+    return out
+
+
+def _server_or_404(sid):
+    s = db.server(sid)
+    if not s:
+        raise ApiError("Сервер не найден", 404)
+    return s
+
+
+@app.get("/api/servers")
+async def servers_public():
+    data = {"servers": [server_json(s) for s in db.servers(only_enabled=True)]}
+    return JSONResponse(data, headers={"Cache-Control": "public, max-age=60"})
+
+
+@app.get("/api/admin/servers")
+async def admin_servers(_=Depends(admin_user)):
+    return {"servers": [server_json(s) for s in db.servers(only_enabled=False)]}
+
+
+@app.post("/api/admin/servers")
+async def admin_server_create(req: Request, _=Depends(admin_user)):
+    return server_json(db.create_server(**_server_fields(await body(req))))
+
+
+@app.put("/api/admin/servers/{sid}")
+async def admin_server_update(sid: int, req: Request, _=Depends(admin_user)):
+    _server_or_404(sid)
+    return server_json(db.update_server(sid, **_server_fields(await body(req), partial=True)))
+
+
+@app.delete("/api/admin/servers/{sid}")
+async def admin_server_delete(sid: int, _=Depends(admin_user)):
+    _server_or_404(sid)
+    db.delete_server(sid)
+    return {"ok": True}
+
+
+@app.post("/api/admin/servers/reorder")
+async def admin_servers_reorder(req: Request, _=Depends(admin_user)):
+    d = await body(req)
+    ids = d.get("ids")
+    if not isinstance(ids, list) or not all(isinstance(i, int) for i in ids):
+        raise ApiError("ids: список чисел")
+    db.reorder_servers(ids)
+    return {"servers": [server_json(s) for s in db.servers(only_enabled=False)]}
+
+
+@app.post("/api/admin/servers/{sid}/icon")
+async def admin_server_icon(sid: int, file: UploadFile = File(...), u=Depends(admin_user)):
+    _server_or_404(sid)
+    h = textures.store_server_icon(await file.read(), u["id"])
+    return server_json(db.update_server(sid, icon_hash=h))
+
+
+@app.delete("/api/admin/servers/{sid}/icon")
+async def admin_server_icon_delete(sid: int, _=Depends(admin_user)):
+    _server_or_404(sid)
+    return server_json(db.update_server(sid, icon_hash=None))
+
+
+# ============================================================ admin: users
+
+@app.get("/api/admin/users")
+async def admin_users(q: str = "", limit: int = 50, _=Depends(admin_user)):
+    return {"users": [{"username": x["username"], "email": x["email"], "created": x["created"],
+                       "last_login": x["last_login"], "has_skin": bool(x["skin_hash"]), "has_cape": bool(x["cape_hash"]),
+                       "is_admin": db.is_admin(x), "env_admin": x["username"].lower() in config.ADMINS}
+                      for x in db.search_users(q.strip(), limit)]}
+
+
+@app.post("/api/admin/users/{name}/admin")
+async def admin_user_flag(name: str, req: Request, me=Depends(admin_user)):
+    target = _user_or_404(name)
+    d = await body(req)
+    flag = 1 if d.get("is_admin") in (True, 1, "1", "true") else 0
+    if not flag and target["id"] == me["id"]:
+        raise ApiError("Нельзя снять права с самого себя")
+    db.update_user(target["id"], is_admin=flag)
+    return {"username": target["username"], "is_admin": db.is_admin(db.user_by_id(target["id"]))}
+
+
+# ============================================================ launcher downloads
+
+def _launcher_latest():
+    data = dict(launcher.latest())
+    for plat in ("windows", "macos"):
+        p = launcher.local_file(plat)
+        if p:
+            data[plat] = {"url": launcher.download_url(plat), "name": p.name, "size": p.stat().st_size}
+        elif data.get(plat):
+            data[plat] = dict(data[plat], url=launcher.download_url(plat), github=data[plat]["url"])
+    return data
+
+
+@app.get("/api/launcher/latest")
+async def launcher_latest():
+    return JSONResponse(_launcher_latest(), headers={"Cache-Control": "public, max-age=300"})
+
+
+@app.get("/api/launcher/version")
+async def launcher_version():
+    d = _launcher_latest()
+    return {"version": d["version"], "windows": d["windows"]["url"] if d["windows"] else None,
+            "macos": d["macos"]["url"] if d["macos"] else None}
+
+
+@app.get("/api/launcher/download/{platform}")
+async def launcher_download(platform: str):
+    if platform not in config.LAUNCHER_FILES:
+        raise ApiError("Платформа: windows или macos", 404)
+    p = launcher.local_file(platform)
+    if p:
+        return FileResponse(p, filename=p.name, media_type="application/octet-stream")
+    asset = launcher.latest().get(platform)
+    if not asset or not asset.get("url"):
+        raise ApiError("Сборка для этой платформы ещё не опубликована", 404)
+    return RedirectResponse(asset["url"], status_code=302)
+
+
 @app.get("/api/health")
 async def health():
-    return {"ok": True, "users": db.one("SELECT COUNT(*) AS n FROM users")["n"]}
+    return {"ok": True, "users": db.one("SELECT COUNT(*) AS n FROM users")["n"],
+            "servers": db.one("SELECT COUNT(*) AS n FROM servers WHERE enabled=1")["n"]}

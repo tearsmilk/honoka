@@ -133,6 +133,33 @@ def store(data: bytes, kind: str, owner_id: int, fps=None):
     return db.texture(h)
 
 
+def store_server_icon(data: bytes, owner_id: int):
+    """Иконка сервера: PNG/JPG/WEBP любого размера → 64×64 PNG (как в списке серверов игры)."""
+    if len(data) > config.MAX_UPLOAD:
+        raise TextureError("Файл больше 8 МБ")
+    try:
+        im = Image.open(io.BytesIO(data))
+        im.load()
+    except Exception as e:
+        raise TextureError("Не удалось прочитать изображение — нужен PNG, JPG или WEBP") from e
+    if im.format not in ("PNG", "JPEG", "WEBP", "GIF"):
+        raise TextureError("Поддерживаются PNG, JPG и WEBP")
+    im = im.convert("RGBA")
+    side = min(im.size)
+    left, top = (im.width - side) // 2, (im.height - side) // 2
+    im = im.crop((left, top, left + side, top + side))
+    im = im.resize((64, 64), Image.NEAREST if side <= 64 else Image.LANCZOS)
+    buf = io.BytesIO()
+    im.save(buf, "PNG", optimize=True)
+    raw = buf.getvalue()
+    h = hashlib.sha256(raw).hexdigest()
+    config.ensure_dirs()
+    (config.TEXTURES / f"{h}.png").write_bytes(raw)
+    (config.TEXTURES / f"{h}.std.png").write_bytes(raw)
+    db.save_texture(h, "server_icon", owner_id, 64, 64, 1, 1, False)
+    return h
+
+
 _default = {}
 
 

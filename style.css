@@ -298,7 +298,66 @@ code {
 .kv code { font-size: 0.75em; }
 .btn:disabled { opacity: .5; cursor: not-allowed; filter: none; }
 
+.card__icon--eta { background: linear-gradient(135deg, #f0e6d8 0 50%, #d97757 50%); }
+.card p a { color: var(--green-light); text-decoration: underline; }
+.btn--disabled { opacity: .5; cursor: not-allowed; filter: none; }
+.form input[type=checkbox] { width: 18px; height: 18px; padding: 0; box-shadow: none; accent-color: var(--green); }
+.form input[type=file] { padding: 8px; font-size: 13px; }
+.btn--admin { margin-right: 10px; background: #5a3a7a; box-shadow: inset -4px -4px 0 #3a2050, inset 4px 4px 0 #8a6aaa; }
+
+/* ---------- ЛАУНЧЕР (страница скачивания) ---------- */
+.dl { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+.dl__hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; margin-bottom: 56px; }
+.dl__title { font-family: var(--pixel); font-size: clamp(22px, 4vw, 40px); color: #fff; text-shadow: 5px 5px 0 #3f3f3f; margin: 8px 0 16px; }
+.dl__lead { color: #ddd; font-size: 17px; margin-bottom: 24px; }
+.dl__buttons { display: flex; flex-wrap: wrap; gap: 14px; }
+.dl__ver { color: var(--muted); font-size: 13px; margin-top: 14px; min-height: 1.2em; }
+.dl__shot { background: linear-gradient(160deg, #f4ece2, #e7d6c4); border: 3px solid #000; box-shadow: inset -4px -4px 0 rgba(0,0,0,.25), inset 4px 4px 0 rgba(255,255,255,.5); padding: 18px; color: #2b2520; font-family: var(--body); }
+.dl__shot h4 { font-family: var(--pixel); font-size: 10px; color: #d97757; margin-bottom: 12px; }
+.dl__row { display: flex; align-items: center; gap: 12px; background: #fff8f0; border: 2px solid #d9c9b8; padding: 10px; margin-bottom: 8px; }
+.dl__row img, .dl__row .dl__ico { width: 40px; height: 40px; image-rendering: pixelated; background: #3e7a1b; border: 2px solid #2b2520; flex: 0 0 auto; }
+.dl__row b { display: block; font-size: 14px; }
+.dl__row small { color: #6a5a4a; font-size: 12px; }
+.dl__row .dl__play { margin-left: auto; font-family: var(--pixel); font-size: 8px; color: #fff; background: #d97757; padding: 8px 10px; border: 2px solid #2b2520; }
+.dl__features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 48px; }
+.dl__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.dl__cols ul, .dl__cols ol { padding-left: 20px; color: #ddd; font-size: 14px; display: grid; gap: 6px; }
+
+/* ---------- АДМИНКА ---------- */
+.adm { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+.adm__title { font-family: var(--pixel); font-size: 18px; color: var(--gold); text-shadow: 4px 4px 0 #000; margin-bottom: 24px; }
+.adm__tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.adm__tabs .tab { flex: 0 0 auto; padding: 12px 18px; }
+.srv { display: grid; gap: 10px; }
+.srv__row { display: grid; grid-template-columns: 64px 1fr auto; gap: 16px; align-items: center; background: #1c1c1c; border: 3px solid #000; padding: 12px; }
+.srv__row--off { opacity: .55; }
+.srv__icon { width: 64px; height: 64px; image-rendering: pixelated; background: #2a2a2a; border: 2px solid #000; object-fit: cover; }
+.srv__name { font-weight: 700; font-size: 16px; color: #fff; }
+.srv__name small { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 8px; }
+.srv__motd { font-size: 14px; color: #ccc; line-height: 1.4; }
+.srv__addr { font-family: var(--pixel); font-size: 8px; color: var(--green-light); margin-top: 6px; }
+.srv__act { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.btn--tiny { font-size: 8px; padding: 8px 10px; }
+.btn--red { background: #a33; box-shadow: inset -4px -4px 0 #611, inset 4px 4px 0 #d66; }
+.adm__form { background: var(--panel); border: 3px solid #000; box-shadow: inset -4px -4px 0 #1a1a1a, inset 4px 4px 0 #3e3e3e; padding: 24px; margin-top: 28px; }
+.adm__form .form { grid-template-columns: 1fr 1fr; }
+.adm__form .form .span2 { grid-column: 1 / -1; }
+.adm__form textarea { font: 500 15px var(--body); color: var(--text); background: #111; border: 3px solid #000; padding: 10px 12px; min-height: 70px; resize: vertical; }
+.preview { background: #fff8f0; border: 3px solid #000; padding: 12px; color: #2b2520; }
+.preview__label { font-family: var(--pixel); font-size: 8px; color: #6a5a4a; margin-bottom: 8px; }
+.preview .dl__row { margin: 0; }
+.usr { display: grid; gap: 8px; }
+.usr__row { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; background: #1c1c1c; border: 3px solid #000; padding: 10px 12px; font-size: 14px; }
+.usr__row small { color: var(--muted); display: block; font-size: 12px; }
+.adm__search { display: flex; gap: 10px; margin-bottom: 16px; }
+.adm__search input { flex: 1; font: 500 15px var(--body); color: var(--text); background: #111; border: 3px solid #000; padding: 10px 12px; }
+.adm__msg { text-align: center; padding: 100px 16px; color: var(--muted); }
+.adm__msg a { color: var(--green-light); text-decoration: underline; }
+
 @media (max-width: 860px) {
+  .dl__hero, .dl__cols, .adm__form .form { grid-template-columns: 1fr; }
+  .srv__row { grid-template-columns: 48px 1fr; }
+  .srv__act { grid-column: 1 / -1; justify-content: flex-start; }
   .acc__hero { grid-template-columns: 1fr; }
   .viewer { max-width: 340px; margin: 0 auto; }
   .acc__grid { grid-template-columns: 1fr; }

@@ -38,6 +38,38 @@
 
 Подключение лаунчеров: Эта — вкладка «mc-ru.org» при добавлении аккаунта; остальные — `-javaagent:authlib-injector.jar=https://mc-ru.org/api/yggdrasil`; HD/анимация в игре — CustomSkinLoader с корнем `https://mc-ru.org/api/csl/`.
 
+## Админка и серверы
+
+Страница `/admin` (только для администраторов): список серверов, который показывает лаунчер Эта в разделе «Серверы», и управление пользователями.
+
+**Как стать админом.** Впиши свой ник в unit systemd: `Environment=MCRU_ADMINS=твойник` (несколько — через запятую) в `/etc/systemd/system/mc-ru-api.service`, затем `systemctl daemon-reload && systemctl restart mc-ru-api`. Такие ники — админы всегда; остальным права выдаются в админке на вкладке «Пользователи» (флаг `is_admin` в базе).
+
+**Сервер** = название (до 48), адрес (домен или IPv4, можно `host:port`), порт (по умолчанию 25565), версия (до 32), MOTD (до 300 символов, поддерживаются `§`-коды цвета как в игре), иконка (PNG/JPG/WEBP → 64×64), флаг «показывать», порядок (стрелки). Выключенные серверы в `/api/servers` не попадают.
+
+| Метод | Путь | Что |
+|---|---|---|
+| GET | `/api/servers` | публичный список для лаунчера: `{servers:[{id,name,ip,port,version,motd,icon_url,sort}]}` (кеш 60 с) |
+| GET / POST | `/api/admin/servers` | все серверы / создать (`{name, ip, port, version, motd, sort, enabled}`) |
+| PUT / DELETE | `/api/admin/servers/{id}` | изменить (любое подмножество полей) / удалить |
+| POST / DELETE | `/api/admin/servers/{id}/icon` | multipart `file` → иконка / убрать |
+| POST | `/api/admin/servers/reorder` | `{ids:[…]}` — новый порядок |
+| GET | `/api/admin/users?q=&limit=` | поиск пользователей |
+| POST | `/api/admin/users/{ник}/admin` | `{is_admin: true\|false}` |
+
+## Лаунчер на сайте
+
+Страница `/launcher` — скачивание Эты. Кнопки ведут на `/api/launcher/download/windows` и `/api/launcher/download/macos`:
+- по умолчанию это 302 на последний релиз GitHub `tearsmilk/amkawa-lang` с тегом `eta-v*` (`.exe` для Windows, `.dmg` для macOS; список кешируется 10 минут, при недоступности GitHub отдаётся последнее известное);
+- если положить файл в `$MCRU_DATA/launcher/` (`/var/lib/mc-ru/launcher/Eta-windows-x64.exe`, `…/Eta-macOS-x64.dmg`), он отдаётся напрямую с сайта — для хостинга лаунчера без GitHub. Не забудь `chown www-data`.
+
+| Метод | Путь | Что |
+|---|---|---|
+| GET | `/api/launcher/latest` | `{version, tag, published, notes, windows:{url,name,size}, macos:{…}}` (без релиза — `version: null`) |
+| GET | `/api/launcher/version` | компактно для проверки обновлений: `{version, windows, macos}` |
+| GET | `/api/launcher/download/{windows\|macos}` | файл или 302 на GitHub |
+
+Выпуск новой версии: тег `eta-vX.Y.Z` в репозитории лаунчера — CI сам соберёт и приложит `.exe`/`.dmg` к релизу, сайт подхватит его в течение 10 минут.
+
 ## Локально
 ```bash
 cd server
@@ -59,10 +91,17 @@ cp /opt/mc-ru-api/server/mc-ru-api.service /etc/systemd/system/
 systemctl daemon-reload && systemctl enable --now mc-ru-api
 curl -s 127.0.0.1:8787/api/health
 ```
-В nginx внутри блока `server { listen 443 ... }` для mc-ru.org добавь содержимое `server/nginx-api.conf` (`location /api/` → `127.0.0.1:8787`, `location = /account` → `account.html`), затем:
+В nginx внутри блока `server { listen 443 ... }` для mc-ru.org добавь содержимое `server/nginx-api.conf` (`location /api/` → `127.0.0.1:8787`, `location = /account|/admin|/launcher` → соответствующий html), затем:
 ```bash
 nginx -t && systemctl reload nginx
 ```
+Если `/api/` и `/account` уже вставлены раньше, добавь только два новых location одной командой (вставка после строки `location = /account`):
+```bash
+sed -i '/location = \/account {/,/}/{/}/a\    location = /admin { try_files /admin.html =404; }\n    location = /launcher { try_files /launcher.html =404; }
+}' /etc/nginx/sites-available/mc-ru.org
+nginx -t && systemctl reload nginx
+```
+Админ-доступ: `sed -i "s|^#Environment=MCRU_ADMINS=.*|Environment=MCRU_ADMINS=ТВОЙНИК|" /etc/systemd/system/mc-ru-api.service && systemctl daemon-reload && systemctl restart mc-ru-api` (ник — тот, под которым зарегистрирован на сайте).
 Обновление после `git pull` / распаковки нового zip в `/opt/minesite`:
 ```bash
 rsync -a --delete /opt/minesite/server/ /opt/mc-ru-api/server/

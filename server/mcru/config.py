@@ -14,9 +14,19 @@ JWT_DAYS = 30
 SESSION_DAYS = 7
 MAX_UPLOAD = 8 * 1024 * 1024
 
+# админы, которым не нужен флаг в базе (чтобы владелец мог войти в админку с нуля): MCRU_ADMINS=nick1,nick2
+ADMINS = {a.strip().lower() for a in os.environ.get("MCRU_ADMINS", "").split(",") if a.strip()}
+
+# откуда брать сборки лаунчера: релизы GitHub (теги eta-v*) либо файлы, положенные в $MCRU_DATA/launcher/
+GITHUB_REPO = os.environ.get("MCRU_GITHUB_REPO", "tearsmilk/amkawa-lang")
+GITHUB_TOKEN = os.environ.get("MCRU_GITHUB_TOKEN", "")
+LAUNCHER_DIR = DATA / "launcher"
+LAUNCHER_FILES = {"windows": "Eta-windows-x64.exe", "macos": "Eta-macOS-x64.dmg"}
+
 
 def ensure_dirs():
     TEXTURES.mkdir(parents=True, exist_ok=True)
+    LAUNCHER_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def secret() -> bytes:

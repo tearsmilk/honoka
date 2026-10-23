@@ -106,7 +106,9 @@
     showTexture('skin', user.skin, user.model);
     showTexture('cape', user.cape);
     const auth = $('[data-auth]');
-    if (auth) auth.innerHTML = `<a class="userchip" href="/account">${headHtml(user.username, 28)}<span>${user.username}</span></a>`;
+    if (auth) auth.innerHTML = mcru.userChip(user);
+    const adminLink = $('[data-admin-link]');
+    if (adminLink) adminLink.hidden = !user.is_admin;
   }
   render();
 
