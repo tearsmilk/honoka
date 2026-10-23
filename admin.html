@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админка — mc-ru.org</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="acc-body">
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img src="/assets/logo.svg" alt="" width="36" height="36">
+    <span>MC-RU.ORG</span>
+  </a>
+  <nav class="nav nav--acc">
+    <a href="/">На главную</a>
+    <a href="/account">Кабинет</a>
+    <a href="/launcher">Лаунчер</a>
+  </nav>
+  <div class="topbar__auth" data-auth></div>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<p class="adm__msg" data-loading>Загружаем админку…</p>
+<p class="adm__msg" data-denied hidden>Нет доступа. Админка только для администраторов сообщества. <a href="/">На главную</a></p>
+
+<main class="adm" data-adm hidden>
+  <h1 class="adm__title">Админка</h1>
+  <div class="adm__tabs">
+    <button class="tab tab--on" data-atab="servers">Серверы</button>
+    <button class="tab" data-atab="cosmetics">Косметика</button>
+    <button class="tab" data-atab="rurs">Руры</button>
+    <button class="tab" data-atab="users">Пользователи</button>
+  </div>
+
+  <!-- COSMETICS -->
+  <section data-apane="cosmetics" hidden>
+    <p class="form__hint" style="margin-bottom:14px">Каталог гардероба мода rurukaSuka (лаунчер Эта ставит мод сам). Модель — файл <code>.bbmodel</code> из Blockbench, варианты — PNG-текстуры-перекраски. Выключенная косметика в игре не показывается, но у купивших остаётся.</p>
+    <div class="srv" data-cosmetics></div>
+    <p class="form__err" data-err="clist"></p>
+
+    <div class="adm__form">
+      <h2 class="panel__title" data-cform-title>Добавить косметику</h2>
+      <form class="form" data-cosmetic-form>
+        <input type="hidden" name="id">
+        <label>Название<input name="name" maxlength="64" required placeholder="Ушки лисы"></label>
+        <label>Категория<select name="category">
+          <option value="hats">Шапки</option><option value="wings">Крылья</option><option value="back">Спина</option>
+          <option value="pets">Питомцы</option><option value="arms">Руки</option><option value="legs">Ноги</option>
+          <option value="auras">Ауры</option><option value="costumes">Костюмы</option></select></label>
+        <label>Цена, руров<input name="price" type="number" min="0" max="1000000" value="0"></label>
+        <label>Порядок<input name="sort" type="number" value="0"></label>
+        <label>Масштаб<input name="scale" type="number" step="0.05" min="0.05" max="20" value="1"></label>
+        <label>Сдвиг X / Y / Z<span class="xyz"><input name="off_x" type="number" step="0.1" value="0"><input name="off_y" type="number" step="0.1" value="0"><input name="off_z" type="number" step="0.1" value="0"></span></label>
+        <label>Модель (.bbmodel)<input name="model" type="file" accept=".bbmodel,application/json"></label>
+        <label class="radio" style="align-self:end"><input type="checkbox" name="enabled" checked> Показывать в игре</label>
+        <div class="span2" data-variants hidden>
+          <p class="preview__label" style="color:var(--muted)">Варианты-цвета</p>
+          <div class="vars" data-vars-list></div>
+          <div class="form__row">
+            <input name="vname" maxlength="64" placeholder="Название варианта (Рыжий)">
+            <input name="vfile" type="file" accept="image/png">
+            <button class="btn btn--small" type="button" data-var-add>Добавить вариант</button>
+          </div>
+        </div>
+        <p class="form__err span2" data-err="cform"></p>
+        <div class="form__row span2">
+          <button class="btn btn--green" type="submit" data-csubmit>Добавить</button>
+          <button class="btn" type="button" data-ccancel hidden>Отмена</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- RURS -->
+  <section data-apane="rurs" hidden>
+    <p class="form__hint" style="margin-bottom:14px">Руры — валюта гардероба. Найди игрока и начисли (или спиши — отрицательное число).</p>
+    <div class="adm__search">
+      <input data-rsearch placeholder="Ник или e-mail" autocomplete="off">
+      <button class="btn btn--small" data-rsearch-btn>Найти</button>
+    </div>
+    <div class="usr" data-rusers></div>
+    <p class="form__err" data-err="rurs"></p>
+  </section>
+
+  <!-- SERVERS -->
+  <section data-apane="servers">
+    <p class="form__hint" style="margin-bottom:14px">Этот список видят игроки в лаунчере Эта (раздел «Серверы» внизу главного меню). Выключенные серверы остаются здесь, но в лаунчер не попадают. Порядок — стрелками.</p>
+    <div class="srv" data-servers></div>
+    <p class="form__err" data-err="list"></p>
+
+    <div class="adm__form">
+      <h2 class="panel__title" data-form-title>Добавить сервер</h2>
+      <form class="form" data-server-form>
+        <input type="hidden" name="id">
+        <label>Название<input name="name" maxlength="48" required placeholder="Ферма mc-ru"></label>
+        <label>Адрес (ip или домен, можно с :портом)<input name="ip" required placeholder="play.mc-ru.org"></label>
+        <label>Порт<input name="port" type="number" min="1" max="65535" value="25565"></label>
+        <label>Версия<input name="version" maxlength="32" placeholder="1.21.1 · Fabric"></label>
+        <label class="span2">Описание (MOTD, можно §-коды цвета)<textarea name="motd" maxlength="300" placeholder="§aВыживание §7без приватов · §eивенты по выходным"></textarea></label>
+        <label>Иконка (PNG/JPG/WEBP, станет 64×64)<input name="icon" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <label class="radio" style="align-self:end"><input type="checkbox" name="enabled" checked> Показывать в лаунчере</label>
+        <div class="span2 preview">
+          <p class="preview__label">Так увидят в лаунчере</p>
+          <div class="dl__row">
+            <img class="srv__icon" data-prev-icon alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+            <div><b data-prev-name>Название сервера</b><small data-prev-motd>Описание</small></div>
+            <span class="dl__play">Играть</span>
+          </div>
+        </div>
+        <p class="form__err span2" data-err="form"></p>
+        <div class="form__row span2">
+          <button class="btn btn--green" type="submit" data-submit>Добавить</button>
+          <button class="btn" type="button" data-cancel hidden>Отмена</button>
+          <button class="btn" type="button" data-icon-delete hidden>Убрать иконку</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- USERS -->
+  <section data-apane="users" hidden>
+    <div class="adm__search">
+      <input data-usearch placeholder="Поиск по нику или e-mail" autocomplete="off">
+      <button class="btn btn--small" data-usearch-btn>Найти</button>
+    </div>
+    <div class="usr" data-users></div>
+    <p class="form__err" data-err="users"></p>
+    <p class="form__hint" style="margin-top:14px">Переехавшие с onii.ink игроки входят старым паролем; их номер в моде (UUID вида 0000012) и привязанный ник лицензии сохранены.</p>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>© <span data-year></span> mc-ru.org</p>
+</footer>
+
+<script src="/script.js"></script>
+<script src="/admin.js"></script>
+</body>
+</html>

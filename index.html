@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mc-ru.org — русскоязычное Minecraft сообщество</title>
+  <meta name="description" content="mc-ru.org — сообщество русскоязычных игроков Minecraft. Общение, гайды, сборки, обзоры серверов, помощь новичкам и ивенты.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="#top">
+    <img src="assets/logo.svg" alt="" width="36" height="36">
+    <span>MC-RU.ORG</span>
+  </a>
+  <nav class="nav">
+    <a href="#about">О нас</a>
+    <a href="#features">Что здесь</a>
+    <a href="#join">Как вступить</a>
+    <a href="#rules">Правила</a>
+    <a href="#skins">Скины</a>
+    <a href="/launcher">Лаунчер</a>
+    <a href="#community">Контакты</a>
+  </nav>
+  <div class="topbar__auth" data-auth>
+    <button class="btn btn--small" data-open-login>Войти</button>
+  </div>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__sky">
+      <div class="cloud cloud--1"></div>
+      <div class="cloud cloud--2"></div>
+      <div class="cloud cloud--3"></div>
+    </div>
+    <div class="hero__content">
+      <p class="hero__splash" data-splash>Привет, крафтер!</p>
+      <h1 class="hero__title">MC-RU.ORG</h1>
+      <p class="hero__sub">Русскоязычное сообщество Minecraft<br>Общение · Гайды · Сборки · Серверы · Ивенты</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--big btn--green" href="https://discord.gg/2tGDC7bsye" target="_blank" rel="noopener">Зайти в Discord</a>
+        <a class="btn btn--big" href="/launcher">Скачать лаунчер</a>
+        <a class="btn btn--big" href="#about">Узнать больше</a>
+      </div>
+      <p class="hero__version">Не сервер, а место, где собираются игроки · С 2024 года</p>
+    </div>
+    <div class="hero__ground"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2 class="section__title">О нас</h2>
+    <div class="about">
+      <div class="about__text">
+        <p>mc-ru.org — это не очередной сервер, а сообщество. Мы собираем русскоязычных игроков Minecraft в одном месте: от тех, кто только поставил игру, до тех, кто пишет моды и строит мегапроекты.</p>
+        <p>Здесь делятся сборками и ресурспаками, обсуждают обновления, ищут напарников на выживание, советуют нормальные сервера и помогают новичкам разобраться, почему не запускается Forge.</p>
+      </div>
+      <ul class="stats">
+        <li class="stat"><span class="stat__num" data-count="3500">0</span><span class="stat__label">участников</span></li>
+        <li class="stat"><span class="stat__num" data-count="120">0</span><span class="stat__label">гайдов и статей</span></li>
+        <li class="stat"><span class="stat__num" data-count="40">0</span><span class="stat__label">проверенных серверов</span></li>
+        <li class="stat"><span class="stat__num" data-count="15">0</span><span class="stat__label">ивентов за год</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section section--dark" id="features">
+    <h2 class="section__title">Что здесь есть</h2>
+    <div class="cards">
+      <article class="card">
+        <div class="card__icon card__icon--grass"></div>
+        <h3>Общение</h3>
+        <p>Discord и Telegram с активными чатами: ваниль, моды, строительство, редстоун, PvP и просто болталка.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--gold"></div>
+        <h3>Гайды</h3>
+        <p>Как поставить моды, собрать ферму, настроить оптифайн, не умереть в Незере. Пишут сами участники.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--iron"></div>
+        <h3>Сборки и паки</h3>
+        <p>Проверенные модпаки, ресурспаки и шейдеры с описанием и ссылками. Без вирусов и «скачать с турбобита».</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--diamond"></div>
+        <h3>Обзоры серверов</h3>
+        <p>Честные отзывы участников о серверах: где не грифят, где адекватная администрация, где лучший онлайн.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--redstone"></div>
+        <h3>Ивенты</h3>
+        <p>Конкурсы построек, совместные выживания, турниры по бед-варсу. Всё на площадках сообщества, призы от участников.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--obsidian"></div>
+        <h3>Помощь новичкам</h3>
+        <p>Канал #помощь, где ответят на любой вопрос без «гугли». Крашлоги читаем, лаунчеры настраиваем.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--eta"></div>
+        <h3>Лаунчер Эта</h3>
+        <p>Свой лаунчер для Windows и macOS: сборки с Modrinth и CurseForge, скины и плащи с сайта, Microsoft-аккаунт и список серверов сообщества. <a href="/launcher">Скачать →</a></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- JOIN -->
+  <section class="section" id="join">
+    <h2 class="section__title">Как вступить</h2>
+    <ol class="steps">
+      <li class="step">
+        <span class="step__num">1</span>
+        <div>
+          <h3>Зайди в Discord</h3>
+          <p>Это главная площадка. Ссылка ниже, регистрация не нужна, если уже есть аккаунт Discord.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">2</span>
+        <div>
+          <h3>Прочитай правила</h3>
+          <p>Их немного, и они простые. Нажми реакцию под правилами, чтобы открыть остальные каналы.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">3</span>
+        <div>
+          <h3>Представься</h3>
+          <p>Напиши пару слов о себе в <code>#знакомство</code>: во что играешь, что ищешь. Так быстрее найдёшь своих.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step__num">4</span>
+        <div>
+          <h3>Подпишись на новости</h3>
+          <p>Telegram-канал дублирует анонсы ивентов и новые гайды, если в Discord заходишь редко.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- RULES -->
+  <section class="section section--dark" id="rules">
+    <h2 class="section__title">Правила</h2>
+    <div class="rules">
+      <div class="rule"><span class="rule__n">§1</span><p>Уважай других. Оскорбления, травля, политика и срачи «ваниль vs моды» — мут.</p></div>
+      <div class="rule"><span class="rule__n">§2</span><p>Без спама и рекламы без согласования. Хочешь рассказать о сервере — есть отдельный канал.</p></div>
+      <div class="rule"><span class="rule__n">§3</span><p>Никаких читов, краков лаунчеров и пиратских ссылок в общих каналах.</p></div>
+      <div class="rule"><span class="rule__n">§4</span><p>Файлы и сборки — только с описанием и источником. Подозрительное удаляем.</p></div>
+      <div class="rule"><span class="rule__n">§5</span><p>Вопросы — в тематические каналы. Так их быстрее заметят и ответят.</p></div>
+      <div class="rule"><span class="rule__n">§6</span><p>Споры с модерацией — в личку, а не в общий чат.</p></div>
+    </div>
+  </section>
+
+  <!-- SKINS -->
+  <section class="section section--dark" id="skins">
+    <h2 class="section__title">Скины и плащи</h2>
+    <p class="section__lead">Аккаунт mc-ru.org — это твой ник, скин и плащ в одном месте. Работает в лаунчере <strong>Эта</strong> и в любом другом через authlib-injector.</p>
+    <div class="cards cards--3">
+      <article class="card">
+        <div class="card__icon card__icon--diamond"></div>
+        <h3>HD-скины</h3>
+        <p>Загружай скины от 64×64 до 1024×1024 и плащи до 2048×1024. Старый формат 64×32 конвертируем сами.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--redstone"></div>
+        <h3>Анимация</h3>
+        <p>GIF, APNG или PNG-полоса кадров — скин и плащ оживают прямо в игре. До 64 кадров, 1–30 кадров/с.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--grass"></div>
+        <h3>Вход в лаунчер</h3>
+        <p>В Эте выбери «mc-ru.org» при добавлении аккаунта. В других лаунчерах — authlib-injector с адресом <code>mc-ru.org/api/yggdrasil</code>.</p>
+      </article>
+    </div>
+    <div class="section__actions">
+      <a class="btn btn--big btn--green" href="/account" data-account-link>Открыть кабинет</a>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="section" id="community">
+    <h2 class="section__title">Где мы живём</h2>
+    <div class="socials">
+      <a class="social" href="https://discord.gg/2tGDC7bsye" target="_blank" rel="noopener">
+        <span class="social__title">Discord</span>
+        <span class="social__sub">Главная площадка: чаты, голосовые, ивенты</span>
+      </a>
+      <a class="social" href="https://t.me/mc_ru_org" target="_blank" rel="noopener">
+        <span class="social__title">Telegram</span>
+        <span class="social__sub">Новости, анонсы, новые гайды</span>
+      </a>
+      <a class="social" href="https://vk.com/mc_ru_org" target="_blank" rel="noopener">
+        <span class="social__title">ВКонтакте</span>
+        <span class="social__sub">Скриншоты, голосования, мемы</span>
+      </a>
+      <a class="social" href="https://youtube.com/@mc_ru_org" target="_blank" rel="noopener">
+        <span class="social__title">YouTube</span>
+        <span class="social__sub">Обзоры сборок и записи ивентов</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>© <span data-year></span> mc-ru.org. Не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang/Microsoft.</p>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal" data-modal hidden>
+  <div class="modal__box">
+    <button class="modal__close" aria-label="Закрыть" data-modal-close>✕</button>
+    <div class="tabs">
+      <button class="tab tab--on" data-tab="login">Вход</button>
+      <button class="tab" data-tab="register">Регистрация</button>
+    </div>
+    <form class="form" data-form="login">
+      <label>Ник или e-mail<input name="login" autocomplete="username" required></label>
+      <label>Пароль<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="form__err" data-err></p>
+      <button class="btn btn--green" type="submit">Войти</button>
+    </form>
+    <form class="form" data-form="register" hidden>
+      <label>Ник<input name="username" pattern="[A-Za-z0-9_]{3,16}" title="3–16 символов: латиница, цифры, _" autocomplete="username" required></label>
+      <label>E-mail<input name="email" type="email" autocomplete="email" required></label>
+      <label>Пароль<input name="password" type="password" minlength="8" autocomplete="new-password" required></label>
+      <p class="form__hint">Ник — это имя в игре. Потом сменить нельзя.</p>
+      <p class="form__err" data-err></p>
+      <button class="btn btn--green" type="submit">Создать аккаунт</button>
+    </form>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

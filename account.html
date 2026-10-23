@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кабинет — mc-ru.org</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="acc-body">
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img src="/assets/logo.svg" alt="" width="36" height="36">
+    <span>MC-RU.ORG</span>
+  </a>
+  <nav class="nav nav--acc">
+    <a href="/">На главную</a>
+    <a href="#skin">Скин</a>
+    <a href="#cape">Плащ</a>
+    <a href="#wardrobe">Гардероб</a>
+    <a href="#launcher">Лаунчер</a>
+    <a href="#settings">Аккаунт</a>
+    <a href="/admin" data-admin-link hidden>Админка</a>
+  </nav>
+  <div class="topbar__auth" data-auth></div>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<main class="acc" data-acc hidden>
+  <section class="acc__hero">
+    <div class="viewer">
+      <canvas id="viewer" width="320" height="420"></canvas>
+      <div class="viewer__ctl">
+        <button class="btn btn--small" data-anim="walk">Идти</button>
+        <button class="btn btn--small" data-anim="run">Бежать</button>
+        <button class="btn btn--small" data-anim="idle">Стоять</button>
+        <label class="chk"><input type="checkbox" data-rotate checked> Вращать</label>
+      </div>
+    </div>
+    <div class="acc__who">
+      <p class="acc__hello">Привет,</p>
+      <h1 class="acc__name" data-name>…</h1>
+      <p class="acc__meta"><span data-model-label>Classic</span> · UUID <code data-uuid>…</code> <button class="link" data-copy-uuid>копировать</button></p>
+      <div class="badges" data-badges></div>
+      <p class="acc__hint">Скин и плащ применяются сразу: в Эте и через authlib-injector — обычное разрешение, HD и анимация — через CustomSkinLoader или Эту.</p>
+    </div>
+  </section>
+
+  <div class="acc__grid">
+    <!-- SKIN -->
+    <section class="panel" id="skin">
+      <h2 class="panel__title">Скин</h2>
+      <div class="drop" data-drop="skin">
+        <input type="file" accept="image/png,image/gif,image/apng" hidden data-file="skin">
+        <p class="drop__big">Перетащи файл или нажми</p>
+        <p class="drop__small">PNG 64×64 / 64×32 / HD до 1024×1024 · GIF, APNG или PNG-полоса кадров для анимации</p>
+        <p class="drop__name" data-fname="skin"></p>
+      </div>
+      <div class="form__row">
+        <label class="radio"><input type="radio" name="model" value="classic" checked> Classic (Steve, 4px руки)</label>
+        <label class="radio"><input type="radio" name="model" value="slim"> Slim (Alex, 3px руки)</label>
+      </div>
+      <div class="form__row" data-fps-row="skin" hidden>
+        <label>Кадров в секунду <input type="number" min="1" max="30" value="10" data-fps="skin" class="input--short"></label>
+        <span class="form__hint">для PNG-полосы; у GIF/APNG берём из файла</span>
+      </div>
+      <p class="form__err" data-err="skin"></p>
+      <div class="form__row">
+        <button class="btn btn--green" data-upload="skin" disabled>Загрузить скин</button>
+        <button class="btn" data-delete="skin">Удалить</button>
+        <a class="btn" data-download="skin" download hidden>Скачать</a>
+      </div>
+    </section>
+
+    <!-- CAPE -->
+    <section class="panel" id="cape">
+      <h2 class="panel__title">Плащ</h2>
+      <div class="drop" data-drop="cape">
+        <input type="file" accept="image/png,image/gif,image/apng" hidden data-file="cape">
+        <p class="drop__big">Перетащи файл или нажми</p>
+        <p class="drop__small">PNG 64×32 / HD до 2048×1024 · GIF, APNG или PNG-полоса кадров для анимации</p>
+        <p class="drop__name" data-fname="cape"></p>
+      </div>
+      <div class="form__row" data-fps-row="cape" hidden>
+        <label>Кадров в секунду <input type="number" min="1" max="30" value="10" data-fps="cape" class="input--short"></label>
+      </div>
+      <p class="form__err" data-err="cape"></p>
+      <div class="form__row">
+        <button class="btn btn--green" data-upload="cape" disabled>Загрузить плащ</button>
+        <button class="btn" data-delete="cape">Удалить</button>
+        <a class="btn" data-download="cape" download hidden>Скачать</a>
+      </div>
+    </section>
+
+    <!-- WARDROBE -->
+    <section class="panel" id="wardrobe">
+      <h2 class="panel__title">Руры и гардероб</h2>
+      <p class="ward__balance">На счету: <b data-balance>…</b></p>
+      <p class="form__hint">Номер в моде: <code data-public-id>…</code><span data-license-nick hidden> · ник лицензии: <b></b></span></p>
+      <div class="ward" data-wardrobe></div>
+      <p class="form__hint" style="margin-top:12px">Гардероб открывается в игре — мод rurukaSuka ставится лаунчером Эта автоматически (настройка «Косметика rurukaSuka»). Покупка и примерка там же, руры начисляют админы сообщества.</p>
+    </section>
+
+    <!-- LAUNCHER -->
+    <section class="panel" id="launcher">
+      <h2 class="panel__title">Подключить к лаунчеру</h2>
+      <h3 class="panel__sub">Эта (наш лаунчер)</h3>
+      <ol class="mini-steps">
+        <li>Открой Эту → <b>Аккаунты</b> → <b>Добавить аккаунт</b>.</li>
+        <li>Выбери вкладку <b>mc-ru.org</b>.</li>
+        <li>Введи ник или e-mail и пароль от этого сайта.</li>
+      </ol>
+      <p class="form__hint">Скин, плащ, HD и анимация подхватятся автоматически.</p>
+      <h3 class="panel__sub">Другие лаунчеры (authlib-injector)</h3>
+      <p>Добавь в аргументы JVM:</p>
+      <pre class="code" data-copy-text>-javaagent:authlib-injector.jar=https://mc-ru.org/api/yggdrasil</pre>
+      <p>Или укажи адрес сервера авторизации <code>https://mc-ru.org/api/yggdrasil</code> в HMCL, PCL2, PrismLauncher (через authlib-injector). Логин — ник или e-mail, пароль — от сайта.</p>
+      <h3 class="panel__sub">HD и анимация в игре</h3>
+      <p>Нужен мод <b>CustomSkinLoader</b>: в его настройках добавь источник CustomSkinAPI с корнем <code>https://mc-ru.org/api/csl/</code>.</p>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="panel" id="settings">
+      <h2 class="panel__title">Аккаунт</h2>
+      <dl class="kv">
+        <dt>Ник</dt><dd data-name>…</dd>
+        <dt>E-mail</dt><dd data-email>…</dd>
+        <dt>UUID</dt><dd><code data-uuid>…</code></dd>
+      </dl>
+      <h3 class="panel__sub">Сменить пароль</h3>
+      <form class="form" data-pass-form>
+        <label>Старый пароль<input name="old" type="password" autocomplete="current-password" required></label>
+        <label>Новый пароль<input name="new" type="password" minlength="8" autocomplete="new-password" required></label>
+        <p class="form__err" data-err="pass"></p>
+        <p class="form__ok" data-ok="pass"></p>
+        <button class="btn" type="submit">Сменить</button>
+      </form>
+      <h3 class="panel__sub">Сессия</h3>
+      <button class="btn" data-logout>Выйти</button>
+    </section>
+  </div>
+</main>
+
+<p class="acc__loading" data-loading>Загружаем кабинет…</p>
+
+<footer class="footer">
+  <p>© <span data-year></span> mc-ru.org. Не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang/Microsoft.</p>
+</footer>
+
+<script src="https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.bundle.js"></script>
+<script src="/script.js"></script>
+<script src="/account.js"></script>
+</body>
+</html>
