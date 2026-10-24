@@ -1,11 +1,11 @@
-package ink.myata.mythsupport;
+package ink.myata.mythicsupport;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class MythSupportPlugin extends JavaPlugin {
+public final class MythicSupportPlugin extends JavaPlugin {
 
     private NamespacedKey ambientKey;
     private AmbientSpawner spawner;
@@ -18,13 +18,13 @@ public final class MythSupportPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EggSuppressListener(this), this);
 
         startSpawner();
-        getLogger().info("MythSupport включён.");
+        getLogger().info("MythicSupport enabled.");
     }
 
     @Override
     public void onDisable() {
         stopSpawner();
-        getLogger().info("MythSupport выключён.");
+        getLogger().info("MythicSupport disabled.");
     }
 
     public NamespacedKey getAmbientKey() {
@@ -49,7 +49,7 @@ public final class MythSupportPlugin extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("mythsupport.admin")) {
+        if (!sender.hasPermission("mythicsupport.admin")) {
             sender.sendMessage("Нет прав.");
             return true;
         }
@@ -57,10 +57,10 @@ public final class MythSupportPlugin extends JavaPlugin {
             reloadConfig();
             stopSpawner();
             startSpawner();
-            sender.sendMessage("MythSupport: конфиг перезагружен.");
+            sender.sendMessage("MythicSupport: config reloaded.");
             return true;
         }
-        sender.sendMessage("Использование: /mythsupport reload");
+        sender.sendMessage("Использование: /mythicsupport reload");
         return true;
     }
 }

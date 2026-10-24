@@ -1,4 +1,4 @@
-package ink.myata.mythsupport;
+package ink.myata.mythicsupport;
 
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.bukkit.BukkitAdapter;
@@ -32,12 +32,12 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public final class AmbientSpawner extends BukkitRunnable {
 
-    private final MythSupportPlugin plugin;
+    private final MythicSupportPlugin plugin;
 
     // UUID наших мобов -> тик, когда рядом последний раз был игрок
     private final Map<UUID, Long> tracked = new HashMap<>();
 
-    public AmbientSpawner(MythSupportPlugin plugin) {
+    public AmbientSpawner(MythicSupportPlugin plugin) {
         this.plugin = plugin;
     }
 

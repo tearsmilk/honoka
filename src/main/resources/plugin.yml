@@ -1,16 +1,16 @@
-name: MythSupport
-version: 1.0.0
-main: ink.myata.mythsupport.MythSupportPlugin
+name: MythicSupport
+version: rl-build-0.7
+main: ink.myata.mythicsupport.MythicSupportPlugin
 api-version: '1.21'
-authors: [fame, noterdam]
-description: Заменяет ванильных мобов (зомби, криперы) на мобов MythicMobs, включая яйца призыва.
+authors: [tearsmilk]
+description: Additional content for MythicMobs - ambient spawner with per-mob rules, vanilla mob replacement and spawn-egg replacement.
 depend: [MythicMobs, ModelEngine]
 commands:
-  mythsupport:
-    description: Управление MythSupport
-    usage: /mythsupport reload
-    permission: mythsupport.admin
+  mythicsupport:
+    description: MythicSupport management
+    usage: /mythicsupport reload
+    permission: mythicsupport.admin
 permissions:
-  mythsupport.admin:
-    description: Доступ к командам MythSupport
+  mythicsupport.admin:
+    description: Access to MythicSupport commands
     default: op

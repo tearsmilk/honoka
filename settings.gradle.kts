@@ -1,1 +1,1 @@
-rootProject.name = "mythsupport"
+rootProject.name = "mythicsupport"

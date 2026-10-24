@@ -1,4 +1,4 @@
-package ink.myata.mythsupport;
+package ink.myata.mythicsupport;
 
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.bukkit.BukkitAdapter;
@@ -36,9 +36,9 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public final class EggSuppressListener implements Listener {
 
-    private final MythSupportPlugin plugin;
+    private final MythicSupportPlugin plugin;
 
-    public EggSuppressListener(MythSupportPlugin plugin) {
+    public EggSuppressListener(MythicSupportPlugin plugin) {
         this.plugin = plugin;
     }
 

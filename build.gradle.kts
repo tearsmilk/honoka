@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ink.myata"
-version = "1.0.0"
+version = "rl-build-0.7"
 
 java {
     toolchain {
@@ -42,7 +42,7 @@ tasks.processResources {
 }
 
 tasks.jar {
-    archiveBaseName.set("mythsupport")
+    archiveBaseName.set("mythicsupport")
 }
 
 tasks.wrapper {

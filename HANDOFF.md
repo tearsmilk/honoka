@@ -1,25 +1,25 @@
-# MythSupport — хэндовер для нового чата
+# MythicSupport — хэндовер для нового чата
 
-Плагин Minecraft (Paper/**Purpur 1.21.11**, **Java 25**). Автор: fame/noterdam. Пакет `ink.myata.mythsupport`.
+Плагин Minecraft (Paper/**Purpur 1.21.11**, **Java 25**). Автор: fame/noterdam. Пакет `ink.myata.mythicsupport`.
 Назначение: заменять ванильных мобов на мобов MythicMobs и управлять их спавном/деспавном.
 
 ## Стек и сборка
 - **Gradle Kotlin DSL**, враппер **внутри проекта** (`./gradlew build`). Враппер указывает на **Gradle 9.1.0** — это важно: на Java 25 более старый Gradle (8.14.x) падает с ошибкой вида `25.0.4.1`.
 - Зависимости (`compileOnly`): `io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT`, `io.lumine:Mythic-Dist:5.7.0` (версию MythicMobs сверять на mvn.lumine.io под сервер).
 - Репозитории: papermc, lumine, mavenCentral.
-- Результат: `build/libs/mythsupport-1.0.0.jar` → в `plugins/` рядом с MythicMobs и ModelEngine.
-- `plugin.yml`: `depend: [MythicMobs, ModelEngine]`, команда `/mythsupport reload` (право `mythsupport.admin`).
+- Результат: `build/libs/mythicsupport-rl-build-0.7.jar` → в `plugins/` рядом с MythicMobs и ModelEngine.
+- `plugin.yml`: `depend: [MythicMobs, ModelEngine]`, команда `/mythicsupport reload` (право `mythicsupport.admin`).
 
 ## Статус сборки (2026-10-24)
 - Код **скомпилирован** (`javac --release 21`) против настоящих jar с сервера: `purpur-api-1.21.11-R0.1-SNAPSHOT` и `MythicMobsPremium-5.13.1`. Все предположения по MythicMobs API подтверждены `javap`:
   `MythicBukkit.inst().getMobManager().getMythicMob(String)` → `Optional<MythicMob>`, `MythicMob.spawn(AbstractLocation, double)` → `ActiveMob`, `BukkitAdapter.adapt(Location)`, `ActiveMob.getEntity().getBukkitEntity()`.
 - Единственная ошибка компиляции: `Bukkit.getCurrentTick()` возвращает `int`, в `tracked.put(...)` нужен `(long)`. Исправлено.
-- Задеплоено на сервер `lobby` (панель mgr.hosting-minecraft.pro, id 88635a9b) как `plugins/mythsupport-1.0.0.jar`, сервер перезапущен, плагин включился, спавнер работает (в логе появились Corrupted Prowler).
+- Задеплоено на сервер `lobby` (панель mgr.hosting-minecraft.pro, id 88635a9b) как `plugins/mythicsupport-rl-build-0.7.jar`, сервер перезапущен, плагин включился, спавнер работает (в логе появились Corrupted Prowler).
 - Прокси в облачной среде не пускает к repo.papermc.io и mvn.lumine.io, поэтому в `build.gradle.kts` добавлен fallback: если в `libs/` лежат jar-файлы, онлайн-зависимости не нужны. Jar с сервера размером >4 МБ через панель напрямую не скачать — для этого использовался временный плагин, который режет файл на части.
 
 ## Файлы
-- `src/main/java/ink/myata/mythsupport/MythSupportPlugin.java` — enable/disable, запуск фонового спавнера по таймеру, команда reload.
-- `AmbientSpawner.java` — `BukkitRunnable`: держит `count` мобов в радиусе вокруг игрока, деспавнит по таймеру. Метит мобов через PersistentDataContainer ключом `mythsupport:ambient`.
+- `src/main/java/ink/myata/mythsupport/MythicSupportPlugin.java` — enable/disable, запуск фонового спавнера по таймеру, команда reload.
+- `AmbientSpawner.java` — `BukkitRunnable`: держит `count` мобов в радиусе вокруг игрока, деспавнит по таймеру. Метит мобов через PersistentDataContainer ключом `mythicsupport:ambient`.
 - `EggSuppressListener.java` — яйца призыва (1 яйцо = 1 спавн) + подавление ванильного спавна.
 - `src/main/resources/config.yml` — конфиг (ниже).
 - `src/main/resources/plugin.yml`.
