@@ -1,0 +1,16 @@
+name: MythicSupport
+version: rl-build-0.10
+main: ink.myata.mythicsupport.MythicSupportPlugin
+api-version: '1.21'
+authors: [tearsmilk]
+description: Additional content for MythicMobs - ambient spawner with per-mob rules, vanilla mob replacement and spawn-egg replacement.
+depend: [MythicMobs, ModelEngine]
+commands:
+  mythicsupport:
+    description: MythicSupport management
+    usage: /mythicsupport reload
+    permission: mythicsupport.admin
+permissions:
+  mythicsupport.admin:
+    description: Access to MythicSupport commands
+    default: op
