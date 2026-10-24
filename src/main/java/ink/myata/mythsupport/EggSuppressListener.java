@@ -31,6 +31,8 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * 1) Яйца призыва: 1 яйцо = 1 спавн мифик-моба (рандом из списка), трата яйца в выживании/приключении.
  * 2) Подавление ванильного спавна перечисленных типов (кроме яиц).
+ * 3) Замена ванильного моба мифик-мобом прямо в момент его спавна (replace-vanilla):
+ *    ванильный триггер сохраняется целиком, подменяется только сущность.
  */
 public final class EggSuppressListener implements Listener {
 
@@ -50,6 +52,24 @@ public final class EggSuppressListener implements Listener {
                 || reason == SpawnReason.DISPENSE_EGG) {
             return;
         }
+        // Замена ванильного моба на мифик-моба в момент его спавна (replace-vanilla).
+        // Весь ванильный триггер остаётся родным: например, Варден появляется по счётчику крикунов,
+        // а мы лишь подменяем сущность в той же точке.
+        List<String> replacement = replaceMobsFor(event.getEntityType());
+        if (!replacement.isEmpty()) {
+            event.setCancelled(true);
+            String mobName = replacement.size() == 1
+                    ? replacement.get(0)
+                    : replacement.get(ThreadLocalRandom.current().nextInt(replacement.size()));
+            spawnMythic(mobName, event.getLocation());
+            if (plugin.getConfig().getBoolean("debug", false)) {
+                plugin.getLogger().info("Замена " + event.getEntityType() + " (" + reason + ") -> " + mobName
+                        + " в " + event.getLocation().getWorld().getName() + " [" + event.getLocation().getBlockX()
+                        + "," + event.getLocation().getBlockY() + "," + event.getLocation().getBlockZ() + "]");
+            }
+            return;
+        }
+
         Set<EntityType> suppress = loadSuppress();
         if (suppress.contains(event.getEntityType())) {
             event.setCancelled(true);
@@ -101,6 +121,14 @@ public final class EggSuppressListener implements Listener {
             }
         }
         return set;
+    }
+
+    private List<String> replaceMobsFor(EntityType type) {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("replace-vanilla");
+        if (section == null) return List.of();
+        List<String> mobs = new ArrayList<>(section.getStringList(type.name()));
+        mobs.removeIf(s -> s == null || s.isBlank());
+        return mobs;
     }
 
     private List<String> eggMobsFor(EntityType type) {
