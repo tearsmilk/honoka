@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ink.myata"
-version = "rl-build-0.8"
+version = "rl-build-0.9"
 
 java {
     toolchain {

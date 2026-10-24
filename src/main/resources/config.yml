@@ -22,6 +22,9 @@ ambient-spawner:
   tick-interval: 20        # как часто работает цикл (тики). 20 = раз в секунду
   max-spawn-per-cycle: 5   # максимум спавнов за один цикл (чтобы не было лагов)
   despawn-after: 200       # через сколько тиков удалить моба, если рядом нет игрока
+  # Типы миров, где работает спавнер: NORMAL (обычный мир), NETHER, THE_END. По умолчанию только NORMAL.
+  environments:
+    - NORMAL
   mobs:                    # пул мобов MythicMobs (выбор случайный)
     - cprowler_em
     - ElectricCreeper

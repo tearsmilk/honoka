@@ -61,6 +61,7 @@ public final class AmbientSpawner extends BukkitRunnable {
         double level = cfg.getDouble("level", 1);
         boolean debug = cfg.getBoolean("debug", false);
         List<String> worlds = cfg.getStringList("worlds");
+        Set<World.Environment> environments = loadEnvironments(cfg.getStringList("ambient-spawner.environments"));
         List<String> mobs = cfg.getStringList("ambient-spawner.mobs");
         if (mobs.isEmpty()) return;
         Map<String, SpawnRule> rules = loadRules(cfg.getConfigurationSection("ambient-spawner.mob-rules"));
@@ -93,6 +94,7 @@ public final class AmbientSpawner extends BukkitRunnable {
         // 2) Спавн до count вокруг каждого игрока
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!worldAllowed(p.getWorld(), worlds)) continue;
+            if (!environments.contains(p.getWorld().getEnvironment())) continue;
 
             int near = countNearAndAdopt(p, radiusBlocks, now);
             int deficit = count - near;
@@ -300,6 +302,23 @@ public final class AmbientSpawner extends BukkitRunnable {
 
     private boolean isOurMob(Entity e) {
         return e.getPersistentDataContainer().has(plugin.getAmbientKey(), PersistentDataType.BYTE);
+    }
+
+    // Типы миров, где работает спавнер: NORMAL (обычный), NETHER, THE_END. По умолчанию только NORMAL.
+    private Set<World.Environment> loadEnvironments(List<String> list) {
+        Set<World.Environment> set = new HashSet<>();
+        if (list == null || list.isEmpty()) {
+            set.add(World.Environment.NORMAL);
+            return set;
+        }
+        for (String s : list) {
+            try {
+                set.add(World.Environment.valueOf(s.trim().toUpperCase(Locale.ROOT)));
+            } catch (IllegalArgumentException ex) {
+                plugin.getLogger().warning("Неизвестный тип мира в ambient-spawner.environments: " + s + " (NORMAL, NETHER, THE_END)");
+            }
+        }
+        return set;
     }
 
     private boolean worldAllowed(World w, List<String> worlds) {
