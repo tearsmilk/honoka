@@ -1,0 +1,16 @@
+name: MythSupport
+version: 1.0.0
+main: ink.myata.mythsupport.MythSupportPlugin
+api-version: '1.21'
+authors: [fame, noterdam]
+description: Заменяет ванильных мобов (зомби, криперы) на мобов MythicMobs, включая яйца призыва.
+depend: [MythicMobs, ModelEngine]
+commands:
+  mythsupport:
+    description: Управление MythSupport
+    usage: /mythsupport reload
+    permission: mythsupport.admin
+permissions:
+  mythsupport.admin:
+    description: Доступ к командам MythSupport
+    default: op
