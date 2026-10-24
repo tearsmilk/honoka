@@ -10,17 +10,12 @@
 - Результат: `build/libs/mythsupport-1.0.0.jar` → в `plugins/` рядом с MythicMobs и ModelEngine.
 - `plugin.yml`: `depend: [MythicMobs, ModelEngine]`, команда `/mythsupport reload` (право `mythsupport.admin`).
 
-## ВАЖНО: ничего не удалось скомпилировать/протестировать
-Среда прошлого чата блокировала прокси-сервером репозитории PaperMC, Lumine и services.gradle.org (403), а JDK 25 там не было (только 21). Поэтому:
-- Код написан, но **не проверен компиляцией** против Paper/MythicMobs API.
-- Первым делом в новом чате (или локально у пользователя): `./gradlew build`, разобрать ошибки компиляции.
-- **Проверить предположения по MythicMobs 5.x API** (возможные источники ошибок):
-  - `MythicBukkit.inst().getMobManager().getMythicMob(String)` → `Optional<MythicMob>`
-  - `MythicMob.spawn(AbstractLocation, double)` → `ActiveMob`
-  - `BukkitAdapter.adapt(org.bukkit.Location)` → `AbstractLocation`
-  - `activeMob.getEntity().getBukkitEntity()` → `org.bukkit.entity.Entity`
-  Если имена методов отличаются в версии пользователя — поправить здесь.
-- `Bukkit.getCurrentTick()` — используется как счётчик тиков (есть в Paper/Purpur).
+## Статус сборки (2026-10-24)
+- Код **скомпилирован** (`javac --release 21`) против настоящих jar с сервера: `purpur-api-1.21.11-R0.1-SNAPSHOT` и `MythicMobsPremium-5.13.1`. Все предположения по MythicMobs API подтверждены `javap`:
+  `MythicBukkit.inst().getMobManager().getMythicMob(String)` → `Optional<MythicMob>`, `MythicMob.spawn(AbstractLocation, double)` → `ActiveMob`, `BukkitAdapter.adapt(Location)`, `ActiveMob.getEntity().getBukkitEntity()`.
+- Единственная ошибка компиляции: `Bukkit.getCurrentTick()` возвращает `int`, в `tracked.put(...)` нужен `(long)`. Исправлено.
+- Задеплоено на сервер `lobby` (панель mgr.hosting-minecraft.pro, id 88635a9b) как `plugins/mythsupport-1.0.0.jar`, сервер перезапущен, плагин включился, спавнер работает (в логе появились Corrupted Prowler).
+- Прокси в облачной среде не пускает к repo.papermc.io и mvn.lumine.io, поэтому в `build.gradle.kts` добавлен fallback: если в `libs/` лежат jar-файлы, онлайн-зависимости не нужны. Jar с сервера размером >4 МБ через панель напрямую не скачать — для этого использовался временный плагин, который режет файл на части.
 
 ## Файлы
 - `src/main/java/ink/myata/mythsupport/MythSupportPlugin.java` — enable/disable, запуск фонового спавнера по таймеру, команда reload.
