@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -15,10 +16,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -58,6 +62,7 @@ public final class AmbientSpawner extends BukkitRunnable {
         List<String> worlds = cfg.getStringList("worlds");
         List<String> mobs = cfg.getStringList("ambient-spawner.mobs");
         if (mobs.isEmpty()) return;
+        Map<String, SpawnRule> rules = loadRules(cfg.getConfigurationSection("ambient-spawner.mob-rules"));
 
         long now = Bukkit.getCurrentTick();
 
@@ -96,7 +101,9 @@ public final class AmbientSpawner extends BukkitRunnable {
             for (int i = 0; i < toSpawn; i++) {
                 Location loc = findSpawnLocation(p, radiusBlocks, minDistance, maxLight, clearance);
                 if (loc == null) continue;
-                spawnOne(mobs, loc, level, debug);
+                List<String> candidates = allowedAt(mobs, rules, loc);
+                if (candidates.isEmpty()) continue;
+                spawnOne(candidates, loc, level, debug);
             }
         }
     }
@@ -217,6 +224,69 @@ public final class AmbientSpawner extends BukkitRunnable {
     private boolean isDarkEnough(Block feet, int maxLight) {
         if (maxLight >= 15) return true;
         return feet.getLightFromBlocks() <= maxLight && feet.getLightLevel() <= maxLight;
+    }
+
+    // ---- Правила спавна по мобам (ambient-spawner.mob-rules) ----
+
+    /** Условия, при которых моб может появиться в точке. Все заданные условия должны выполняться. */
+    private static final class SpawnRule {
+        Boolean underground;   // true = только без неба над головой (пещеры/данжи), false = только под открытым небом
+        Integer minY, maxY;    // диапазон высот
+        Set<String> worlds;    // имена миров
+        Set<String> biomes;    // ключи биомов (DEEP_DARK, LUSH_CAVES, ...)
+
+        boolean matches(Location loc) {
+            World w = loc.getWorld();
+            if (w == null) return false;
+            int y = loc.getBlockY();
+            if (minY != null && y < minY) return false;
+            if (maxY != null && y > maxY) return false;
+            if (worlds != null && !worlds.contains(w.getName().toUpperCase(Locale.ROOT))) return false;
+            if (underground != null) {
+                Block b = loc.getBlock();
+                boolean isUnderground = b.getLightFromSky() == 0
+                        && w.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()) > y;
+                if (underground != isUnderground) return false;
+            }
+            if (biomes != null) {
+                String biome = loc.getBlock().getBiome().getKey().getKey().toUpperCase(Locale.ROOT);
+                if (!biomes.contains(biome)) return false;
+            }
+            return true;
+        }
+    }
+
+    private Map<String, SpawnRule> loadRules(ConfigurationSection section) {
+        Map<String, SpawnRule> rules = new HashMap<>();
+        if (section == null) return rules;
+        for (String mob : section.getKeys(false)) {
+            ConfigurationSection rs = section.getConfigurationSection(mob);
+            if (rs == null) continue;
+            SpawnRule r = new SpawnRule();
+            if (rs.contains("underground")) r.underground = rs.getBoolean("underground");
+            if (rs.contains("min-y")) r.minY = rs.getInt("min-y");
+            if (rs.contains("max-y")) r.maxY = rs.getInt("max-y");
+            if (rs.contains("worlds")) r.worlds = toSet(rs.getStringList("worlds"));
+            if (rs.contains("biomes")) r.biomes = toSet(rs.getStringList("biomes"));
+            rules.put(mob, r);
+        }
+        return rules;
+    }
+
+    private Set<String> toSet(List<String> list) {
+        Set<String> set = new HashSet<>();
+        for (String s : list) if (s != null && !s.isBlank()) set.add(s.trim().toUpperCase(Locale.ROOT));
+        return set;
+    }
+
+    // Мобы из пула, которым разрешено появиться в этой точке (без правила = разрешено везде)
+    private List<String> allowedAt(List<String> mobs, Map<String, SpawnRule> rules, Location loc) {
+        List<String> out = new ArrayList<>(mobs.size());
+        for (String mob : mobs) {
+            SpawnRule r = rules.get(mob);
+            if (r == null || r.matches(loc)) out.add(mob);
+        }
+        return out;
     }
 
     private boolean isOurMob(Entity e) {

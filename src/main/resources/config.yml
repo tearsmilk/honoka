@@ -30,6 +30,19 @@ ambient-spawner:
     - SporeCreeper
     - UmberCreeper
 
+  # Правила по мобам: где именно может появиться моб из списка mobs. Моб без правила спавнится везде.
+  # Все указанные условия должны выполняться одновременно.
+  #   underground: true  — только там, где нет неба над головой (пещеры, данжи); false — только под открытым небом
+  #   min-y / max-y      — диапазон высот
+  #   worlds             — список миров
+  #   biomes             — список биомов (ключи Minecraft: DEEP_DARK, LUSH_CAVES, DRIPSTONE_CAVES, ...)
+  mob-rules:
+    spider_melee:
+      underground: true
+    spider_poison:
+      underground: true
+      max-y: 60
+
 # ===== Подавление ванильного спавна =====
 # Эти ванильные мобы НЕ будут спавниться в мире (natural/спавнеры),
 # чтобы мир не переполнялся вместе с фоновым спавнером.
