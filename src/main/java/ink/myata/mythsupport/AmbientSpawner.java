@@ -50,6 +50,7 @@ public final class AmbientSpawner extends BukkitRunnable {
         int count = Math.max(0, cfg.getInt("ambient-spawner.count", 20));
         int minDistance = Math.max(0, cfg.getInt("ambient-spawner.min-distance", 12));
         int maxLight = Math.min(15, Math.max(0, cfg.getInt("ambient-spawner.max-light", 2)));
+        int clearance = Math.min(3, Math.max(0, cfg.getInt("ambient-spawner.spawn-clearance", 1)));
         int maxPerCycle = Math.max(1, cfg.getInt("ambient-spawner.max-spawn-per-cycle", 5));
         long despawnAfter = Math.max(0, cfg.getLong("ambient-spawner.despawn-after", 200));
         double level = cfg.getDouble("level", 1);
@@ -93,7 +94,7 @@ public final class AmbientSpawner extends BukkitRunnable {
 
             int toSpawn = Math.min(deficit, maxPerCycle);
             for (int i = 0; i < toSpawn; i++) {
-                Location loc = findSpawnLocation(p, radiusBlocks, minDistance, maxLight);
+                Location loc = findSpawnLocation(p, radiusBlocks, minDistance, maxLight, clearance);
                 if (loc == null) continue;
                 spawnOne(mobs, loc, level, debug);
             }
@@ -125,7 +126,7 @@ public final class AmbientSpawner extends BukkitRunnable {
         return false;
     }
 
-    private Location findSpawnLocation(Player player, int radiusBlocks, int minDistance, int maxLight) {
+    private Location findSpawnLocation(Player player, int radiusBlocks, int minDistance, int maxLight, int clearance) {
         World w = player.getWorld();
         Location pl = player.getLocation();
         for (int attempt = 0; attempt < 24; attempt++) {
@@ -137,7 +138,7 @@ public final class AmbientSpawner extends BukkitRunnable {
             // Не грузим невыгруженные чанки
             if (!w.isChunkLoaded(x >> 4, z >> 4)) continue;
 
-            Integer y = findStandableY(w, x, pl.getBlockY(), z, maxLight);
+            Integer y = findStandableY(w, x, pl.getBlockY(), z, maxLight, clearance);
             if (y != null) {
                 return new Location(w, x + 0.5, y, z + 0.5);
             }
@@ -147,7 +148,7 @@ public final class AmbientSpawner extends BukkitRunnable {
 
     // Ищет пригодную для спавна высоту рядом с уровнем игрока (поддержка и поверхности, и пещер).
     // Точка подходит только если там темно: свет (небо с поправкой на время суток и блочные источники) <= maxLight.
-    private Integer findStandableY(World w, int x, int baseY, int z, int maxLight) {
+    private Integer findStandableY(World w, int x, int baseY, int z, int maxLight, int clearance) {
         int min = w.getMinHeight() + 1;
         int max = w.getMaxHeight() - 2;
         for (int dy = 0; dy <= 12; dy++) {
@@ -158,7 +159,8 @@ public final class AmbientSpawner extends BukkitRunnable {
                 Block feet = w.getBlockAt(x, y, z);
                 Block head = w.getBlockAt(x, y + 1, z);
                 if (below.getType().isSolid() && feet.isPassable() && head.isPassable()
-                        && isDarkEnough(feet, maxLight)) {
+                        && isDarkEnough(feet, maxLight)
+                        && hasClearance(w, x, y, z, clearance)) {
                     return y;
                 }
             }
@@ -194,6 +196,20 @@ public final class AmbientSpawner extends BukkitRunnable {
             plugin.getLogger().info("Спавн " + name + " в " + loc.getWorld().getName()
                     + " [" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + "]");
         }
+    }
+
+    // Вокруг точки спавна должно быть свободно: (2*clearance+1)^2 блоков на уровне ног и головы.
+    // Нужно для мобов с широким хитбоксом/моделью (пауки), иначе они задыхаются в стенах.
+    private boolean hasClearance(World w, int x, int y, int z, int clearance) {
+        if (clearance <= 0) return true;
+        for (int dx = -clearance; dx <= clearance; dx++) {
+            for (int dz = -clearance; dz <= clearance; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                if (!w.getBlockAt(x + dx, y, z + dz).isPassable()) return false;
+                if (!w.getBlockAt(x + dx, y + 1, z + dz).isPassable()) return false;
+            }
+        }
+        return true;
     }
 
     // getLightLevel() = max(свет от блоков, свет неба с учётом времени суток), как у ванильного спавна.
