@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -166,6 +167,7 @@ public final class AmbientSpawner extends BukkitRunnable {
                 Block feet = w.getBlockAt(x, y, z);
                 Block head = w.getBlockAt(x, y + 1, z);
                 if (below.getType().isSolid() && feet.isPassable() && head.isPassable()
+                        && !isWet(below) && !isWet(feet) && !isWet(head)
                         && isDarkEnough(feet, maxLight)
                         && hasClearance(w, x, y, z, clearance)) {
                     return y;
@@ -212,11 +214,18 @@ public final class AmbientSpawner extends BukkitRunnable {
         for (int dx = -clearance; dx <= clearance; dx++) {
             for (int dz = -clearance; dz <= clearance; dz++) {
                 if (dx == 0 && dz == 0) continue;
-                if (!w.getBlockAt(x + dx, y, z + dz).isPassable()) return false;
-                if (!w.getBlockAt(x + dx, y + 1, z + dz).isPassable()) return false;
+                Block f = w.getBlockAt(x + dx, y, z + dz);
+                Block h = w.getBlockAt(x + dx, y + 1, z + dz);
+                if (!f.isPassable() || !h.isPassable() || isWet(f) || isWet(h)) return false;
             }
         }
         return true;
+    }
+
+    // Вода/лава/залитый водой блок: наши мобы не спавнятся в воде и под водой
+    private boolean isWet(Block b) {
+        if (b.isLiquid()) return true;
+        return b.getBlockData() instanceof Waterlogged wl && wl.isWaterlogged();
     }
 
     // getLightLevel() = max(свет от блоков, свет неба с учётом времени суток), как у ванильного спавна.
