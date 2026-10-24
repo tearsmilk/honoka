@@ -6,6 +6,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -73,7 +74,22 @@ public final class EggSuppressListener implements Listener {
         Set<EntityType> suppress = loadSuppress();
         if (suppress.contains(event.getEntityType())) {
             event.setCancelled(true);
+            return;
         }
+
+        // Запрет ванильного спавна только в указанных типах миров (suppress-vanilla-in-environments)
+        if (suppressedInEnvironment(event.getEntityType(), event.getLocation().getWorld().getEnvironment())) {
+            event.setCancelled(true);
+        }
+    }
+
+    private boolean suppressedInEnvironment(EntityType type, World.Environment env) {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection("suppress-vanilla-in-environments");
+        if (section == null) return false;
+        for (String s : section.getStringList(type.name())) {
+            if (s != null && s.trim().equalsIgnoreCase(env.name())) return true;
+        }
+        return false;
     }
 
     // ---- Яйца призыва ----

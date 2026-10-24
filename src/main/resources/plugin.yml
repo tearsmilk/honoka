@@ -1,5 +1,5 @@
 name: MythicSupport
-version: rl-build-0.9
+version: rl-build-0.10
 main: ink.myata.mythicsupport.MythicSupportPlugin
 api-version: '1.21'
 authors: [tearsmilk]
