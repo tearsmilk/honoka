@@ -59,7 +59,7 @@ _mod_cache = {"at": 0.0, "data": None}
 
 def _fetch_mod():
     """Последний релиз мода rurukaSuka (теги rurukasuka-v*): jar + rurukasuka-mod.json с поддерживаемыми версиями."""
-    url = f"https://api.github.com/repos/{config.GITHUB_REPO}/releases?per_page=30"
+    url = f"https://api.github.com/repos/{config.MOD_GITHUB_REPO}/releases?per_page=30"
     req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json", "User-Agent": "mc-ru.org"})
     if config.GITHUB_TOKEN:
         req.add_header("Authorization", f"Bearer {config.GITHUB_TOKEN}")

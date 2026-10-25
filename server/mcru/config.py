@@ -18,7 +18,8 @@ MAX_UPLOAD = 8 * 1024 * 1024
 ADMINS = {a.strip().lower() for a in os.environ.get("MCRU_ADMINS", "").split(",") if a.strip()}
 
 # откуда брать сборки лаунчера: релизы GitHub (теги eta-v*) либо файлы, положенные в $MCRU_DATA/launcher/
-GITHUB_REPO = os.environ.get("MCRU_GITHUB_REPO", "tearsmilk/amkawa-lang")
+GITHUB_REPO = os.environ.get("MCRU_GITHUB_REPO", "tearsmilk/etalauncher")          # релизы лаунчера eta-v*
+MOD_GITHUB_REPO = os.environ.get("MCRU_MOD_GITHUB_REPO", "tearsmilk/amkawa-lang")   # релизы мода rurukasuka-v*
 GITHUB_TOKEN = os.environ.get("MCRU_GITHUB_TOKEN", "")
 LAUNCHER_DIR = DATA / "launcher"
 LAUNCHER_FILES = {"windows": "Eta-windows-x64.exe", "macos": "Eta-macOS-x64.dmg"}
