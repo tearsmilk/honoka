@@ -1,0 +1,20 @@
+@npc("Рыбак Ефим", skin="Notch")
+class Fisher:
+    @step("start")
+    def on_click(self, player, npc):
+        if player.has_flag("quest.fisher.done"):
+            npc.say("Опять ты! Клёв сегодня хороший.")
+            return
+        npc.say("Принеси мне трёх треск — дам удочку получше.")
+        npc.step("waiting", player)
+
+    @step("waiting")
+    def on_click(self, player, npc):
+        if player.take("cod", 3):
+            npc.animate("happy")
+            npc.say("Вот это улов! Держи.")
+            player.give(Item("fishing_rod", enchant={"lure": 3}))
+            player.flag("quest.fisher.done", True)
+            npc.step("start", player)
+        else:
+            npc.say("Пока не вижу трёх треск…")

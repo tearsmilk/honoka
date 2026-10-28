@@ -1,0 +1,12 @@
+@every("1h")
+def tournament():
+    Broadcast("<gold>Турнир рыбаков! 10 минут.")
+    server.flag("tournament", {}, expire="10m")
+    for left in range(600, 0, -1):
+        for p in Players():
+            p.bossbar("tour", f"Турнир: {left // 60}:{left % 60:02d}", progress=left / 600)
+        wait("1s")
+    scores = server.flag("tournament") or {}
+    if scores:
+        win = max(scores, key=scores.get)
+        Broadcast(f"<yellow>Победил {win} — {scores[win]} кг")

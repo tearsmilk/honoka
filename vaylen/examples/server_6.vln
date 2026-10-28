@@ -1,0 +1,21 @@
+records = Data("parkour_records")
+
+@on("player enters area", area="parkour_start")
+def start(event):
+    event.player.flag("pk_start", server.time_ms)
+    event.player.actionbar("<green>Время пошло!")
+
+@on("player enters area", area="parkour_finish")
+def finish(event):
+    p = event.player
+    t0 = p.flag("pk_start")
+    if t0 is None:
+        return
+    sec = (server.time_ms - t0) / 1000
+    p.unflag("pk_start")
+    best = records.get(p.name)
+    if best is None or sec < best:
+        records[p.name] = sec
+        Broadcast(f"<gold>{p.name}<yellow> — новый рекорд: {sec:.2f} с")
+    else:
+        p.tell(f"<gray>{sec:.2f} с (рекорд {best:.2f})")

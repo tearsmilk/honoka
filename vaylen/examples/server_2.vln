@@ -1,0 +1,16 @@
+@command("сетдом")
+def set_home(player, args):
+    name = args[0] if args else "main"
+    player.flag(f"home.{name}", player.location)
+    player.tell(f"<green>Дом <white>{name}<green> сохранён")
+
+@command("дом")
+def home(player, args):
+    loc = player.flag(f"home.{args[0] if args else 'main'}")
+    if loc:
+        player.teleport(loc)
+    else:
+        player.tell("<red>Такого дома нет")
+
+def tab(player, args):
+    return [n.split('.')[1] for n in player.flags("home.")]

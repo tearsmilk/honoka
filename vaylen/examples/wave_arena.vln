@@ -1,0 +1,217 @@
+# ⚔ АРЕНА ВОЛН — отбивайся от волн мобов, между волнами закупайся в магазине
+# Монеты дают за убийства и за каждую пережитую волну. Каждая 5-я волна — босс.
+# F — открыть магазин в любой момент. Между волнами магазин открывается сам.
+
+R = 15                      # арена от -15 до 15 по x и z
+BREAK = 20                  # секунд передышки между волнами
+MAX_WAVE = 20
+SPAWNS = [(-12, 0, -12), (12, 0, -12), (-12, 0, 12), (12, 0, 12), (0, 0, -13), (0, 0, 13)]
+
+REWARD = {"zombie": 3, "husk": 4, "skeleton": 5, "spider": 4, "creeper": 6, "witch": 8, "vindicator": 10, "ravager": 40}
+
+state = {"coins": 25, "wave": 0, "kills": 0, "on": True, "break": False, "mode": PlayerMode}
+
+SHOP = [  # слот, предмет, название, цена, что сделать
+    (10, "stone_sword", "<white>Каменный меч", 15, ("give", "stone_sword", 1)),
+    (11, "iron_sword", "<white>Железный меч", 45, ("give", "iron_sword", 1)),
+    (12, "diamond_sword", "<aqua>Алмазный меч", 120, ("give", "diamond_sword", 1)),
+    (13, "bow", "<white>Лук + 32 стрелы", 40, ("bow", None, 0)),
+    (14, "shield", "<white>Щит", 30, ("give", "shield", 1)),
+    (15, "iron_chestplate", "<white>Железная броня", 90, ("armor", "iron", 0)),
+    (16, "diamond_chestplate", "<aqua>Алмазная броня", 260, ("armor", "diamond", 0)),
+    (19, "cooked_beef", "<gold>Стейки ×8", 10, ("give", "cooked_beef", 8)),
+    (20, "golden_apple", "<gold>Золотое яблоко", 35, ("give", "golden_apple", 1)),
+    (21, "glistering_melon_slice", "<red>Лечение (сразу)", 20, ("heal", None, 0)),
+    (22, "sugar", "<aqua>Скорость 60 с", 25, ("effect", "speed", 60)),
+    (23, "blaze_powder", "<red>Сила 45 с", 50, ("effect", "strength", 45)),
+    (24, "iron_block", "<white>Голем-защитник", 150, ("golem", None, 0)),
+    (25, "cobblestone_wall", "<gray>Починить арену", 15, ("walls", None, 0)),
+]
+
+
+# ---------------------------------------------------------------- арена
+def build_arena():
+    Clear(-R - 1, 0, -R - 1, R + 1, 12, R + 1)
+    Floor(-R, -R, R, R, -1, "stone_bricks")
+    for x in range(-R + 3, R, 6):
+        for z in range(-R + 3, R, 6):
+            SetBlock(x, -1, z, "sea_lantern")
+    walls()
+    for x, y, z in SPAWNS:
+        SetBlock(x, -1, z, "crying_obsidian")
+
+
+def walls():
+    Walls(-R - 1, 0, -R - 1, R + 1, 1, R + 1, "polished_blackstone_bricks")
+    Walls(-R - 1, 2, -R - 1, R + 1, 4, R + 1, "tinted_glass")
+
+
+# ---------------------------------------------------------------- магазин
+shop = Menu("<gold>⚔ Магазин арены", rows=4)
+
+
+def open_shop(player=None):
+    shop.fill("gray_stained_glass_pane", name=" ", all=True)
+    shop.border("black_stained_glass_pane", name=" ")
+    shop.set(4, "sunflower", name=f"<gold>Монеты: <white>{state['coins']}",
+             lore=[f"<gray>Волна: <white>{state['wave']}", f"<gray>Убито: <white>{state['kills']}"])
+    for slot, item, title, cost, act in SHOP:
+        color = "<green>" if state["coins"] >= cost else "<red>"
+        shop.button(slot, item, buy(slot), name=title, lore=[f"{color}{cost} монет", "<dark_gray>клик — купить"])
+    if state["break"]:
+        shop.button(31, "lime_dye", lambda p, s, c: start_now(), name="<green><bold>▶ Начать волну сейчас")
+    shop.button(35, "barrier", lambda p, s, c: give_up(), name="<red>Сдаться")
+    if player is None:
+        shop.open()
+    else:
+        shop.open(player)
+
+
+def buy(slot):
+    def handler(player, s, click):
+        for sl, item, title, cost, act in SHOP:
+            if sl != slot:
+                continue
+            if state["coins"] < cost:
+                ActionBar(f"<red>Нужно {cost} монет, у тебя {state['coins']}")
+                Sound("block.note_block.bass", pitch=0.6)
+                return
+            state["coins"] -= cost
+            kind, what, n = act
+            if kind == "give":
+                Give(what, n)
+            elif kind == "bow":
+                Give("bow")
+                Give("arrow", 32)
+            elif kind == "armor":
+                for part in ["helmet", "chestplate", "leggings", "boots"]:
+                    Give(f"{what}_{part}")
+            elif kind == "heal":
+                Heal()
+                Feed()
+            elif kind == "effect":
+                Effect(what, n, 1)
+            elif kind == "golem":
+                SummonMob(PlayerX, 0, PlayerZ + 2, "iron_golem", {"name": "<white>Защитник"})
+            elif kind == "walls":
+                walls()
+            Sound("entity.experience_orb.pickup")
+            ActionBar(f"<green>Куплено: {title}")
+            open_shop(player)
+            return
+    return handler
+
+
+def start_now():
+    state["break"] = False
+    shop.close()
+
+
+def give_up():
+    state["on"] = False
+    shop.close()
+
+
+def on_key(key):
+    if key == "f":
+        open_shop()
+
+
+# ---------------------------------------------------------------- мобы и волны
+def on_mob_death(mob, x, y, z):
+    if mob in REWARD and state["on"]:
+        state["coins"] += REWARD[mob]
+        state["kills"] += 1
+        ActionBar(f"<gold>+{REWARD[mob]} <gray>за {mob}  <gold>Монеты: {state['coins']}")
+
+
+def wave_mobs(n):
+    pool = ["zombie"]
+    if n >= 2: pool.append("husk")
+    if n >= 3: pool.append("skeleton")
+    if n >= 4: pool.append("spider")
+    if n >= 6: pool.append("creeper")
+    if n >= 8: pool.append("witch")
+    if n >= 11: pool.append("vindicator")
+    return [Choice(pool) for _ in range(3 + n * 2)]
+
+
+def spawn_wave(n):
+    hp_bonus = n * 2
+    for i, mob in enumerate(wave_mobs(n)):
+        x, y, z = SPAWNS[i % len(SPAWNS)]
+        Particle(x, 1, z, "portal", count=30)
+        SummonMob(x + Random(-1, 1), 0, z + Random(-1, 1), mob, {"health": 20 + hp_bonus})
+        if i % 4 == 3:
+            wait(10)                        # волна выходит порциями
+    if n % 5 == 0:                          # босс
+        boss = "ravager" if n >= 15 else "zombie"
+        SummonMob(0, 0, -12, boss, ["glowing", "persistent", {"name": f"<dark_red><bold>Босс волны {n}", "health": 80 + n * 20, "item": "netherite_sword"}])
+        Title("<dark_red>БОСС!", f"волна {n}", seconds=2)
+        Sound("entity.wither.spawn", volume=0.6)
+
+
+def alive():                                # только враги — голем-защитник не в счёт
+    return sum(CountMobs(m) for m in REWARD)
+
+
+def status():
+    left = alive()
+    if state["break"]:
+        return
+    ActionBar(f"<red>Волна {state['wave']}  <gray>мобов: <white>{left}  <gold>монет: {state['coins']}  <dark_gray>F — магазин")
+
+
+# ---------------------------------------------------------------- игра
+print("⚔ Арена волн: строю арену…")
+KillMobs()
+build_arena()
+Gamemode("survival")
+Heal()
+Feed()
+Teleport(0, 0, 0)
+SetSpawn(0, 0, 0)
+Give("wooden_sword")
+Give("bread", 6)
+Title("<red>⚔ Арена волн", "F — магазин, держись!", seconds=3)
+wait(60)
+
+while state["on"] and state["wave"] < MAX_WAVE:
+    state["wave"] += 1
+    w = state["wave"]
+    Title(f"<red>Волна {w}", "<gray>к бою!", seconds=2)
+    Sound("event.raid.horn", volume=0.7)
+    spawn_wave(w)
+    while state["on"] and alive() > 0:
+        status()
+        wait(20)
+    if not state["on"]:
+        break
+    bonus = 10 + w * 5
+    state["coins"] += bonus
+    Firework(0, 1, 0, color=["gold", "yellow"])
+    Title(f"<green>Волна {w} пройдена!", f"<gold>+{bonus} монет", seconds=2)
+    if w == MAX_WAVE:
+        break
+    state["break"] = True
+    open_shop()
+    for t in range(BREAK, 0, -1):
+        if not state["break"] or not state["on"]:
+            break
+        ActionBar(f"<green>Передышка: {t} с  <gold>монет: {state['coins']}  <dark_gray>F — магазин")
+        wait(20)
+    state["break"] = False
+    shop.close()
+
+KillMobs()
+won = state["on"] and state["wave"] >= MAX_WAVE
+if won:
+    Title("<gold><bold>ПОБЕДА!", f"все {MAX_WAVE} волн отбиты", seconds=4)
+    for i in range(5):
+        Firework(Random(-8, 8), 1, Random(-8, 8), color=["gold", "aqua", "lime"])
+        wait(8)
+else:
+    Title("<red>Игра окончена", f"дошёл до волны {state['wave']}", seconds=3)
+print(f"Итог: волна {state['wave']}, убито {state['kills']}, монет осталось {state['coins']}")
+Gamemode(state["mode"])
+Stop()

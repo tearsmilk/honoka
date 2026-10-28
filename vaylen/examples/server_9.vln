@@ -1,0 +1,9 @@
+House(0, 0, 0, 9, 7, 5, "stone_bricks", "dark_oak_planks")
+Tree(12, 0, 3, "cherry")
+for i in range(5):
+    Firework(4, 8, 3, colors=["red", "gold"])
+    wait(10)
+
+def on_chat(message):
+    if message == "ночь":
+        SetTime(18000)
