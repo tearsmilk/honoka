@@ -1,0 +1,15 @@
+@menu("<dark_green>Лавка", rows=3, glyph="<glyph:shop_bg>")
+class Shop:
+    goods = {11: ("bread", 16, 10), 13: ("cooked_beef", 8, 25), 15: ("golden_apple", 1, 200)}
+
+    def build(self, player):
+        return {slot: Item(m, n, lore=[f"<yellow>{price} монет"]) for slot, (m, n, price) in self.goods.items()}
+
+    def click(self, player, slot, item):
+        if slot in self.goods:
+            m, n, price = self.goods[slot]
+            if player.pay(price):
+                player.give(Item(m, n))
+                Sound(player.location, "entity.experience_orb.pickup")
+            else:
+                player.tell("<red>Не хватает монет")

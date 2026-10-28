@@ -1,0 +1,279 @@
+# ⛏ ОХОТНИК ЗА РУДОЙ — игра прямо в меню-сундуке
+# Руда появляется в клетках — кликай, пока не исчезла. Серия попаданий даёт бонус,
+# динамит отнимает очки. Монеты тратятся на улучшения и предметы в магазине.
+# Прогресс сохраняется на игроке (флаг), так что после перезапуска он не пропадёт.
+
+SAVE = "ore_hunter"
+FIELD = [r * 9 + c for r in range(1, 5) for c in range(1, 8)]     # 28 клеток поля
+
+ORES = [  # предмет, название, очки, вес
+    ("coal", "<dark_gray>Уголь", 1, 50),
+    ("raw_iron", "<white>Железо", 2, 28),
+    ("raw_gold", "<gold>Золото", 5, 14),
+    ("diamond", "<aqua>Алмаз", 12, 6),
+    ("emerald", "<green>Изумруд", 30, 2),
+]
+
+UPGRADES = {  # ключ: (предмет, название, описание, цена, макс. уровень)
+    "pick":  ("iron_pickaxe", "<gold>Кирка", "+1 к очкам за каждую руду", 40, 10),
+    "clock": ("clock", "<yellow>Часы", "+5 секунд к игре", 60, 6),
+    "luck":  ("rabbit_foot", "<green>Удача", "редкая руда попадается чаще", 80, 8),
+    "slow":  ("honey_bottle", "<gold>Мёд", "руда исчезает медленнее", 70, 6),
+    "combo": ("blaze_powder", "<red>Комбо", "серия даёт больше бонуса", 90, 5),
+}
+
+SHOP = [  # предмет, количество, название, цена
+    ("bread", 8, "<yellow>Хлеб ×8", 20),
+    ("torch", 32, "<yellow>Факелы ×32", 25),
+    ("iron_pickaxe", 1, "<white>Железная кирка", 120),
+    ("golden_apple", 1, "<gold>Золотое яблоко", 250),
+    ("diamond", 1, "<aqua>Алмаз", 400),
+    ("experience_bottle", 16, "<green>Пузырьки опыта ×16", 300),
+]
+
+st = {}          # сохранение игрока
+game = {}        # текущая партия
+
+
+def price(key):
+    base = UPGRADES[key][3]
+    return int(base * (st[key] + 1) ** 1.6)
+
+
+def load(player):
+    global st
+    saved = player.flag(SAVE, default=None) or {}
+    st = {"coins": 0, "best": 0, "games": 0}
+    for k in UPGRADES:
+        st[k] = 0
+    st.update(saved)
+
+
+def save(player):
+    player.flag(SAVE, st)
+
+
+def frame(m):
+    m.fill("gray_stained_glass_pane", name=" ", all=True)
+    m.border("black_stained_glass_pane", name=" ")
+
+
+# ---------------------------------------------------------------- главное меню
+main = Menu("<gold>⛏ Охотник за рудой", rows=3)
+
+
+def show_main(player):
+    frame(main)
+    main.set(4, "sunflower", name=f"<gold>Монеты: <white>{st['coins']}",
+             lore=[f"<gray>Рекорд: <white>{st['best']}", f"<gray>Сыграно игр: <white>{st['games']}"])
+    main.button(11, "diamond_pickaxe", start, name="<green><bold>▶ Играть",
+                lore=[f"<gray>Время: <white>{30 + st['clock'] * 5} с", "<gray>Кликай по руде, пока не исчезла!"], glow=True)
+    main.button(13, "anvil", open_upgrades, name="<yellow>Улучшения", lore=["<gray>Кирка, часы, удача, мёд, комбо"])
+    main.button(15, "emerald", open_shop, name="<green>Магазин", lore=["<gray>Настоящие предметы за монеты"])
+    main.button(22, "barrier", lambda p, s, c: main.close(), name="<red>Выйти")
+    main.open(player)
+
+
+def back(player, slot, click):
+    show_main(player)
+
+
+# ---------------------------------------------------------------- улучшения
+ups = Menu("<yellow>Улучшения", rows=3)
+
+
+def open_upgrades(player, slot, click):
+    frame(ups)
+    ups.set(4, "sunflower", name=f"<gold>Монеты: <white>{st['coins']}")
+    for i, key in enumerate(UPGRADES):
+        item, title, desc, base, top = UPGRADES[key]
+        lvl = st[key]
+        if lvl >= top:
+            lore = [f"<gray>{desc}", f"<gray>Уровень: <green>{lvl}/{top} (макс.)"]
+        else:
+            lore = [f"<gray>{desc}", f"<gray>Уровень: <white>{lvl}/{top}", f"<gold>Цена: {price(key)} монет", "<dark_gray>клик — купить"]
+        ups.button(11 + i, item, buy_upgrade(key), name=title, lore=lore, amount=max(1, lvl), glow=lvl >= top)
+    ups.button(22, "arrow", back, name="<white>← Назад")
+    ups.open(player)
+
+
+def buy_upgrade(key):
+    def handler(player, slot, click):
+        top = UPGRADES[key][4]
+        if st[key] >= top:
+            ActionBar("<gray>Уже максимальный уровень")
+            return
+        cost = price(key)
+        if st["coins"] < cost:
+            ActionBar(f"<red>Нужно {cost} монет, у тебя {st['coins']}")
+            Sound("block.note_block.bass", pitch=0.6)
+            return
+        st["coins"] -= cost
+        st[key] += 1
+        save(player)
+        Sound("block.anvil.use", pitch=1.4)
+        ActionBar(f"<green>{UPGRADES[key][1]}<green> → уровень {st[key]}")
+        open_upgrades(player, slot, click)
+    return handler
+
+
+# ---------------------------------------------------------------- магазин
+shop = Menu("<green>Магазин", rows=3)
+
+
+def open_shop(player, slot, click):
+    frame(shop)
+    shop.set(4, "sunflower", name=f"<gold>Монеты: <white>{st['coins']}")
+    for i, (item, count, title, cost) in enumerate(SHOP):
+        shop.button(10 + i, item, buy_item(i), name=title, lore=[f"<gold>{cost} монет", "<dark_gray>клик — купить"], amount=min(count, 64))
+    shop.button(22, "arrow", back, name="<white>← Назад")
+    shop.open(player)
+
+
+def buy_item(i):
+    def handler(player, slot, click):
+        item, count, title, cost = SHOP[i]
+        if st["coins"] < cost:
+            ActionBar(f"<red>Нужно {cost} монет")
+            Sound("block.note_block.bass", pitch=0.6)
+            return
+        st["coins"] -= cost
+        save(player)
+        Give(item, count)
+        Sound("entity.experience_orb.pickup")
+        ActionBar(f"<green>Куплено: {title}")
+        open_shop(player, slot, click)
+    return handler
+
+
+# ---------------------------------------------------------------- сама игра
+field = Menu("<gold>⛏ Кликай по руде!", rows=6)
+
+
+def pick_ore():
+    luck = st["luck"]
+    weights = [w + (i * luck * 2 if i >= 2 else 0) for i, (_, _, _, w) in enumerate(ORES)]
+    r = Random(1, sum(weights))
+    for ore, w in zip(ORES, weights):
+        r -= w
+        if r <= 0:
+            return ore
+    return ORES[0]
+
+
+def hud():
+    left = max(0, game["left"])
+    field.set(46, "clock", name=f"<yellow>Осталось: <white>{left // 2} с")
+    field.set(49, "gold_ingot", name=f"<gold>Очки: <white>{game['score']}")
+    field.set(52, "blaze_powder", name=f"<red>Серия: <white>×{game['combo']}",
+              lore=[f"<gray>Бонус: +{combo_bonus()}% очков"])
+
+
+def combo_bonus():
+    return min(game["combo"], 20) * (5 + st["combo"] * 3)
+
+
+def hit(player, slot, click):
+    cell = game.get("cells", {}).get(slot)
+    if not game.get("on") or cell is None:
+        return
+    del game["cells"][slot]
+    field.set(slot, "black_stained_glass_pane", name=" ")
+    if cell["tnt"]:
+        game["score"] = max(0, game["score"] - 15)
+        game["combo"] = 0
+        Sound("entity.generic.explode", volume=0.5, pitch=1.6)
+        ActionBar("<red>💥 Динамит! −15 очков, серия сброшена")
+    else:
+        game["combo"] += 1
+        pts = (cell["pts"] + st["pick"]) * (100 + combo_bonus()) // 100
+        game["score"] += pts
+        Sound("entity.experience_orb.pickup", pitch=min(2.0, 0.8 + game["combo"] * 0.06))
+        ActionBar(f"<green>+{pts}  <gray>серия ×{game['combo']}")
+    hud()
+
+
+def start(player, slot, click):
+    game.clear()
+    # пока партия «выключена»: повторное открытие поля закрывает старое окно, и on_close не должен её завершить
+    game.update({"on": False, "score": 0, "combo": 0, "cells": {}, "left": (30 + st["clock"] * 5) * 2})
+    life = 6 + st["slow"]                      # сколько полусекунд руда живёт
+    field.fill("black_stained_glass_pane", name=" ", all=True)
+    for i in range(45, 54):
+        field.set(i, "gray_stained_glass_pane", name=" ")
+    for s in FIELD:
+        field.button(s, "black_stained_glass_pane", hit, name=" ")
+    hud()
+    field.open(player)
+    game["on"] = True
+    Title("<gold>Старт!", "кликай по руде", seconds=1)
+    while game["left"] > 0 and game["on"]:
+        # исчезает старая руда
+        for s, cell in list(game["cells"].items()):
+            cell["ttl"] -= 1
+            if cell["ttl"] <= 0:
+                del game["cells"][s]
+                field.set(s, "black_stained_glass_pane", name=" ")
+                if not cell["tnt"] and game["combo"] > 0:
+                    game["combo"] = 0
+                    ActionBar("<gray>Руда ушла — серия сброшена")
+        # появляется новая (чем ближе к концу — тем больше)
+        spawn = 1 + (1 if game["left"] < 20 else 0) + (1 if Random(1, 3) == 1 else 0)
+        free = [s for s in FIELD if s not in game["cells"]]
+        for _ in range(min(spawn, len(free))):
+            s = Choice(free)
+            free.remove(s)
+            if Random(1, 9) == 1:
+                game["cells"][s] = {"tnt": True, "pts": 0, "ttl": life}
+                field.set(s, "tnt", name="<red>Не трогай!")
+            else:
+                item, title, pts, _ = pick_ore()
+                game["cells"][s] = {"tnt": False, "pts": pts, "ttl": life}
+                field.set(s, item, name=f"{title} <gray>+{pts}")
+        game["left"] -= 1
+        hud()
+        wait(10)
+    finish(player)
+
+
+def finish(player):
+    if not game.get("on"):
+        return
+    game["on"] = False
+    score = game["score"]
+    st["coins"] += score
+    st["games"] += 1
+    record = score > st["best"]
+    if record:
+        st["best"] = score
+    save(player)
+    field.fill("gray_stained_glass_pane", name=" ", all=True)
+    field.set(13, "nether_star" if record else "gold_ingot",
+              name=("<gold><bold>НОВЫЙ РЕКОРД! " if record else "<yellow>Конец игры! ") + f"<white>{score} очков",
+              lore=[f"<gold>+{score} монет", f"<gray>Всего монет: <white>{st['coins']}"], glow=record)
+    field.button(29, "diamond_pickaxe", start, name="<green>▶ Ещё раз")
+    field.button(33, "arrow", back, name="<white>В меню")
+    if record:
+        Firework(PlayerX, PlayerY + 1, PlayerZ, color=["gold", "yellow"])
+        Title("<gold>Новый рекорд!", f"{score} очков", seconds=2)
+    Sound("ui.toast.challenge_complete" if record else "entity.player.levelup")
+
+
+@field.on_close
+def closed(player):
+    if game.get("on"):          # закрыл меню посреди игры — партия засчитывается как есть
+        finish(player)
+
+
+# ---------------------------------------------------------------- запуск
+def begin(player, slot, click):
+    load(player)
+    show_main(player)
+
+
+# Меню открывается сразу; кнопки получают player — по нему загружаем сохранение
+starter = Menu("<gold>⛏ Охотник за рудой", rows=1)
+starter.fill("black_stained_glass_pane", name=" ")
+starter.button(4, "diamond_pickaxe", begin, name="<green><bold>Начать", lore=["<gray>Клик — в главное меню"], glow=True)
+starter.open()
+print("Игра «Охотник за рудой» открыта. Закрыл меню? Нажми ▶ Запуск ещё раз.")

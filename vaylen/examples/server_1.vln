@@ -1,0 +1,9 @@
+@on("player joins")
+def welcome(event):
+    p = event.player
+    if not p.has_flag("seen"):
+        p.flag("seen", True)
+        Broadcast(f"<gold>Новый игрок: <white>{p.name}")
+        p.give(Item("bread", 8))
+    wait("2s")
+    p.title("<green>С возвращением!", subtitle=f"<gray>Монет: {p.flag('coins', default=0)}")

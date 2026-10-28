@@ -1,0 +1,13 @@
+@item("fire_wand", "blaze_rod", "<gradient:gold:red>Посох огня",
+      lore=["<gray>ПКМ — огненный шар", "<dark_gray>Перезарядка 3 с"], model="orsess:fire_wand")
+def fire_wand(): pass
+
+@on("player right clicks", with="fire_wand")
+def cast(event):
+    p = event.player
+    if p.has_flag("wand_cd"):
+        p.actionbar("<red>Посох остывает…")
+        return
+    p.shoot("small_fireball", speed=1.5)
+    Sound(p.location, "entity.blaze.shoot")
+    p.flag("wand_cd", True, expire="3s")

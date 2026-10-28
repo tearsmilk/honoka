@@ -1,0 +1,9 @@
+@command("награда")
+def daily(player, args):
+    if player.has_flag("daily"):
+        left = player.flag_expire("daily")
+        player.tell(f"<gray>Следующая награда через {left}")
+        return
+    player.give(Item("emerald", 5))
+    player.flag("daily", True, expire="24h")
+    player.tell("<green>Награда получена! <click:run_command:/награда><u>Проверить завтра</u></click>")

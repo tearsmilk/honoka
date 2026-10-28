@@ -1,0 +1,1673 @@
+{
+ "sandbox": {
+  "functions": [
+   {
+    "c": "Блоки",
+    "n": "SetBlock",
+    "p": "x, y, z, block",
+    "d": "Ставит блок в точку (x, y, z). Можно указать состояние: \"oak_stairs[facing=east]\".",
+    "e": "SetBlock(0, 0, 0, \"diamond_block\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "GetBlock",
+    "p": "x, y, z",
+    "d": "Возвращает название блока в точке, например \"stone\" или \"air\".",
+    "e": "if GetBlock(0, -1, 0) == \"grass_block\":\n    print(\"Под нами трава\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "IsBlock",
+    "p": "x, y, z, block",
+    "d": "True, если в точке стоит этот блок.",
+    "e": "if IsBlock(5, 0, 5, \"gold_block\"):\n    Say(\"Золото на месте!\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "IsAir",
+    "p": "x, y, z",
+    "d": "True, если в точке пусто (воздух).",
+    "e": "if IsAir(0, 0, 0):\n    SetBlock(0, 0, 0, \"stone\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "BreakBlock",
+    "p": "x, y, z, drop=True",
+    "d": "Ломает блок, как будто его сломал игрок. drop=False — без выпадения предмета.",
+    "e": "BreakBlock(0, 0, 0)"
+   },
+   {
+    "c": "Блоки",
+    "n": "Fill",
+    "p": "x1, y1, z1, x2, y2, z2, block",
+    "d": "Заполняет прямоугольную область блоками (до 1 000 000 блоков за раз).",
+    "e": "Fill(0, 0, 0, 9, 0, 9, \"stone\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "FillHollow",
+    "p": "x1, y1, z1, x2, y2, z2, block",
+    "d": "Строит пустую коробку: стены, пол и потолок, а внутри воздух.",
+    "e": "FillHollow(0, 0, 0, 6, 4, 6, \"glass\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "Walls",
+    "p": "x1, y1, z1, x2, y2, z2, block",
+    "d": "Строит четыре стены без пола и потолка.",
+    "e": "Walls(0, 0, 0, 8, 3, 8, \"cobblestone\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "Floor",
+    "p": "x1, z1, x2, z2, y, block",
+    "d": "Кладёт горизонтальный пол на высоте y.",
+    "e": "Floor(-5, -5, 5, 5, -1, \"oak_planks\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "Replace",
+    "p": "x1, y1, z1, x2, y2, z2, old, new",
+    "d": "Заменяет в области один блок на другой. Возвращает число замен.",
+    "e": "n = Replace(-10, -1, -10, 10, -1, 10, \"grass_block\", \"sand\")\nprint(\"Заменено:\", n)"
+   },
+   {
+    "c": "Блоки",
+    "n": "Clear",
+    "p": "x1, y1, z1, x2, y2, z2",
+    "d": "Очищает область (ставит воздух).",
+    "e": "Clear(0, 0, 0, 20, 20, 20)"
+   },
+   {
+    "c": "Блоки",
+    "n": "CountBlocks",
+    "p": "x1, y1, z1, x2, y2, z2, block",
+    "d": "Считает, сколько таких блоков в области.",
+    "e": "print(CountBlocks(0, 0, 0, 10, 10, 10, \"stone\"))"
+   },
+   {
+    "c": "Блоки",
+    "n": "TopY",
+    "p": "x, z",
+    "d": "Высота самого верхнего непустого блока в столбце (x, z).",
+    "e": "y = TopY(10, 10)\nSetBlock(10, y + 1, 10, \"torch\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "Line",
+    "p": "x1, y1, z1, x2, y2, z2, block",
+    "d": "Проводит прямую линию из блоков между двумя точками.",
+    "e": "Line(0, 0, 0, 10, 10, 0, \"gold_block\")"
+   },
+   {
+    "c": "Блоки",
+    "n": "Copy",
+    "p": "x1, y1, z1, x2, y2, z2",
+    "d": "Копирует область в буфер. Возвращает число блоков.",
+    "e": "Copy(0, 0, 0, 5, 5, 5)"
+   },
+   {
+    "c": "Блоки",
+    "n": "Paste",
+    "p": "x, y, z",
+    "d": "Вставляет скопированную область, (x, y, z) — угол вставки.",
+    "e": "Copy(0, 0, 0, 5, 5, 5)\nPaste(20, 0, 0)"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Sphere",
+    "p": "x, y, z, radius, block",
+    "d": "Сплошной шар с центром (x, y, z).",
+    "e": "Sphere(0, 10, 0, 5, \"glass\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "HollowSphere",
+    "p": "x, y, z, radius, block",
+    "d": "Пустой шар (только оболочка).",
+    "e": "HollowSphere(0, 10, 0, 8, \"glass\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Dome",
+    "p": "x, y, z, radius, block",
+    "d": "Купол — верхняя половина пустого шара.",
+    "e": "Dome(0, 0, 0, 10, \"white_stained_glass\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Cylinder",
+    "p": "x, y, z, radius, height, block",
+    "d": "Сплошной цилиндр (столб), основание в (x, y, z).",
+    "e": "Cylinder(0, 0, 0, 3, 10, \"quartz_block\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "HollowCylinder",
+    "p": "x, y, z, radius, height, block",
+    "d": "Труба — пустой цилиндр.",
+    "e": "HollowCylinder(0, 0, 0, 4, 12, \"stone_bricks\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Circle",
+    "p": "x, y, z, radius, block",
+    "d": "Кольцо (окружность) на высоте y.",
+    "e": "Circle(0, 0, 0, 10, \"red_wool\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Disk",
+    "p": "x, y, z, radius, block",
+    "d": "Закрашенный круг на высоте y.",
+    "e": "Disk(0, -1, 0, 8, \"blue_concrete\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Pyramid",
+    "p": "x, y, z, size, block, hollow=False",
+    "d": "Пирамида: (x, y, z) — центр основания, size — половина ширины.",
+    "e": "Pyramid(0, 0, 0, 10, \"sandstone\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "House",
+    "p": "x, y, z, width=7, depth=7, height=4, wall=\"oak_planks\", roof=\"spruce_planks\"",
+    "d": "Готовый домик с дверью, окнами, полом и крышей. (x, y, z) — угол дома.",
+    "e": "House(0, 0, 0)\nHouse(12, 0, 0, 9, 7, 5, \"stone_bricks\", \"dark_oak_planks\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Tower",
+    "p": "x, y, z, height, radius=3, block=\"stone_bricks\"",
+    "d": "Круглая башня с зубцами наверху.",
+    "e": "Tower(0, 0, 0, 15)"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Tree",
+    "p": "x, y, z, kind=\"oak\"",
+    "d": "Сажает дерево: oak, birch, spruce, jungle, acacia, dark_oak, cherry, mangrove, azalea.",
+    "e": "for i in range(5):\n    Tree(i * 6, 0, 10, \"birch\")"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Maze",
+    "p": "x, y, z, width, depth, height=3, block=\"hedge\"",
+    "d": "Строит случайный лабиринт. width и depth — число клеток, block — материал стен (\"hedge\" = листва).",
+    "e": "Maze(0, 0, 0, 10, 10)"
+   },
+   {
+    "c": "Фигуры и постройки",
+    "n": "Stairs",
+    "p": "x, y, z, length, direction=\"north\", block=\"stone_brick_stairs\"",
+    "d": "Лестница вверх в сторону north/south/east/west.",
+    "e": "Stairs(0, 0, 0, 10, \"east\")"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SummonMob",
+    "p": "x, y, z, mob, options=None",
+    "d": "Призывает моба и возвращает его номер (id). options — список или словарь: \"glowing\", \"noai\", \"baby\", \"silent\", \"invulnerable\", \"fire\", \"persistent\", \"nogravity\", {\"name\": \"Вася\", \"health\": 40, \"effect\": \"speed\", \"item\": \"diamond_sword\", \"armor\": \"iron\"}.",
+    "e": "zombie = SummonMob(5, 0, 5, \"zombie\", [\"glowing\", \"noai\"])\nSummonMob(0, 0, 0, \"pig\", {\"name\": \"Хрюша\", \"baby\": True})"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "Summon",
+    "p": "x, y, z, entity, nbt=\"\"",
+    "d": "Призывает любую сущность (лодку, стрелу, вагонетку...) с NBT-данными как в команде /summon.",
+    "e": "Summon(0, 5, 0, \"falling_block\", \"{BlockState:{Name:'minecraft:sand'}}\")"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SpawnItem",
+    "p": "x, y, z, item, count=1",
+    "d": "Бросает предмет на землю.",
+    "e": "SpawnItem(0, 1, 0, \"diamond\", 5)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "KillMobs",
+    "p": "mob=\"all\", radius=0",
+    "d": "Убирает мобов (не игроков). radius=0 — во всём мире. Возвращает количество.",
+    "e": "KillMobs(\"zombie\")\nKillMobs(\"all\", 20)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "CountMobs",
+    "p": "mob=\"all\", radius=0",
+    "d": "Считает мобов. radius — расстояние от игрока, 0 — весь мир.",
+    "e": "if CountMobs(\"zombie\") < 5:\n    SummonMob(0, 0, 0, \"zombie\")"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "FindMobs",
+    "p": "mob=\"all\", radius=32",
+    "d": "Список id мобов рядом с игроком.",
+    "e": "for m in FindMobs(\"cow\"):\n    SetMobGlow(m)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "NearestMob",
+    "p": "mob=\"all\", radius=64",
+    "d": "id ближайшего к игроку моба или None.",
+    "e": "m = NearestMob(\"zombie\")\nif m:\n    KillMob(m)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobExists",
+    "p": "id",
+    "d": "True, если моб с таким id жив.",
+    "e": "while MobExists(boss):\n    wait(20)\nSay(\"Босс побеждён!\")"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobType",
+    "p": "id",
+    "d": "Тип моба, например \"zombie\".",
+    "e": "print(MobType(m))"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobPos",
+    "p": "id",
+    "d": "Координаты моба списком [x, y, z].",
+    "e": "x, y, z = MobPos(m)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobX",
+    "p": "id",
+    "d": "Координата X моба.",
+    "e": "print(MobX(m))"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobY",
+    "p": "id",
+    "d": "Координата Y моба.",
+    "e": "print(MobY(m))"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobZ",
+    "p": "id",
+    "d": "Координата Z моба.",
+    "e": "print(MobZ(m))"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MoveMob",
+    "p": "id, x, y, z",
+    "d": "Телепортирует моба.",
+    "e": "MoveMob(m, 0, 10, 0)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobWalkTo",
+    "p": "id, x, y, z, speed=1.0",
+    "d": "Моб сам идёт к точке (если у него есть ИИ).",
+    "e": "MobWalkTo(m, 10, 0, 10)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "PushMob",
+    "p": "id, vx, vy, vz",
+    "d": "Толкает моба (задаёт скорость). vy=1 — подбросить вверх.",
+    "e": "PushMob(m, 0, 1.5, 0)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobHealth",
+    "p": "id",
+    "d": "Здоровье моба.",
+    "e": "print(MobHealth(m))"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetMobHealth",
+    "p": "id, health",
+    "d": "Задаёт здоровье (и максимум, если нужно больше).",
+    "e": "SetMobHealth(m, 100)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetMobName",
+    "p": "id, name",
+    "d": "Даёт мобу имя над головой.",
+    "e": "SetMobName(m, \"Король\")"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetMobGlow",
+    "p": "id, on=True",
+    "d": "Подсветка моба (видно сквозь стены).",
+    "e": "SetMobGlow(m)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetMobAI",
+    "p": "id, on",
+    "d": "Включает/выключает ИИ: без ИИ моб стоит статуей.",
+    "e": "SetMobAI(m, False)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetBaby",
+    "p": "id, on=True",
+    "d": "Делает моба малышом.",
+    "e": "SetBaby(m)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "SetMobSpeed",
+    "p": "id, speed",
+    "d": "Скорость ходьбы (обычно 0.2–0.3).",
+    "e": "SetMobSpeed(m, 0.5)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobEffect",
+    "p": "id, effect, seconds=10, level=1",
+    "d": "Накладывает эффект на моба.",
+    "e": "MobEffect(m, \"levitation\", 5)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "MobRide",
+    "p": "id, mount_id",
+    "d": "Сажает моба верхом на другого.",
+    "e": "chicken = SummonMob(0, 0, 0, \"chicken\")\nzombie = SummonMob(0, 0, 0, \"zombie\", [\"baby\"])\nMobRide(zombie, chicken)"
+   },
+   {
+    "c": "Мобы и существа",
+    "n": "KillMob",
+    "p": "id",
+    "d": "Убивает одного моба.",
+    "e": "KillMob(m)"
+   },
+   {
+    "c": "Игрок",
+    "n": "Teleport",
+    "p": "x, y, z",
+    "d": "Телепортирует игрока (камеру).",
+    "e": "Teleport(0, 20, 0)"
+   },
+   {
+    "c": "Игрок",
+    "n": "Move",
+    "p": "dx, dy, dz",
+    "d": "Сдвигает игрока на столько блоков.",
+    "e": "Move(0, 5, 0)"
+   },
+   {
+    "c": "Игрок",
+    "n": "Look",
+    "p": "yaw, pitch",
+    "d": "Поворачивает взгляд: yaw 0=юг, 90=запад, 180=север, -90=восток; pitch -90=вверх, 90=вниз.",
+    "e": "Look(180, 30)"
+   },
+   {
+    "c": "Игрок",
+    "n": "LookAt",
+    "p": "x, y, z",
+    "d": "Поворачивает взгляд на точку.",
+    "e": "LookAt(0, 0, 0)"
+   },
+   {
+    "c": "Игрок",
+    "n": "PlayerPos",
+    "p": "",
+    "d": "Координаты игрока [x, y, z] (целые).",
+    "e": "x, y, z = PlayerPos()"
+   },
+   {
+    "c": "Игрок",
+    "n": "LookingAt",
+    "p": "",
+    "d": "Блок под прицелом [x, y, z] или None (до 100 блоков).",
+    "e": "p = LookingAt()\nif p:\n    SetBlock(p[0], p[1], p[2], \"gold_block\")"
+   },
+   {
+    "c": "Игрок",
+    "n": "Give",
+    "p": "item, count=1",
+    "d": "Даёт предмет в инвентарь.",
+    "e": "Give(\"diamond_sword\")\nGive(\"cake\", 3)"
+   },
+   {
+    "c": "Игрок",
+    "n": "ClearInventory",
+    "p": "",
+    "d": "Очищает инвентарь.",
+    "e": "ClearInventory()"
+   },
+   {
+    "c": "Игрок",
+    "n": "HasItem",
+    "p": "item",
+    "d": "Сколько таких предметов у игрока (0 — нет).",
+    "e": "if HasItem(\"diamond\") > 0:\n    Say(\"Богач!\")"
+   },
+   {
+    "c": "Игрок",
+    "n": "SetHealth",
+    "p": "health",
+    "d": "Задаёт здоровье игрока (20 = 10 сердец).",
+    "e": "SetHealth(10)"
+   },
+   {
+    "c": "Игрок",
+    "n": "Heal",
+    "p": "",
+    "d": "Полностью лечит игрока.",
+    "e": "Heal()"
+   },
+   {
+    "c": "Игрок",
+    "n": "Feed",
+    "p": "",
+    "d": "Полностью насыщает игрока.",
+    "e": "Feed()"
+   },
+   {
+    "c": "Игрок",
+    "n": "Effect",
+    "p": "effect, seconds=10, level=1",
+    "d": "Накладывает эффект: speed, jump_boost, night_vision, levitation, invisibility, regeneration...",
+    "e": "Effect(\"night_vision\", 600)"
+   },
+   {
+    "c": "Игрок",
+    "n": "ClearEffects",
+    "p": "",
+    "d": "Снимает все эффекты.",
+    "e": "ClearEffects()"
+   },
+   {
+    "c": "Игрок",
+    "n": "Gamemode",
+    "p": "mode",
+    "d": "Режим: \"spectator\" (наблюдатель), \"creative\", \"survival\", \"adventure\".",
+    "e": "Gamemode(\"creative\")"
+   },
+   {
+    "c": "Игрок",
+    "n": "SetXP",
+    "p": "levels",
+    "d": "Задаёт уровень опыта.",
+    "e": "SetXP(30)"
+   },
+   {
+    "c": "Игрок",
+    "n": "AddXP",
+    "p": "levels",
+    "d": "Добавляет уровни опыта.",
+    "e": "AddXP(5)"
+   },
+   {
+    "c": "Игрок",
+    "n": "SetSpawn",
+    "p": "x, y, z",
+    "d": "Точка возрождения игрока.",
+    "e": "SetSpawn(0, 0, 0)"
+   },
+   {
+    "c": "Игрок",
+    "n": "SetFlySpeed",
+    "p": "speed",
+    "d": "Скорость полёта (обычно 0.05, наблюдатель — 0.1).",
+    "e": "SetFlySpeed(0.2)"
+   },
+   {
+    "c": "Игрок",
+    "n": "Launch",
+    "p": "vx, vy, vz",
+    "d": "Подбрасывает игрока (в режиме выживания/творчества).",
+    "e": "Launch(0, 2, 0)"
+   },
+   {
+    "c": "Игрок",
+    "n": "PlayerInArea",
+    "p": "x1, y1, z1, x2, y2, z2",
+    "d": "True, если игрок внутри области.",
+    "e": "if PlayerInArea(0, 0, 0, 10, 10, 10):\n    Title(\"Ты в зоне!\")"
+   },
+   {
+    "c": "Игрок",
+    "n": "PlayerNear",
+    "p": "x, y, z, radius",
+    "d": "True, если игрок ближе radius блоков к точке.",
+    "e": "if PlayerNear(0, 0, 0, 5):\n    Say(\"Близко!\")"
+   },
+   {
+    "c": "Игрок",
+    "n": "Players",
+    "p": "",
+    "d": "Список имён всех игроков на сервере.",
+    "e": "print(Players())"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "SetTime",
+    "p": "time",
+    "d": "Время суток: число 0–24000 или \"day\", \"noon\", \"evening\", \"night\", \"midnight\", \"morning\".",
+    "e": "SetTime(\"night\")"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "GetTime",
+    "p": "",
+    "d": "Текущее время суток 0–23999 (то же, что переменная Time).",
+    "e": "print(GetTime())"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "SetWeather",
+    "p": "kind, seconds=600",
+    "d": "Погода: \"clear\", \"rain\", \"thunder\".",
+    "e": "SetWeather(\"thunder\")"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "GetWeather",
+    "p": "",
+    "d": "Текущая погода: \"clear\", \"rain\" или \"thunder\".",
+    "e": "if GetWeather() == \"rain\":\n    SetWeather(\"clear\")"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "DayCycle",
+    "p": "on",
+    "d": "Включает или останавливает смену дня и ночи.",
+    "e": "DayCycle(False)"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "Gamerule",
+    "p": "name, value",
+    "d": "Меняет правило игры, например \"doMobSpawning\", \"keepInventory\".",
+    "e": "Gamerule(\"keepInventory\", True)"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "Difficulty",
+    "p": "level",
+    "d": "Сложность: \"peaceful\", \"easy\", \"normal\", \"hard\".",
+    "e": "Difficulty(\"peaceful\")"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "Command",
+    "p": "text",
+    "d": "Выполняет любую команду Minecraft (без /). Возвращает результат.",
+    "e": "Command(\"weather clear\")\nCommand(\"give @p apple 5\")"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "SetWorldSpawn",
+    "p": "x, y, z",
+    "d": "Точка появления мира.",
+    "e": "SetWorldSpawn(0, 0, 0)"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "Biome",
+    "p": "x, y, z",
+    "d": "Название биома в точке.",
+    "e": "print(Biome(0, 0, 0))"
+   },
+   {
+    "c": "Мир и погода",
+    "n": "LightLevel",
+    "p": "x, y, z",
+    "d": "Уровень освещённости 0–15.",
+    "e": "if LightLevel(0, 0, 0) < 8:\n    SetBlock(0, 0, 0, \"torch\")"
+   },
+   {
+    "c": "Эффекты",
+    "n": "Explosion",
+    "p": "x, y, z, power=3, fire=False, breaks=True",
+    "d": "Взрыв. power 4 — как динамит. breaks=False — без разрушений.",
+    "e": "Explosion(0, 0, 0, 5)"
+   },
+   {
+    "c": "Эффекты",
+    "n": "Lightning",
+    "p": "x, y, z",
+    "d": "Удар молнии.",
+    "e": "Lightning(0, 0, 0)"
+   },
+   {
+    "c": "Эффекты",
+    "n": "Particle",
+    "p": "x, y, z, particle=\"flame\", count=20, spread=0.5",
+    "d": "Частицы: flame, heart, smoke, cloud, end_rod, happy_villager, firework, explosion, note, soul_fire_flame...",
+    "e": "Particle(0, 2, 0, \"heart\", 30)"
+   },
+   {
+    "c": "Эффекты",
+    "n": "Sound",
+    "p": "sound, x=None, y=None, z=None, volume=1, pitch=1",
+    "d": "Проигрывает звук (без координат — у игрока). Например \"entity.cat.ambient\", \"block.note_block.pling\".",
+    "e": "Sound(\"entity.player.levelup\")"
+   },
+   {
+    "c": "Эффекты",
+    "n": "Firework",
+    "p": "x, y, z, color=\"red\", power=1",
+    "d": "Запускает фейерверк. Цвета: red, orange, yellow, green, blue, purple, white, pink...",
+    "e": "Firework(0, 0, 0, \"blue\")"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "print",
+    "p": "*values",
+    "d": "Пишет в консоль справа (стандартный print из Python).",
+    "e": "print(\"Привет!\", PlayerX)"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "Say",
+    "p": "text",
+    "d": "Сообщение в игровой чат.",
+    "e": "Say(\"Всем привет!\")"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "Title",
+    "p": "text, subtitle=\"\", seconds=3",
+    "d": "Большая надпись по центру экрана.",
+    "e": "Title(\"Уровень 1\", \"Найди алмаз\")"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "ActionBar",
+    "p": "text",
+    "d": "Надпись над панелью предметов.",
+    "e": "ActionBar(\"Очки: \" + str(score))"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "ClearConsole",
+    "p": "",
+    "d": "Очищает консоль справа.",
+    "e": "ClearConsole()"
+   },
+   {
+    "c": "Сообщения и консоль",
+    "n": "Help",
+    "p": "name=None",
+    "d": "Справка по функции в консоли. Без аргумента — список всех функций.",
+    "e": "Help(\"SummonMob\")"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "wait",
+    "p": "ticks=1",
+    "d": "Пауза: 20 тиков = 1 секунда. Мир продолжает жить.",
+    "e": "for i in range(10):\n    SetBlock(0, i, 0, \"stone\")\n    wait(5)"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "Wait",
+    "p": "ticks=1",
+    "d": "То же, что wait.",
+    "e": "Wait(20)"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "WaitSeconds",
+    "p": "seconds",
+    "d": "Пауза в секундах (можно дробные).",
+    "e": "WaitSeconds(1.5)"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "sleep",
+    "p": "seconds",
+    "d": "То же, что WaitSeconds (как time.sleep).",
+    "e": "sleep(2)"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "WaitUntil",
+    "p": "condition, timeout=0",
+    "d": "Ждёт, пока функция condition не вернёт True. timeout — максимум тиков (0 — без ограничения).",
+    "e": "WaitUntil(lambda: PlayerY > 30)\nSay(\"Ты высоко!\")"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "Ticks",
+    "p": "",
+    "d": "Сколько тиков прошло с запуска программы.",
+    "e": "print(Ticks())"
+   },
+   {
+    "c": "Время и ожидание",
+    "n": "Stop",
+    "p": "",
+    "d": "Останавливает программу.",
+    "e": "if PlayerY < -50:\n    Stop()"
+   },
+   {
+    "c": "События",
+    "n": "OnEvent",
+    "p": "event, func=None",
+    "d": "Подписывает функцию на событие: tick, chat, block_break, block_place, mob_death, player_move, key. Можно как декоратор: @OnEvent(\"chat\").",
+    "e": "def hello(msg):\n    print(\"Ты написал:\", msg)\nOnEvent(\"chat\", hello)"
+   },
+   {
+    "c": "События",
+    "n": "Every",
+    "p": "ticks, func",
+    "d": "Вызывает func каждые ticks тиков, пока программа работает.",
+    "e": "def spawn():\n    SummonMob(0, 0, 0, \"chicken\")\nEvery(40, spawn)"
+   },
+   {
+    "c": "События",
+    "n": "After",
+    "p": "ticks, func",
+    "d": "Вызывает func один раз через ticks тиков.",
+    "e": "After(100, lambda: Say(\"Прошло 5 секунд\"))"
+   },
+   {
+    "c": "Полезное",
+    "n": "Random",
+    "p": "a, b",
+    "d": "Случайное целое число от a до b включительно.",
+    "e": "x = Random(-10, 10)"
+   },
+   {
+    "c": "Полезное",
+    "n": "RandomFloat",
+    "p": "",
+    "d": "Случайное дробное число от 0 до 1.",
+    "e": "if RandomFloat() < 0.5:\n    print(\"Орёл\")"
+   },
+   {
+    "c": "Полезное",
+    "n": "Choice",
+    "p": "items",
+    "d": "Случайный элемент списка.",
+    "e": "SetBlock(0, 0, 0, Choice([\"red_wool\", \"blue_wool\", \"lime_wool\"]))"
+   },
+   {
+    "c": "Полезное",
+    "n": "randint",
+    "p": "a, b",
+    "d": "То же, что Random (как random.randint).",
+    "e": "n = randint(1, 6)"
+   },
+   {
+    "c": "Полезное",
+    "n": "Distance",
+    "p": "x1, y1, z1, x2, y2, z2",
+    "d": "Расстояние между двумя точками.",
+    "e": "print(Distance(0, 0, 0, 3, 4, 0))"
+   },
+   {
+    "c": "Полезное",
+    "n": "DistanceToPlayer",
+    "p": "x, y, z",
+    "d": "Расстояние от игрока до точки.",
+    "e": "if DistanceToPlayer(0, 0, 0) < 3:\n    Say(\"Ты у старта\")"
+   },
+   {
+    "c": "Полезное",
+    "n": "Blocks",
+    "p": "search=\"\"",
+    "d": "Список названий блоков (с фильтром).",
+    "e": "print(Blocks(\"wool\"))"
+   },
+   {
+    "c": "Полезное",
+    "n": "Mobs",
+    "p": "search=\"\"",
+    "d": "Список названий мобов (с фильтром).",
+    "e": "print(Mobs())"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "Menu",
+    "p": "title, rows=3, type=\"chest\"",
+    "d": "Создаёт меню-сундук (rows от 1 до 6; type: chest, hopper, dispenser, dropper). В заголовке MiniMessage и глифы Nexo <glyph:id>.",
+    "e": "m = Menu(\"<gold>Магазин\", rows=3)\nm.open()"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "button",
+    "p": "slot, item, on_click, name=None, lore=[], amount=1, glow=False",
+    "d": "m.button(…) — кнопка: при клике вызывается on_click(player, slot, click), click — \"left\", \"right\", \"shift\". Слот — номер (0…) или (ряд, столбец).",
+    "e": "def buy(player, slot, click):\n    Give(\"bread\", 8)\n    print(\"Куплено!\")\n\nm.button(13, \"bread\", buy, name=\"<yellow>Хлеб ×8\")"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "set",
+    "p": "slot, item, name=None, lore=[], amount=1, glow=False",
+    "d": "m.set(…) — положить предмет в слот (без клика). None — очистить слот.",
+    "e": "m.set((1, 4), \"diamond\", name=\"<aqua>Алмаз\", lore=[\"<gray>Редкий\"])"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "fill",
+    "p": "item, name=\" \", all=False",
+    "d": "m.fill(…) — заполнить пустые слоты (all=True — все).",
+    "e": "m.fill(\"gray_stained_glass_pane\", name=\" \")"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "border",
+    "p": "item, name=\" \"",
+    "d": "m.border(…) — рамка по краю сундука.",
+    "e": "m.border(\"black_stained_glass_pane\", name=\" \")"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "row",
+    "p": "row, item, name=None",
+    "d": "m.row(…) — заполнить ряд (с нуля).",
+    "e": "m.row(0, \"lime_stained_glass_pane\", name=\" \")"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "open",
+    "p": "player=None",
+    "d": "m.open() — открыть меню (в песочнице — тебе; в скриптах сервера — m.open(player)).",
+    "e": "m.open()"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "close",
+    "p": "",
+    "d": "m.close() — закрыть меню у всех, кто его смотрит.",
+    "e": "m.close()"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "on_close",
+    "p": "func",
+    "d": "m.on_close(f) — f(player) вызовется, когда меню закроют. Можно как декоратор: @m.on_close",
+    "e": "@m.on_close\ndef bye(player):\n    print(\"Меню закрыто\")"
+   },
+   {
+    "c": "Меню (GUI)",
+    "n": "clear",
+    "p": "slot=None",
+    "d": "m.clear() — очистить всё меню; m.clear(slot) — один слот.",
+    "e": "m.clear()"
+   }
+  ],
+  "vars": [
+   {
+    "n": "PlayerX",
+    "d": "Координата X игрока (целое число)"
+   },
+   {
+    "n": "PlayerY",
+    "d": "Координата Y игрока (высота ног)"
+   },
+   {
+    "n": "PlayerZ",
+    "d": "Координата Z игрока"
+   },
+   {
+    "n": "Xplayer",
+    "d": "То же, что PlayerX"
+   },
+   {
+    "n": "Yplayer",
+    "d": "То же, что PlayerY"
+   },
+   {
+    "n": "Zplayer",
+    "d": "То же, что PlayerZ"
+   },
+   {
+    "n": "PlayerExactX",
+    "d": "Точная X игрока (дробная)"
+   },
+   {
+    "n": "PlayerExactY",
+    "d": "Точная Y игрока (дробная)"
+   },
+   {
+    "n": "PlayerExactZ",
+    "d": "Точная Z игрока (дробная)"
+   },
+   {
+    "n": "PlayerYaw",
+    "d": "Поворот головы по горизонтали (градусы)"
+   },
+   {
+    "n": "PlayerPitch",
+    "d": "Наклон головы (−90 вверх, 90 вниз)"
+   },
+   {
+    "n": "PlayerHealth",
+    "d": "Здоровье игрока (0–20)"
+   },
+   {
+    "n": "PlayerFood",
+    "d": "Сытость игрока (0–20)"
+   },
+   {
+    "n": "PlayerXP",
+    "d": "Уровень опыта"
+   },
+   {
+    "n": "PlayerName",
+    "d": "Имя игрока"
+   },
+   {
+    "n": "PlayerMode",
+    "d": "Режим игры: spectator, creative, survival, adventure"
+   },
+   {
+    "n": "PlayerOnGround",
+    "d": "True, если игрок стоит на земле"
+   },
+   {
+    "n": "PlayerInWater",
+    "d": "True, если игрок в воде"
+   },
+   {
+    "n": "PlayerSneaking",
+    "d": "True, если игрок крадётся (Shift)"
+   },
+   {
+    "n": "PlayerBlock",
+    "d": "Блок под ногами игрока"
+   },
+   {
+    "n": "PlayerDimension",
+    "d": "Измерение: overworld, the_nether, the_end"
+   },
+   {
+    "n": "LookX",
+    "d": "X блока под прицелом (или None)"
+   },
+   {
+    "n": "LookY",
+    "d": "Y блока под прицелом (или None)"
+   },
+   {
+    "n": "LookZ",
+    "d": "Z блока под прицелом (или None)"
+   },
+   {
+    "n": "LookBlock",
+    "d": "Название блока под прицелом (или None)"
+   },
+   {
+    "n": "Time",
+    "d": "Время суток 0–23999 (0 — утро, 6000 — полдень, 13000 — ночь)"
+   },
+   {
+    "n": "Day",
+    "d": "Номер игрового дня"
+   },
+   {
+    "n": "IsDay",
+    "d": "True днём"
+   },
+   {
+    "n": "IsNight",
+    "d": "True ночью"
+   },
+   {
+    "n": "Weather",
+    "d": "Погода: \"clear\", \"rain\", \"thunder\""
+   },
+   {
+    "n": "IsRaining",
+    "d": "True, если идёт дождь"
+   },
+   {
+    "n": "IsThundering",
+    "d": "True, если гроза"
+   },
+   {
+    "n": "MobCount",
+    "d": "Сколько всего мобов в мире"
+   },
+   {
+    "n": "PlayerCount",
+    "d": "Сколько игроков на сервере"
+   },
+   {
+    "n": "Tick",
+    "d": "Тиков с запуска программы (20 в секунду)"
+   }
+  ],
+  "events": [
+   {
+    "n": "tick",
+    "s": "on_tick()",
+    "d": "Каждый игровой тик (20 раз в секунду)."
+   },
+   {
+    "n": "chat",
+    "s": "on_chat(message)",
+    "d": "Игрок написал сообщение в чат."
+   },
+   {
+    "n": "block_break",
+    "s": "on_block_break(x, y, z, block)",
+    "d": "Игрок сломал блок."
+   },
+   {
+    "n": "block_place",
+    "s": "on_block_place(x, y, z, block)",
+    "d": "Игрок поставил блок."
+   },
+   {
+    "n": "mob_death",
+    "s": "on_mob_death(mob, x, y, z)",
+    "d": "Умер моб (mob — тип, например \"zombie\")."
+   },
+   {
+    "n": "player_move",
+    "s": "on_player_move(x, y, z)",
+    "d": "Игрок перешёл на другой блок."
+   },
+   {
+    "n": "key",
+    "s": "on_key(key)",
+    "d": "Нажата клавиша (когда редактор закрыт): \"g\", \"h\", \"1\", \"up\", \"space\"..."
+   }
+  ]
+ },
+ "decorators": [
+  {
+   "n": "@command",
+   "p": "name, aliases=[], permission=None, usage=\"\"",
+   "d": "Своя команда сервера. Аргументы приходят списком args, игрок — в player. Подсказки Tab — функция tab().",
+   "e": "@command(\"дом\", aliases=[\"home\"], usage=\"/дом [имя]\")\ndef home(player, args):\n    name = args[0] if args else \"main\"\n    loc = player.flag(f\"home.{name}\")\n    if loc is None:\n        player.tell(\"<red>Дом не задан. /сетдом\")\n        return\n    player.teleport(loc)"
+  },
+  {
+   "n": "@on",
+   "p": "event, **switches",
+   "d": "Обработчик события, как world-скрипт в Denizen. Событие пишется по-русски или по-английски, переключатели сужают его: block=, item=, in_area=, with=, cause=.",
+   "e": "@on(\"player breaks block\", block=\"diamond_ore\")\ndef diamond(event):\n    event.player.tell(\"<aqua>Алмаз!\")\n    return {\"drops\": [Item(\"diamond\", 2)]}"
+  },
+  {
+   "n": "@task",
+   "p": "name=None",
+   "d": "Переиспользуемая задача (task-скрипт). Запуск: run(\"имя\", delay=20, args=...). Можно запускать из команд, событий, меню и NPC.",
+   "e": "@task\ndef fireworks_show(where):\n    for i in range(10):\n        Firework(where.add(0, i, 0), colors=[\"red\", \"gold\"])\n        wait(10)\n\nrun(\"fireworks_show\", where=player.location, delay=40)"
+  },
+  {
+   "n": "@item",
+   "p": "id, material, name, lore=[], model=None, glow=False, flags={}",
+   "d": "Свой предмет (item-скрипт): имя, описание, модель из пака (item_model / Nexo id), флаги. Выдача: Item(\"id\"). Проверка в событиях: with=\"id\".",
+   "e": "@item(\"wand\", \"blaze_rod\", \"<gold>Посох огня\", lore=[\"<gray>ПКМ — огненный шар\"], glow=True)\ndef wand(): pass\n\n@on(\"player right clicks\", with=\"wand\")\ndef cast(event):\n    event.player.shoot(\"small_fireball\", speed=1.5)"
+  },
+  {
+   "n": "@npc",
+   "p": "name, skin=None, look_close=True",
+   "d": "Поведение NPC (assignment-скрипт). Шаги диалога — @step, переход — npc.step(\"имя\"). NPC — свой, без Citizens: манекен игрока с моделью или скином.",
+   "e": "@npc(\"Рыбак Ефим\", skin=\"Notch\")\nclass Fisher:\n    @step(\"start\")\n    def on_click(self, player, npc):\n        npc.say(\"Принесёшь трёх карпов?\")\n        npc.step(\"wait_fish\", player)\n\n    @step(\"wait_fish\")\n    def on_click(self, player, npc):\n        if player.take(\"cod\", 3):\n            npc.say(\"Спасибо! Держи.\")\n            player.give(Item(\"fishing_rod\"))"
+  },
+  {
+   "n": "@menu",
+   "p": "title, rows=3, glyph=None",
+   "d": "Меню-сундук (inventory-скрипт): слоты, кнопки с обработчиками, фон глифом Nexo. Открыть: player.open(\"имя\").",
+   "e": "@menu(\"<dark_green>Магазин\", rows=3)\nclass Shop:\n    slots = {13: Item(\"bread\", 16, name=\"<yellow>Хлеб — 10 монет\")}\n\n    def click(self, player, slot, item):\n        if slot == 13 and player.pay(10):\n            player.give(Item(\"bread\", 16))"
+  },
+  {
+   "n": "@proc",
+   "p": "name=None",
+   "d": "Чистая функция (procedure-скрипт), которую можно звать из тегов и других скриптов: <proc[name].context[...]>.",
+   "e": "@proc\ndef rank_color(points):\n    return \"<gold>\" if points > 1000 else \"<gray>\"\n\nplayer.tell(f\"{rank_color(player.flag('points', default=0))}{player.name}\")"
+  },
+  {
+   "n": "@every",
+   "p": "interval",
+   "d": "Таймер (как «on delta time» в Denizen): \"20t\", \"5s\", \"10m\", \"1h\", \"daily 06:00\".",
+   "e": "@every(\"10m\")\ndef autosave_message():\n    Broadcast(\"<gray>Мир сохраняется…\")"
+  },
+  {
+   "n": "Data",
+   "p": "name, default={}",
+   "d": "Данные скрипта (data-скрипт): словарь из YAML/JSON в папке data/, читается и пишется из кода, сохраняется сам.",
+   "e": "kits = Data(\"kits\", {\"start\": [\"stone_sword\", \"bread*8\"]})\nfor it in kits[\"start\"]:\n    player.give(Item.parse(it))"
+  }
+ ],
+ "funcs": [
+  {
+   "c": "Флаги",
+   "n": "obj.flag",
+   "p": "name, value=…, expire=None",
+   "d": "Читает или пишет флаг на игроке, сущности, блоке (location), мире или сервере. expire: \"30s\", \"1h\", \"7d\". Флаги переживают рестарт.",
+   "e": "player.flag(\"coins\", player.flag(\"coins\", default=0) + 5)\nlocation.flag(\"owner\", player.uuid)\nserver.flag(\"event_on\", True, expire=\"2h\")"
+  },
+  {
+   "c": "Флаги",
+   "n": "obj.has_flag",
+   "p": "name",
+   "d": "Есть ли флаг (и не истёк ли он).",
+   "e": "if not player.has_flag(\"daily\"):\n    player.give(Item(\"emerald\", 3))\n    player.flag(\"daily\", True, expire=\"24h\")"
+  },
+  {
+   "c": "Флаги",
+   "n": "obj.unflag",
+   "p": "name",
+   "d": "Удаляет флаг.",
+   "e": "player.unflag(\"quest.fisher\")"
+  },
+  {
+   "c": "Флаги",
+   "n": "obj.flags",
+   "p": "prefix=\"\"",
+   "d": "Все флаги объекта (с префиксом — только ветка), словарём.",
+   "e": "for name, v in player.flags(\"home.\").items():\n    player.tell(name)"
+  },
+  {
+   "c": "Очереди и ожидание",
+   "n": "wait",
+   "p": "ticks | \"5s\"",
+   "d": "Пауза без зависания сервера: очередь засыпает, остальной мир идёт дальше.",
+   "e": "player.title(\"3\"); wait(\"1s\")\nplayer.title(\"2\"); wait(\"1s\")\nplayer.title(\"Старт!\")"
+  },
+  {
+   "c": "Очереди и ожидание",
+   "n": "wait_until",
+   "p": "condition, timeout=None",
+   "d": "Ждать, пока условие станет истинным (проверка раз в тик).",
+   "e": "wait_until(lambda: player.location.y < 50, timeout=\"30s\")"
+  },
+  {
+   "c": "Очереди и ожидание",
+   "n": "run",
+   "p": "task, delay=0, **args",
+   "d": "Запустить задачу в новой очереди (параллельно). Возвращает очередь.",
+   "e": "q = run(\"fireworks_show\", where=player.location)"
+  },
+  {
+   "c": "Очереди и ожидание",
+   "n": "queue",
+   "p": "",
+   "d": "Текущая очередь: queue.id, queue.stop(), queue.player, queue.started.",
+   "e": "if player.health < 4:\n    queue.stop()"
+  },
+  {
+   "c": "Очереди и ожидание",
+   "n": "Cancel",
+   "p": "",
+   "d": "Вернуть из обработчика события, чтобы отменить его (как determine cancelled в Denizen).",
+   "e": "@on(\"player places block\", in_area=\"spawn\")\ndef protect(event):\n    return Cancel()"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.tell",
+   "p": "text",
+   "d": "Сообщение игроку в MiniMessage: <gold>, <bold>, <gradient:red:blue>, <glyph:id>, <click:run_command:/дом>.",
+   "e": "player.tell(\"<green>Привет, <bold>\" + player.name)"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.give / take / has",
+   "p": "item, amount=1",
+   "d": "Выдать, забрать (True — если хватило) и проверить предметы, в том числе свои (@item).",
+   "e": "if player.take(\"diamond\", 3):\n    player.give(Item(\"wand\"))"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.pay / balance",
+   "p": "amount",
+   "d": "Деньги через Vault: снять (True — если хватило) и узнать баланс.",
+   "e": "if player.pay(100):\n    player.tell(\"Куплено\")"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.open",
+   "p": "menu, **data",
+   "d": "Открыть меню (@menu) или книгу/диалог.",
+   "e": "player.open(\"Shop\")"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.ask",
+   "p": "question, timeout=\"30s\"",
+   "d": "Спросить игрока и дождаться ответа в чате (очередь ждёт).",
+   "e": "name = player.ask(\"Как назовём питомца?\")\npet.name = name"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.title / actionbar / bossbar",
+   "p": "text, …",
+   "d": "Титры, строка над хотбаром, полоса босса с прогрессом.",
+   "e": "bar = player.bossbar(\"Волна 1\", progress=1.0, color=\"red\")\nbar.progress = 0.5"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.permission",
+   "p": "node",
+   "d": "Есть ли у игрока право (LuckPerms/Vault).",
+   "e": "if player.permission(\"vip\"):\n    player.give(Item(\"golden_apple\"))"
+  },
+  {
+   "c": "Игрок (сервер)",
+   "n": "player.shoot",
+   "p": "entity, speed=1",
+   "d": "Выпустить снаряд по взгляду: стрела, снежок, огненный шар.",
+   "e": "player.shoot(\"snowball\", speed=2)"
+  },
+  {
+   "c": "Места и области",
+   "n": "Location",
+   "p": "x, y, z, world=\"world\", yaw=0, pitch=0",
+   "d": "Точка мира: .add(), .distance(), .block, .center, .above(), .flag(). Как dLocation в Denizen.",
+   "e": "spawn = Location(0, 64, 0)\nspawn.block = \"gold_block\""
+  },
+  {
+   "c": "Места и области",
+   "n": "Area",
+   "p": "name | (loc1, loc2)",
+   "d": "Область (cuboid): .contains(loc), .players, .blocks(), .fill(). Именованные области задаются /vaylen area и переключателем in_area=.",
+   "e": "arena = Area(\"arena\")\nfor p in arena.players:\n    p.tell(\"Бой начался!\")"
+  },
+  {
+   "c": "Места и области",
+   "n": "Schematic",
+   "p": "file",
+   "d": "Вставить или сохранить схематику (.schem): по слоям, с поворотом, только для одного игрока.",
+   "e": "Schematic(\"house.schem\").paste(player.location, rotate=90, layers_per_tick=1)"
+  },
+  {
+   "c": "Места и области",
+   "n": "ShowBlock",
+   "p": "player, loc, block, duration=None",
+   "d": "Блок, который видит только этот игрок (подсказки, призраки построек).",
+   "e": "ShowBlock(player, target, \"lime_stained_glass\", duration=\"5s\")"
+  },
+  {
+   "c": "Сущности и NPC",
+   "n": "Spawn",
+   "p": "type, location, **props",
+   "d": "Сущность с параметрами: name, glowing, ai, health, equipment, model (BetterModel). Возвращает объект: .remove(), .walk_to(), .flag().",
+   "e": "z = Spawn(\"zombie\", player.location.add(3, 0, 0), name=\"<red>Вася\", health=40)"
+  },
+  {
+   "c": "Сущности и NPC",
+   "n": "Hologram",
+   "p": "location, lines",
+   "d": "Голограмма из text_display: строки меняются на лету, можно сделать её видимой только одному игроку.",
+   "e": "h = Hologram(loc, [\"<gold>Топ рыбаков\", \"1. Ефим — 12 кг\"])"
+  },
+  {
+   "c": "Сущности и NPC",
+   "n": "npc.say / walk_to / look_at / animate",
+   "p": "…",
+   "d": "Управление NPC: реплика над головой и в чат, ходьба по пути, поворот, анимация модели.",
+   "e": "npc.walk_to(Location(10, 64, 5))\nnpc.animate(\"wave\")\nnpc.say(\"Сюда!\")"
+  },
+  {
+   "c": "Сервер",
+   "n": "Broadcast",
+   "p": "text",
+   "d": "Сообщение всем игрокам.",
+   "e": "Broadcast(\"<yellow>Турнир начнётся через 5 минут!\")"
+  },
+  {
+   "c": "Сервер",
+   "n": "Players / OnlinePlayer",
+   "p": "name=None",
+   "d": "Все игроки онлайн или один по нику.",
+   "e": "for p in Players():\n    p.give(Item(\"cake\"))"
+  },
+  {
+   "c": "Сервер",
+   "n": "Console",
+   "p": "command",
+   "d": "Выполнить команду от консоли (права скрипта ограничены настройкой allowed-commands).",
+   "e": "Console(f\"lp user {player.name} parent add vip\")"
+  },
+  {
+   "c": "Сервер",
+   "n": "tag",
+   "p": "\"<player.name>\"",
+   "d": "Тег в синтаксисе Denizen для тех, кто привык к нему; внутри — то же, что атрибуты объектов.",
+   "e": "player.tell(tag(\"<player.location.world.name>\"))"
+  }
+ ],
+ "events": [
+  {
+   "n": "player joins",
+   "ru": "игрок зашёл",
+   "sw": "first_time",
+   "ctx": "player, message"
+  },
+  {
+   "n": "player quits",
+   "ru": "игрок вышел",
+   "sw": "",
+   "ctx": "player, message"
+  },
+  {
+   "n": "player chats",
+   "ru": "игрок пишет в чат",
+   "sw": "",
+   "ctx": "player, message"
+  },
+  {
+   "n": "player breaks block",
+   "ru": "игрок сломал блок",
+   "sw": "block, with, in_area",
+   "ctx": "player, location, block, drops, xp"
+  },
+  {
+   "n": "player places block",
+   "ru": "игрок поставил блок",
+   "sw": "block, in_area",
+   "ctx": "player, location, block"
+  },
+  {
+   "n": "player right clicks",
+   "ru": "ПКМ по блоку или воздуху",
+   "sw": "block, with, in_area",
+   "ctx": "player, location, block, item, hand"
+  },
+  {
+   "n": "player left clicks",
+   "ru": "ЛКМ",
+   "sw": "block, with",
+   "ctx": "player, location, block, item"
+  },
+  {
+   "n": "player clicks entity",
+   "ru": "ПКМ по сущности",
+   "sw": "entity, with",
+   "ctx": "player, entity, item"
+  },
+  {
+   "n": "player damages entity",
+   "ru": "игрок бьёт сущность",
+   "sw": "entity, with",
+   "ctx": "player, entity, damage, cause"
+  },
+  {
+   "n": "entity dies",
+   "ru": "сущность умерла",
+   "sw": "entity, by",
+   "ctx": "entity, killer, drops, xp"
+  },
+  {
+   "n": "player dies",
+   "ru": "игрок умер",
+   "sw": "cause",
+   "ctx": "player, killer, message, keep_inventory"
+  },
+  {
+   "n": "player respawns",
+   "ru": "игрок возродился",
+   "sw": "",
+   "ctx": "player, location"
+  },
+  {
+   "n": "player enters area",
+   "ru": "вошёл в область",
+   "sw": "area",
+   "ctx": "player, area, from, to"
+  },
+  {
+   "n": "player exits area",
+   "ru": "вышел из области",
+   "sw": "area",
+   "ctx": "player, area"
+  },
+  {
+   "n": "player walks",
+   "ru": "сменил блок под ногами",
+   "sw": "in_area",
+   "ctx": "player, from, to"
+  },
+  {
+   "n": "player jumps",
+   "ru": "прыжок",
+   "sw": "in_area",
+   "ctx": "player"
+  },
+  {
+   "n": "player sneaks",
+   "ru": "присел / встал",
+   "sw": "",
+   "ctx": "player, sneaking"
+  },
+  {
+   "n": "player swaps hands",
+   "ru": "F — сменить руки",
+   "sw": "with",
+   "ctx": "player, main, off"
+  },
+  {
+   "n": "player drops item",
+   "ru": "выбросил предмет",
+   "sw": "item",
+   "ctx": "player, item, entity"
+  },
+  {
+   "n": "player picks up item",
+   "ru": "подобрал предмет",
+   "sw": "item",
+   "ctx": "player, item, entity"
+  },
+  {
+   "n": "player consumes",
+   "ru": "съел / выпил",
+   "sw": "item",
+   "ctx": "player, item"
+  },
+  {
+   "n": "player crafts",
+   "ru": "скрафтил",
+   "sw": "item",
+   "ctx": "player, item, recipe"
+  },
+  {
+   "n": "player fishes",
+   "ru": "рыбалка",
+   "sw": "state",
+   "ctx": "player, hook, caught, state"
+  },
+  {
+   "n": "player opens inventory",
+   "ru": "открыл контейнер",
+   "sw": "type",
+   "ctx": "player, inventory, location"
+  },
+  {
+   "n": "player clicks in inventory",
+   "ru": "клик в инвентаре",
+   "sw": "menu, slot",
+   "ctx": "player, inventory, slot, item, click"
+  },
+  {
+   "n": "player changes world",
+   "ru": "сменил мир",
+   "sw": "to",
+   "ctx": "player, from, to"
+  },
+  {
+   "n": "player levels up",
+   "ru": "новый уровень опыта",
+   "sw": "",
+   "ctx": "player, level"
+  },
+  {
+   "n": "entity spawns",
+   "ru": "сущность появилась",
+   "sw": "entity, reason, in_area",
+   "ctx": "entity, location, reason"
+  },
+  {
+   "n": "entity explodes",
+   "ru": "взрыв",
+   "sw": "entity",
+   "ctx": "entity, location, blocks"
+  },
+  {
+   "n": "block grows",
+   "ru": "растение выросло",
+   "sw": "block",
+   "ctx": "location, block"
+  },
+  {
+   "n": "redstone changes",
+   "ru": "сигнал редстоуна",
+   "sw": "block",
+   "ctx": "location, old, new"
+  },
+  {
+   "n": "weather changes",
+   "ru": "смена погоды",
+   "sw": "to",
+   "ctx": "world, weather"
+  },
+  {
+   "n": "time changes",
+   "ru": "наступило время суток",
+   "sw": "hour",
+   "ctx": "world, time"
+  },
+  {
+   "n": "server starts",
+   "ru": "сервер запущен",
+   "sw": "",
+   "ctx": ""
+  },
+  {
+   "n": "script reloads",
+   "ru": "скрипты перезагружены",
+   "sw": "",
+   "ctx": ""
+  }
+ ],
+ "objects": [
+  {
+   "n": "player",
+   "d": "Игрок онлайн",
+   "a": "name, uuid, location, health, food, level, gamemode, inventory, item_in_hand, world, is_op, ping, target_block, target_entity, flag(), permission()"
+  },
+  {
+   "n": "location",
+   "d": "Точка мира",
+   "a": "x, y, z, world, yaw, pitch, block, biome, light, center, above(n), below(n), add(dx,dy,dz), distance(other), flag()"
+  },
+  {
+   "n": "entity",
+   "d": "Сущность",
+   "a": "type, uuid, location, health, name, alive, ai, glowing, passengers, vehicle, flag(), remove(), teleport(), walk_to()"
+  },
+  {
+   "n": "item",
+   "d": "Предмет",
+   "a": "material, amount, name, lore, model, enchantments, durability, script_id, flag(), with(**changes)"
+  },
+  {
+   "n": "world",
+   "d": "Мир",
+   "a": "name, time, weather, players, spawn, difficulty, seed, flag()"
+  },
+  {
+   "n": "area",
+   "d": "Область",
+   "a": "name, min, max, world, players, entities, contains(loc), blocks(), fill(block)"
+  },
+  {
+   "n": "npc",
+   "d": "NPC скрипта",
+   "a": "name, location, step(player), say(text), walk_to(loc), look_at(target), animate(name), skin"
+  },
+  {
+   "n": "server",
+   "d": "Сервер",
+   "a": "players, tps, worlds, time, flag(), online(name)"
+  },
+  {
+   "n": "queue",
+   "d": "Очередь скрипта",
+   "a": "id, player, started, script, stop()"
+  },
+  {
+   "n": "event",
+   "d": "Событие в обработчике",
+   "a": "player, location, block, item, entity, cancel(), + своё у каждого события (см. список)"
+  }
+ ],
+ "examples": [
+  {
+   "t": "⛏ Игра: Охотник за рудой",
+   "d": "Кликер в меню-сундуке: улучшения, магазин, рекорд во флаге.",
+   "f": "ore_hunter.vln",
+   "c": "# ⛏ ОХОТНИК ЗА РУДОЙ — игра прямо в меню-сундуке\n# Руда появляется в клетках — кликай, пока не исчезла. Серия попаданий даёт бонус,\n# динамит отнимает очки. Монеты тратятся на улучшения и предметы в магазине.\n# Прогресс сохраняется на игроке (флаг), так что после перезапуска он не пропадёт.\n\nSAVE = \"ore_hunter\"\nFIELD = [r * 9 + c for r in range(1, 5) for c in range(1, 8)]     # 28 клеток поля\n\nORES = [  # предмет, название, очки, вес\n    (\"coal\", \"<dark_gray>Уголь\", 1, 50),\n    (\"raw_iron\", \"<white>Железо\", 2, 28),\n    (\"raw_gold\", \"<gold>Золото\", 5, 14),\n    (\"diamond\", \"<aqua>Алмаз\", 12, 6),\n    (\"emerald\", \"<green>Изумруд\", 30, 2),\n]\n\nUPGRADES = {  # ключ: (предмет, название, описание, цена, макс. уровень)\n    \"pick\":  (\"iron_pickaxe\", \"<gold>Кирка\", \"+1 к очкам за каждую руду\", 40, 10),\n    \"clock\": (\"clock\", \"<yellow>Часы\", \"+5 секунд к игре\", 60, 6),\n    \"luck\":  (\"rabbit_foot\", \"<green>Удача\", \"редкая руда попадается чаще\", 80, 8),\n    \"slow\":  (\"honey_bottle\", \"<gold>Мёд\", \"руда исчезает медленнее\", 70, 6),\n    \"combo\": (\"blaze_powder\", \"<red>Комбо\", \"серия даёт больше бонуса\", 90, 5),\n}\n\nSHOP = [  # предмет, количество, название, цена\n    (\"bread\", 8, \"<yellow>Хлеб ×8\", 20),\n    (\"torch\", 32, \"<yellow>Факелы ×32\", 25),\n    (\"iron_pickaxe\", 1, \"<white>Железная кирка\", 120),\n    (\"golden_apple\", 1, \"<gold>Золотое яблоко\", 250),\n    (\"diamond\", 1, \"<aqua>Алмаз\", 400),\n    (\"experience_bottle\", 16, \"<green>Пузырьки опыта ×16\", 300),\n]\n\nst = {}          # сохранение игрока\ngame = {}        # текущая партия\n\n\ndef price(key):\n    base = UPGRADES[key][3]\n    return int(base * (st[key] + 1) ** 1.6)\n\n\ndef load(player):\n    global st\n    saved = player.flag(SAVE, default=None) or {}\n    st = {\"coins\": 0, \"best\": 0, \"games\": 0}\n    for k in UPGRADES:\n        st[k] = 0\n    st.update(saved)\n\n\ndef save(player):\n    player.flag(SAVE, st)\n\n\ndef frame(m):\n    m.fill(\"gray_stained_glass_pane\", name=\" \", all=True)\n    m.border(\"black_stained_glass_pane\", name=\" \")\n\n\n# ---------------------------------------------------------------- главное меню\nmain = Menu(\"<gold>⛏ Охотник за рудой\", rows=3)\n\n\ndef show_main(player):\n    frame(main)\n    main.set(4, \"sunflower\", name=f\"<gold>Монеты: <white>{st['coins']}\",\n             lore=[f\"<gray>Рекорд: <white>{st['best']}\", f\"<gray>Сыграно игр: <white>{st['games']}\"])\n    main.button(11, \"diamond_pickaxe\", start, name=\"<green><bold>▶ Играть\",\n                lore=[f\"<gray>Время: <white>{30 + st['clock'] * 5} с\", \"<gray>Кликай по руде, пока не исчезла!\"], glow=True)\n    main.button(13, \"anvil\", open_upgrades, name=\"<yellow>Улучшения\", lore=[\"<gray>Кирка, часы, удача, мёд, комбо\"])\n    main.button(15, \"emerald\", open_shop, name=\"<green>Магазин\", lore=[\"<gray>Настоящие предметы за монеты\"])\n    main.button(22, \"barrier\", lambda p, s, c: main.close(), name=\"<red>Выйти\")\n    main.open(player)\n\n\ndef back(player, slot, click):\n    show_main(player)\n\n\n# ---------------------------------------------------------------- улучшения\nups = Menu(\"<yellow>Улучшения\", rows=3)\n\n\ndef open_upgrades(player, slot, click):\n    frame(ups)\n    ups.set(4, \"sunflower\", name=f\"<gold>Монеты: <white>{st['coins']}\")\n    for i, key in enumerate(UPGRADES):\n        item, title, desc, base, top = UPGRADES[key]\n        lvl = st[key]\n        if lvl >= top:\n            lore = [f\"<gray>{desc}\", f\"<gray>Уровень: <green>{lvl}/{top} (макс.)\"]\n        else:\n            lore = [f\"<gray>{desc}\", f\"<gray>Уровень: <white>{lvl}/{top}\", f\"<gold>Цена: {price(key)} монет\", \"<dark_gray>клик — купить\"]\n        ups.button(11 + i, item, buy_upgrade(key), name=title, lore=lore, amount=max(1, lvl), glow=lvl >= top)\n    ups.button(22, \"arrow\", back, name=\"<white>← Назад\")\n    ups.open(player)\n\n\ndef buy_upgrade(key):\n    def handler(player, slot, click):\n        top = UPGRADES[key][4]\n        if st[key] >= top:\n            ActionBar(\"<gray>Уже максимальный уровень\")\n            return\n        cost = price(key)\n        if st[\"coins\"] < cost:\n            ActionBar(f\"<red>Нужно {cost} монет, у тебя {st['coins']}\")\n            Sound(\"block.note_block.bass\", pitch=0.6)\n            return\n        st[\"coins\"] -= cost\n        st[key] += 1\n        save(player)\n        Sound(\"block.anvil.use\", pitch=1.4)\n        ActionBar(f\"<green>{UPGRADES[key][1]}<green> → уровень {st[key]}\")\n        open_upgrades(player, slot, click)\n    return handler\n\n\n# ---------------------------------------------------------------- магазин\nshop = Menu(\"<green>Магазин\", rows=3)\n\n\ndef open_shop(player, slot, click):\n    frame(shop)\n    shop.set(4, \"sunflower\", name=f\"<gold>Монеты: <white>{st['coins']}\")\n    for i, (item, count, title, cost) in enumerate(SHOP):\n        shop.button(10 + i, item, buy_item(i), name=title, lore=[f\"<gold>{cost} монет\", \"<dark_gray>клик — купить\"], amount=min(count, 64))\n    shop.button(22, \"arrow\", back, name=\"<white>← Назад\")\n    shop.open(player)\n\n\ndef buy_item(i):\n    def handler(player, slot, click):\n        item, count, title, cost = SHOP[i]\n        if st[\"coins\"] < cost:\n            ActionBar(f\"<red>Нужно {cost} монет\")\n            Sound(\"block.note_block.bass\", pitch=0.6)\n            return\n        st[\"coins\"] -= cost\n        save(player)\n        Give(item, count)\n        Sound(\"entity.experience_orb.pickup\")\n        ActionBar(f\"<green>Куплено: {title}\")\n        open_shop(player, slot, click)\n    return handler\n\n\n# ---------------------------------------------------------------- сама игра\nfield = Menu(\"<gold>⛏ Кликай по руде!\", rows=6)\n\n\ndef pick_ore():\n    luck = st[\"luck\"]\n    weights = [w + (i * luck * 2 if i >= 2 else 0) for i, (_, _, _, w) in enumerate(ORES)]\n    r = Random(1, sum(weights))\n    for ore, w in zip(ORES, weights):\n        r -= w\n        if r <= 0:\n            return ore\n    return ORES[0]\n\n\ndef hud():\n    left = max(0, game[\"left\"])\n    field.set(46, \"clock\", name=f\"<yellow>Осталось: <white>{left // 2} с\")\n    field.set(49, \"gold_ingot\", name=f\"<gold>Очки: <white>{game['score']}\")\n    field.set(52, \"blaze_powder\", name=f\"<red>Серия: <white>×{game['combo']}\",\n              lore=[f\"<gray>Бонус: +{combo_bonus()}% очков\"])\n\n\ndef combo_bonus():\n    return min(game[\"combo\"], 20) * (5 + st[\"combo\"] * 3)\n\n\ndef hit(player, slot, click):\n    cell = game.get(\"cells\", {}).get(slot)\n    if not game.get(\"on\") or cell is None:\n        return\n    del game[\"cells\"][slot]\n    field.set(slot, \"black_stained_glass_pane\", name=\" \")\n    if cell[\"tnt\"]:\n        game[\"score\"] = max(0, game[\"score\"] - 15)\n        game[\"combo\"] = 0\n        Sound(\"entity.generic.explode\", volume=0.5, pitch=1.6)\n        ActionBar(\"<red>💥 Динамит! −15 очков, серия сброшена\")\n    else:\n        game[\"combo\"] += 1\n        pts = (cell[\"pts\"] + st[\"pick\"]) * (100 + combo_bonus()) // 100\n        game[\"score\"] += pts\n        Sound(\"entity.experience_orb.pickup\", pitch=min(2.0, 0.8 + game[\"combo\"] * 0.06))\n        ActionBar(f\"<green>+{pts}  <gray>серия ×{game['combo']}\")\n    hud()\n\n\ndef start(player, slot, click):\n    game.clear()\n    # пока партия «выключена»: повторное открытие поля закрывает старое окно, и on_close не должен её завершить\n    game.update({\"on\": False, \"score\": 0, \"combo\": 0, \"cells\": {}, \"left\": (30 + st[\"clock\"] * 5) * 2})\n    life = 6 + st[\"slow\"]                      # сколько полусекунд руда живёт\n    field.fill(\"black_stained_glass_pane\", name=\" \", all=True)\n    for i in range(45, 54):\n        field.set(i, \"gray_stained_glass_pane\", name=\" \")\n    for s in FIELD:\n        field.button(s, \"black_stained_glass_pane\", hit, name=\" \")\n    hud()\n    field.open(player)\n    game[\"on\"] = True\n    Title(\"<gold>Старт!\", \"кликай по руде\", seconds=1)\n    while game[\"left\"] > 0 and game[\"on\"]:\n        # исчезает старая руда\n        for s, cell in list(game[\"cells\"].items()):\n            cell[\"ttl\"] -= 1\n            if cell[\"ttl\"] <= 0:\n                del game[\"cells\"][s]\n                field.set(s, \"black_stained_glass_pane\", name=\" \")\n                if not cell[\"tnt\"] and game[\"combo\"] > 0:\n                    game[\"combo\"] = 0\n                    ActionBar(\"<gray>Руда ушла — серия сброшена\")\n        # появляется новая (чем ближе к концу — тем больше)\n        spawn = 1 + (1 if game[\"left\"] < 20 else 0) + (1 if Random(1, 3) == 1 else 0)\n        free = [s for s in FIELD if s not in game[\"cells\"]]\n        for _ in range(min(spawn, len(free))):\n            s = Choice(free)\n            free.remove(s)\n            if Random(1, 9) == 1:\n                game[\"cells\"][s] = {\"tnt\": True, \"pts\": 0, \"ttl\": life}\n                field.set(s, \"tnt\", name=\"<red>Не трогай!\")\n            else:\n                item, title, pts, _ = pick_ore()\n                game[\"cells\"][s] = {\"tnt\": False, \"pts\": pts, \"ttl\": life}\n                field.set(s, item, name=f\"{title} <gray>+{pts}\")\n        game[\"left\"] -= 1\n        hud()\n        wait(10)\n    finish(player)\n\n\ndef finish(player):\n    if not game.get(\"on\"):\n        return\n    game[\"on\"] = False\n    score = game[\"score\"]\n    st[\"coins\"] += score\n    st[\"games\"] += 1\n    record = score > st[\"best\"]\n    if record:\n        st[\"best\"] = score\n    save(player)\n    field.fill(\"gray_stained_glass_pane\", name=\" \", all=True)\n    field.set(13, \"nether_star\" if record else \"gold_ingot\",\n              name=(\"<gold><bold>НОВЫЙ РЕКОРД! \" if record else \"<yellow>Конец игры! \") + f\"<white>{score} очков\",\n              lore=[f\"<gold>+{score} монет\", f\"<gray>Всего монет: <white>{st['coins']}\"], glow=record)\n    field.button(29, \"diamond_pickaxe\", start, name=\"<green>▶ Ещё раз\")\n    field.button(33, \"arrow\", back, name=\"<white>В меню\")\n    if record:\n        Firework(PlayerX, PlayerY + 1, PlayerZ, color=[\"gold\", \"yellow\"])\n        Title(\"<gold>Новый рекорд!\", f\"{score} очков\", seconds=2)\n    Sound(\"ui.toast.challenge_complete\" if record else \"entity.player.levelup\")\n\n\n@field.on_close\ndef closed(player):\n    if game.get(\"on\"):          # закрыл меню посреди игры — партия засчитывается как есть\n        finish(player)\n\n\n# ---------------------------------------------------------------- запуск\ndef begin(player, slot, click):\n    load(player)\n    show_main(player)\n\n\n# Меню открывается сразу; кнопки получают player — по нему загружаем сохранение\nstarter = Menu(\"<gold>⛏ Охотник за рудой\", rows=1)\nstarter.fill(\"black_stained_glass_pane\", name=\" \")\nstarter.button(4, \"diamond_pickaxe\", begin, name=\"<green><bold>Начать\", lore=[\"<gray>Клик — в главное меню\"], glow=True)\nstarter.open()\nprint(\"Игра «Охотник за рудой» открыта. Закрыл меню? Нажми ▶ Запуск ещё раз.\")\n"
+  },
+  {
+   "t": "⚔ Игра: Арена волн",
+   "d": "20 волн мобов, боссы, магазин между волнами, клавиша F.",
+   "f": "wave_arena.vln",
+   "c": "# ⚔ АРЕНА ВОЛН — отбивайся от волн мобов, между волнами закупайся в магазине\n# Монеты дают за убийства и за каждую пережитую волну. Каждая 5-я волна — босс.\n# F — открыть магазин в любой момент. Между волнами магазин открывается сам.\n\nR = 15                      # арена от -15 до 15 по x и z\nBREAK = 20                  # секунд передышки между волнами\nMAX_WAVE = 20\nSPAWNS = [(-12, 0, -12), (12, 0, -12), (-12, 0, 12), (12, 0, 12), (0, 0, -13), (0, 0, 13)]\n\nREWARD = {\"zombie\": 3, \"husk\": 4, \"skeleton\": 5, \"spider\": 4, \"creeper\": 6, \"witch\": 8, \"vindicator\": 10, \"ravager\": 40}\n\nstate = {\"coins\": 25, \"wave\": 0, \"kills\": 0, \"on\": True, \"break\": False, \"mode\": PlayerMode}\n\nSHOP = [  # слот, предмет, название, цена, что сделать\n    (10, \"stone_sword\", \"<white>Каменный меч\", 15, (\"give\", \"stone_sword\", 1)),\n    (11, \"iron_sword\", \"<white>Железный меч\", 45, (\"give\", \"iron_sword\", 1)),\n    (12, \"diamond_sword\", \"<aqua>Алмазный меч\", 120, (\"give\", \"diamond_sword\", 1)),\n    (13, \"bow\", \"<white>Лук + 32 стрелы\", 40, (\"bow\", None, 0)),\n    (14, \"shield\", \"<white>Щит\", 30, (\"give\", \"shield\", 1)),\n    (15, \"iron_chestplate\", \"<white>Железная броня\", 90, (\"armor\", \"iron\", 0)),\n    (16, \"diamond_chestplate\", \"<aqua>Алмазная броня\", 260, (\"armor\", \"diamond\", 0)),\n    (19, \"cooked_beef\", \"<gold>Стейки ×8\", 10, (\"give\", \"cooked_beef\", 8)),\n    (20, \"golden_apple\", \"<gold>Золотое яблоко\", 35, (\"give\", \"golden_apple\", 1)),\n    (21, \"glistering_melon_slice\", \"<red>Лечение (сразу)\", 20, (\"heal\", None, 0)),\n    (22, \"sugar\", \"<aqua>Скорость 60 с\", 25, (\"effect\", \"speed\", 60)),\n    (23, \"blaze_powder\", \"<red>Сила 45 с\", 50, (\"effect\", \"strength\", 45)),\n    (24, \"iron_block\", \"<white>Голем-защитник\", 150, (\"golem\", None, 0)),\n    (25, \"cobblestone_wall\", \"<gray>Починить арену\", 15, (\"walls\", None, 0)),\n]\n\n\n# ---------------------------------------------------------------- арена\ndef build_arena():\n    Clear(-R - 1, 0, -R - 1, R + 1, 12, R + 1)\n    Floor(-R, -R, R, R, -1, \"stone_bricks\")\n    for x in range(-R + 3, R, 6):\n        for z in range(-R + 3, R, 6):\n            SetBlock(x, -1, z, \"sea_lantern\")\n    walls()\n    for x, y, z in SPAWNS:\n        SetBlock(x, -1, z, \"crying_obsidian\")\n\n\ndef walls():\n    Walls(-R - 1, 0, -R - 1, R + 1, 1, R + 1, \"polished_blackstone_bricks\")\n    Walls(-R - 1, 2, -R - 1, R + 1, 4, R + 1, \"tinted_glass\")\n\n\n# ---------------------------------------------------------------- магазин\nshop = Menu(\"<gold>⚔ Магазин арены\", rows=4)\n\n\ndef open_shop(player=None):\n    shop.fill(\"gray_stained_glass_pane\", name=\" \", all=True)\n    shop.border(\"black_stained_glass_pane\", name=\" \")\n    shop.set(4, \"sunflower\", name=f\"<gold>Монеты: <white>{state['coins']}\",\n             lore=[f\"<gray>Волна: <white>{state['wave']}\", f\"<gray>Убито: <white>{state['kills']}\"])\n    for slot, item, title, cost, act in SHOP:\n        color = \"<green>\" if state[\"coins\"] >= cost else \"<red>\"\n        shop.button(slot, item, buy(slot), name=title, lore=[f\"{color}{cost} монет\", \"<dark_gray>клик — купить\"])\n    if state[\"break\"]:\n        shop.button(31, \"lime_dye\", lambda p, s, c: start_now(), name=\"<green><bold>▶ Начать волну сейчас\")\n    shop.button(35, \"barrier\", lambda p, s, c: give_up(), name=\"<red>Сдаться\")\n    if player is None:\n        shop.open()\n    else:\n        shop.open(player)\n\n\ndef buy(slot):\n    def handler(player, s, click):\n        for sl, item, title, cost, act in SHOP:\n            if sl != slot:\n                continue\n            if state[\"coins\"] < cost:\n                ActionBar(f\"<red>Нужно {cost} монет, у тебя {state['coins']}\")\n                Sound(\"block.note_block.bass\", pitch=0.6)\n                return\n            state[\"coins\"] -= cost\n            kind, what, n = act\n            if kind == \"give\":\n                Give(what, n)\n            elif kind == \"bow\":\n                Give(\"bow\")\n                Give(\"arrow\", 32)\n            elif kind == \"armor\":\n                for part in [\"helmet\", \"chestplate\", \"leggings\", \"boots\"]:\n                    Give(f\"{what}_{part}\")\n            elif kind == \"heal\":\n                Heal()\n                Feed()\n            elif kind == \"effect\":\n                Effect(what, n, 1)\n            elif kind == \"golem\":\n                SummonMob(PlayerX, 0, PlayerZ + 2, \"iron_golem\", {\"name\": \"<white>Защитник\"})\n            elif kind == \"walls\":\n                walls()\n            Sound(\"entity.experience_orb.pickup\")\n            ActionBar(f\"<green>Куплено: {title}\")\n            open_shop(player)\n            return\n    return handler\n\n\ndef start_now():\n    state[\"break\"] = False\n    shop.close()\n\n\ndef give_up():\n    state[\"on\"] = False\n    shop.close()\n\n\ndef on_key(key):\n    if key == \"f\":\n        open_shop()\n\n\n# ---------------------------------------------------------------- мобы и волны\ndef on_mob_death(mob, x, y, z):\n    if mob in REWARD and state[\"on\"]:\n        state[\"coins\"] += REWARD[mob]\n        state[\"kills\"] += 1\n        ActionBar(f\"<gold>+{REWARD[mob]} <gray>за {mob}  <gold>Монеты: {state['coins']}\")\n\n\ndef wave_mobs(n):\n    pool = [\"zombie\"]\n    if n >= 2: pool.append(\"husk\")\n    if n >= 3: pool.append(\"skeleton\")\n    if n >= 4: pool.append(\"spider\")\n    if n >= 6: pool.append(\"creeper\")\n    if n >= 8: pool.append(\"witch\")\n    if n >= 11: pool.append(\"vindicator\")\n    return [Choice(pool) for _ in range(3 + n * 2)]\n\n\ndef spawn_wave(n):\n    hp_bonus = n * 2\n    for i, mob in enumerate(wave_mobs(n)):\n        x, y, z = SPAWNS[i % len(SPAWNS)]\n        Particle(x, 1, z, \"portal\", count=30)\n        SummonMob(x + Random(-1, 1), 0, z + Random(-1, 1), mob, {\"health\": 20 + hp_bonus})\n        if i % 4 == 3:\n            wait(10)                        # волна выходит порциями\n    if n % 5 == 0:                          # босс\n        boss = \"ravager\" if n >= 15 else \"zombie\"\n        SummonMob(0, 0, -12, boss, [\"glowing\", \"persistent\", {\"name\": f\"<dark_red><bold>Босс волны {n}\", \"health\": 80 + n * 20, \"item\": \"netherite_sword\"}])\n        Title(\"<dark_red>БОСС!\", f\"волна {n}\", seconds=2)\n        Sound(\"entity.wither.spawn\", volume=0.6)\n\n\ndef alive():                                # только враги — голем-защитник не в счёт\n    return sum(CountMobs(m) for m in REWARD)\n\n\ndef status():\n    left = alive()\n    if state[\"break\"]:\n        return\n    ActionBar(f\"<red>Волна {state['wave']}  <gray>мобов: <white>{left}  <gold>монет: {state['coins']}  <dark_gray>F — магазин\")\n\n\n# ---------------------------------------------------------------- игра\nprint(\"⚔ Арена волн: строю арену…\")\nKillMobs()\nbuild_arena()\nGamemode(\"survival\")\nHeal()\nFeed()\nTeleport(0, 0, 0)\nSetSpawn(0, 0, 0)\nGive(\"wooden_sword\")\nGive(\"bread\", 6)\nTitle(\"<red>⚔ Арена волн\", \"F — магазин, держись!\", seconds=3)\nwait(60)\n\nwhile state[\"on\"] and state[\"wave\"] < MAX_WAVE:\n    state[\"wave\"] += 1\n    w = state[\"wave\"]\n    Title(f\"<red>Волна {w}\", \"<gray>к бою!\", seconds=2)\n    Sound(\"event.raid.horn\", volume=0.7)\n    spawn_wave(w)\n    while state[\"on\"] and alive() > 0:\n        status()\n        wait(20)\n    if not state[\"on\"]:\n        break\n    bonus = 10 + w * 5\n    state[\"coins\"] += bonus\n    Firework(0, 1, 0, color=[\"gold\", \"yellow\"])\n    Title(f\"<green>Волна {w} пройдена!\", f\"<gold>+{bonus} монет\", seconds=2)\n    if w == MAX_WAVE:\n        break\n    state[\"break\"] = True\n    open_shop()\n    for t in range(BREAK, 0, -1):\n        if not state[\"break\"] or not state[\"on\"]:\n            break\n        ActionBar(f\"<green>Передышка: {t} с  <gold>монет: {state['coins']}  <dark_gray>F — магазин\")\n        wait(20)\n    state[\"break\"] = False\n    shop.close()\n\nKillMobs()\nwon = state[\"on\"] and state[\"wave\"] >= MAX_WAVE\nif won:\n    Title(\"<gold><bold>ПОБЕДА!\", f\"все {MAX_WAVE} волн отбиты\", seconds=4)\n    for i in range(5):\n        Firework(Random(-8, 8), 1, Random(-8, 8), color=[\"gold\", \"aqua\", \"lime\"])\n        wait(8)\nelse:\n    Title(\"<red>Игра окончена\", f\"дошёл до волны {state['wave']}\", seconds=3)\nprint(f\"Итог: волна {state['wave']}, убито {state['kills']}, монет осталось {state['coins']}\")\nGamemode(state[\"mode\"])\nStop()\n"
+  },
+  {
+   "t": "Приветствие и первый вход",
+   "d": "Событие, флаг, MiniMessage, ожидание.",
+   "f": "server_1.vln",
+   "c": "@on(\"player joins\")\ndef welcome(event):\n    p = event.player\n    if not p.has_flag(\"seen\"):\n        p.flag(\"seen\", True)\n        Broadcast(f\"<gold>Новый игрок: <white>{p.name}\")\n        p.give(Item(\"bread\", 8))\n    wait(\"2s\")\n    p.title(\"<green>С возвращением!\", subtitle=f\"<gray>Монет: {p.flag('coins', default=0)}\")"
+  },
+  {
+   "t": "Дома игрока: /сетдом и /дом",
+   "d": "Команды, флаги с вложенными именами, подсказки Tab.",
+   "f": "server_2.vln",
+   "c": "@command(\"сетдом\")\ndef set_home(player, args):\n    name = args[0] if args else \"main\"\n    player.flag(f\"home.{name}\", player.location)\n    player.tell(f\"<green>Дом <white>{name}<green> сохранён\")\n\n@command(\"дом\")\ndef home(player, args):\n    loc = player.flag(f\"home.{args[0] if args else 'main'}\")\n    if loc:\n        player.teleport(loc)\n    else:\n        player.tell(\"<red>Такого дома нет\")\n\ndef tab(player, args):\n    return [n.split('.')[1] for n in player.flags(\"home.\")]"
+  },
+  {
+   "t": "Посох огня",
+   "d": "Свой предмет с моделью из пака, событие с переключателем with=, перезарядка флагом.",
+   "f": "server_3.vln",
+   "c": "@item(\"fire_wand\", \"blaze_rod\", \"<gradient:gold:red>Посох огня\",\n      lore=[\"<gray>ПКМ — огненный шар\", \"<dark_gray>Перезарядка 3 с\"], model=\"orsess:fire_wand\")\ndef fire_wand(): pass\n\n@on(\"player right clicks\", with=\"fire_wand\")\ndef cast(event):\n    p = event.player\n    if p.has_flag(\"wand_cd\"):\n        p.actionbar(\"<red>Посох остывает…\")\n        return\n    p.shoot(\"small_fireball\", speed=1.5)\n    Sound(p.location, \"entity.blaze.shoot\")\n    p.flag(\"wand_cd\", True, expire=\"3s\")"
+  },
+  {
+   "t": "NPC с заданием",
+   "d": "Шаги диалога, проверка предметов, награда, память о выполнении.",
+   "f": "server_4.vln",
+   "c": "@npc(\"Рыбак Ефим\", skin=\"Notch\")\nclass Fisher:\n    @step(\"start\")\n    def on_click(self, player, npc):\n        if player.has_flag(\"quest.fisher.done\"):\n            npc.say(\"Опять ты! Клёв сегодня хороший.\")\n            return\n        npc.say(\"Принеси мне трёх треск — дам удочку получше.\")\n        npc.step(\"waiting\", player)\n\n    @step(\"waiting\")\n    def on_click(self, player, npc):\n        if player.take(\"cod\", 3):\n            npc.animate(\"happy\")\n            npc.say(\"Вот это улов! Держи.\")\n            player.give(Item(\"fishing_rod\", enchant={\"lure\": 3}))\n            player.flag(\"quest.fisher.done\", True)\n            npc.step(\"start\", player)\n        else:\n            npc.say(\"Пока не вижу трёх треск…\")"
+  },
+  {
+   "t": "Меню-магазин",
+   "d": "Сундук-меню, оплата через Vault, фон глифом Nexo.",
+   "f": "server_5.vln",
+   "c": "@menu(\"<dark_green>Лавка\", rows=3, glyph=\"<glyph:shop_bg>\")\nclass Shop:\n    goods = {11: (\"bread\", 16, 10), 13: (\"cooked_beef\", 8, 25), 15: (\"golden_apple\", 1, 200)}\n\n    def build(self, player):\n        return {slot: Item(m, n, lore=[f\"<yellow>{price} монет\"]) for slot, (m, n, price) in self.goods.items()}\n\n    def click(self, player, slot, item):\n        if slot in self.goods:\n            m, n, price = self.goods[slot]\n            if player.pay(price):\n                player.give(Item(m, n))\n                Sound(player.location, \"entity.experience_orb.pickup\")\n            else:\n                player.tell(\"<red>Не хватает монет\")"
+  },
+  {
+   "t": "Паркур с таймером",
+   "d": "Области, вход и выход, очереди, рекорды в данных.",
+   "f": "server_6.vln",
+   "c": "records = Data(\"parkour_records\")\n\n@on(\"player enters area\", area=\"parkour_start\")\ndef start(event):\n    event.player.flag(\"pk_start\", server.time_ms)\n    event.player.actionbar(\"<green>Время пошло!\")\n\n@on(\"player enters area\", area=\"parkour_finish\")\ndef finish(event):\n    p = event.player\n    t0 = p.flag(\"pk_start\")\n    if t0 is None:\n        return\n    sec = (server.time_ms - t0) / 1000\n    p.unflag(\"pk_start\")\n    best = records.get(p.name)\n    if best is None or sec < best:\n        records[p.name] = sec\n        Broadcast(f\"<gold>{p.name}<yellow> — новый рекорд: {sec:.2f} с\")\n    else:\n        p.tell(f\"<gray>{sec:.2f} с (рекорд {best:.2f})\")"
+  },
+  {
+   "t": "Ежедневная награда",
+   "d": "Флаг со сроком, кликабельный текст.",
+   "f": "server_7.vln",
+   "c": "@command(\"награда\")\ndef daily(player, args):\n    if player.has_flag(\"daily\"):\n        left = player.flag_expire(\"daily\")\n        player.tell(f\"<gray>Следующая награда через {left}\")\n        return\n    player.give(Item(\"emerald\", 5))\n    player.flag(\"daily\", True, expire=\"24h\")\n    player.tell(\"<green>Награда получена! <click:run_command:/награда><u>Проверить завтра</u></click>\")"
+  },
+  {
+   "t": "Защита спавна",
+   "d": "Отмена события по области, исключение для админов.",
+   "f": "server_8.vln",
+   "c": "@on(\"player breaks block\", in_area=\"spawn\")\n@on(\"player places block\", in_area=\"spawn\")\ndef protect(event):\n    if event.player.permission(\"vaylen.build.spawn\"):\n        return\n    event.player.actionbar(\"<red>На спавне строить нельзя\")\n    return Cancel()"
+  },
+  {
+   "t": "Песочница: домик и фейерверк",
+   "d": "Песочница: свой участок, функции из мода «Кодинг-мир».",
+   "f": "server_9.vln",
+   "c": "House(0, 0, 0, 9, 7, 5, \"stone_bricks\", \"dark_oak_planks\")\nTree(12, 0, 3, \"cherry\")\nfor i in range(5):\n    Firework(4, 8, 3, colors=[\"red\", \"gold\"])\n    wait(10)\n\ndef on_chat(message):\n    if message == \"ночь\":\n        SetTime(18000)"
+  },
+  {
+   "t": "Турнир каждый час",
+   "d": "Таймер, полоса босса для всех, итоги.",
+   "f": "server_10.vln",
+   "c": "@every(\"1h\")\ndef tournament():\n    Broadcast(\"<gold>Турнир рыбаков! 10 минут.\")\n    server.flag(\"tournament\", {}, expire=\"10m\")\n    for left in range(600, 0, -1):\n        for p in Players():\n            p.bossbar(\"tour\", f\"Турнир: {left // 60}:{left % 60:02d}\", progress=left / 600)\n        wait(\"1s\")\n    scores = server.flag(\"tournament\") or {}\n    if scores:\n        win = max(scores, key=scores.get)\n        Broadcast(f\"<yellow>Победил {win} — {scores[win]} кг\")"
+  }
+ ]
+}

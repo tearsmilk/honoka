@@ -1,0 +1,7 @@
+@on("player breaks block", in_area="spawn")
+@on("player places block", in_area="spawn")
+def protect(event):
+    if event.player.permission("vaylen.build.spawn"):
+        return
+    event.player.actionbar("<red>На спавне строить нельзя")
+    return Cancel()
