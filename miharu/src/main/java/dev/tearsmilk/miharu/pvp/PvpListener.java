@@ -187,7 +187,7 @@ final class PvpListener implements Listener {
             return;
         }
         CombatProfile p = combat.profile(e.getPlayer());
-        if (p == null || !p.legacyGoldenApple) {
+        if (p == null || !p.legacyGoldenApple || dev.tearsmilk.miharu.core.util.Keys.has(e.getItem(), dev.tearsmilk.miharu.core.util.Keys.GOLDEN_HEAD)) {
             return;
         }
         if (type != Material.GOLDEN_APPLE && type != Material.ENCHANTED_GOLDEN_APPLE) {
@@ -223,7 +223,8 @@ final class PvpListener implements Listener {
         int now = Bukkit.getCurrentTick();
         for (Player p : Bukkit.getOnlinePlayers()) {
             CombatProfile profile = combat.profile(p);
-            if (profile == null || !profile.legacyRegen || p.isDead()) {
+            if (profile == null || !profile.legacyRegen || p.isDead()
+                    || Boolean.FALSE.equals(p.getWorld().getGameRuleValue(org.bukkit.GameRules.NATURAL_HEALTH_REGENERATION))) {
                 continue;
             }
             Integer last = lastRegen.get(p.getUniqueId());

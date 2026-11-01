@@ -1,0 +1,19 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<white>Boxing'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet: {material: DIAMOND_HELMET, unbreakable: true}
+    chestplate: {material: DIAMOND_CHESTPLATE, unbreakable: true}
+    leggings: {material: DIAMOND_LEGGINGS, unbreakable: true}
+    boots: {material: DIAMOND_BOOTS, unbreakable: true}
+items:
+  0: {material: DIAMOND_SWORD, unbreakable: true}
+rules:
+  damage: false            # урона нет — только попадания
+  hit-target: 100          # первым набрал 100 ударов — победил
+  hunger: false
+  void-lose: true

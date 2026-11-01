@@ -15,6 +15,15 @@ public record ArenaInstance(World world, Location origin, Arena arena) {
         return s.at(world, origin);
     }
 
+    /** Точка key, а если её нет — fallback. */
+    public Location spawn(String key, String fallback) {
+        return arena.spawn(key) != null ? spawn(key) : spawn(fallback);
+    }
+
+    public boolean has(String key) {
+        return arena.spawn(key) != null;
+    }
+
     /** Абсолютная высота, ниже которой — падение в пустоту. */
     public double voidY() {
         return origin.getY() + arena.voidY();

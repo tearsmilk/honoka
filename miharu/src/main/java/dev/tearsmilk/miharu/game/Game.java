@@ -30,8 +30,10 @@ public abstract class Game {
     protected final String mode;
     protected final Arena arena;
     protected final List<Player> players = new ArrayList<>();
+    final List<Player> spectators = new ArrayList<>();
     protected ArenaInstance instance;
-    protected GameBoard board;
+    /** Своё табло у каждого игрока (строки зависят от того, кто смотрит). */
+    protected final Map<java.util.UUID, GameBoard> boards = new HashMap<>();
     protected State state = State.STARTING;
     protected int ticks;
     protected int runningTicks;
@@ -69,12 +71,62 @@ public abstract class Game {
         return Collections.unmodifiableList(players);
     }
 
+    public List<Player> spectators() {
+        return Collections.unmodifiableList(spectators);
+    }
+
+    /** Зритель вошёл (показать ботов и т.п.). */
+    protected void onSpectate(Player p) {
+    }
+
+    /** Зритель вышел. */
+    protected void onSpectatorLeave(Player p) {
+    }
+
     public boolean isActive() {
         return state == State.COUNTDOWN || state == State.RUNNING;
     }
 
     /** Версия боя игры (null — не трогать). */
     public abstract @Nullable CombatVersion combatVersion();
+
+    /** Готовый профиль боя (например, с настройками кита). null — профиль версии combatVersion(). */
+    public dev.tearsmilk.miharu.pvp.@Nullable CombatProfile combatProfile() {
+        return null;
+    }
+
+    public GameBoard board(Player p) {
+        return boards.get(p.getUniqueId());
+    }
+
+    protected void eachBoard(java.util.function.Consumer<GameBoard> action) {
+        boards.values().forEach(action);
+    }
+
+    /** Повторный отсчёт (новый раунд). */
+    protected void restartCountdown(int seconds) {
+        countdownLeft = Math.max(0, seconds);
+        state = countdownLeft > 0 ? State.COUNTDOWN : State.RUNNING;
+        if (state == State.RUNNING) {
+            onRunning();
+        } else {
+            onCountdown(countdownLeft);
+        }
+    }
+
+    /** Движение игрока в RUNNING (цели Bridge и т.п.). */
+    protected void onMove(Player p, Location to) {
+    }
+
+    /** Можно ли поставить блок. replaced — что было на месте. */
+    protected boolean canPlace(Player p, org.bukkit.block.Block block, org.bukkit.block.BlockState replaced) {
+        return module.config().getBoolean("allow-build", false);
+    }
+
+    /** Можно ли сломать блок. */
+    protected boolean canBreak(Player p, org.bukkit.block.Block block) {
+        return module.config().getBoolean("allow-build", false);
+    }
 
     /** Точка появления игрока. */
     protected abstract Location spawnFor(Player p);

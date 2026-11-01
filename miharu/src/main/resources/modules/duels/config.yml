@@ -1,0 +1,65 @@
+# ═══ Модуль дуэлей ═══
+# Киты: папка kits/ (config.yml — меню и включение, <id>.yml — содержимое и правила).
+# Арены: режимы duel (p1, p2), sumo (p1, p2), bridge (p1, p2, goal1, goal2), mlg (p1, p2, bed1, bed2).
+#   /arena mode duel и т.д. Кит выбирает режим арены в arena-mode. Бот встаёт на p2.
+
+countdown-seconds: 3
+spectate-on-loss: true
+
+# Золотая голова (golden-head: true в предмете кита): эффекты после съедания
+golden-head:
+  effects: ["regeneration:1:180", "absorption:0:2400"]
+
+# Отдача от удочки, как в 1.8
+rod:
+  horizontal: 0.4
+  vertical: 0.36
+
+menus:
+  filler: {enabled: true, material: GRAY_STAINED_GLASS_PANE, name: ' '}
+  # Шаг 2: с кем играть
+  opponent:
+    title: '<dark_gray>{kit} <gray>· соперник'
+    rows: 3
+    bot:
+      slot: 11
+      material: ZOMBIE_HEAD
+      name: '<#ff9ecf><b>Бот</b>'
+      lore:
+        - '<gray>Сразу в бой, без ожидания.'
+        - '<gray>Выбери сложность на следующем шаге.'
+    player:
+      slot: 15
+      material: PLAYER_HEAD
+      name: '<#c9a7ff><b>Игрок</b>'
+      lore:
+        - '<gray>Очередь на {kit}<gray>.'
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+    back:
+      slot: 22
+      material: ARROW
+      name: '<gray>← Назад'
+  # Шаг 3: сложность бота (ключи — id сложностей из modules/bots/config.yml)
+  difficulty:
+    title: '<dark_gray>{kit} <gray>· сложность бота'
+    rows: 3
+    items:
+      easy:
+        slot: 11
+        material: LIME_DYE
+        name: '{difficulty}'
+        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '', '<yellow>▶ Играть']
+      medium:
+        slot: 13
+        material: YELLOW_DYE
+        name: '{difficulty}'
+        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '', '<yellow>▶ Играть']
+      hard:
+        slot: 15
+        material: RED_DYE
+        name: '{difficulty}'
+        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '<gray>Стрейфы, w-tap, блок-хит.', '', '<yellow>▶ Играть']
+    back:
+      slot: 22
+      material: ARROW
+      name: '<gray>← Назад'

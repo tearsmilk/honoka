@@ -8,7 +8,7 @@ softdepend: [WorldEdit, FastAsyncWorldEdit, PlaceholderAPI, Nexo]
 
 permissions:
   miharu.admin:
-    description: '/miharu — перезагрузка, запуск и остановка игр'
+    description: '/miharu — перезагрузка, запуск и остановка игр, /setlobby'
     default: op
     children:
       miharu.arena: true
@@ -23,6 +23,15 @@ permissions:
   miharu.bot:
     description: '/bot — игры с ботами'
     default: true
+  miharu.duel:
+    description: '/duel — дуэли по китам'
+    default: true
+  miharu.spectate:
+    description: '/spectate — наблюдение за играми'
+    default: true
+  miharu.lobby.bypass:
+    description: 'Не трогать инвентарь и режим в лобби (для строителей)'
+    default: false
   miharu.bypass.commands:
     description: 'Любые команды во время игры'
     default: op

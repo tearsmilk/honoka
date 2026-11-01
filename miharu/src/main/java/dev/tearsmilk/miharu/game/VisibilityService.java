@@ -20,7 +20,7 @@ public final class VisibilityService {
     }
 
     public boolean sameContext(Player a, Player b) {
-        return module.games().of(a) == module.games().of(b);
+        return module.games().contextOf(a) == module.games().contextOf(b);
     }
 
     public void update(Player p) {

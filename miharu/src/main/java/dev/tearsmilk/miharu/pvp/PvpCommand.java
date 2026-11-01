@@ -48,7 +48,7 @@ final class PvpCommand implements BasicCommand {
             return;
         }
         if (args[0].equalsIgnoreCase("off") || args[0].equalsIgnoreCase("reset")) {
-            combat.force(target, null);
+            combat.force(target, (CombatVersion) null);
             plugin.messages().send(sender, "pvp.reset", "player", target.getName());
             return;
         }

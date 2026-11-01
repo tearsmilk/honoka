@@ -1,0 +1,31 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<light_purple>Combo'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet: {material: DIAMOND_HELMET, enchants: {protection: 4, unbreaking: 3}}
+    chestplate: {material: DIAMOND_CHESTPLATE, enchants: {protection: 4, unbreaking: 3}}
+    leggings: {material: DIAMOND_LEGGINGS, enchants: {protection: 4, unbreaking: 3}}
+    boots: {material: DIAMOND_BOOTS, enchants: {protection: 4, unbreaking: 3, feather_falling: 4}}
+items:
+  0: {material: DIAMOND_SWORD, enchants: {sharpness: 2, unbreaking: 3}}
+  1: {material: GOLDEN_APPLE, amount: 32}
+  8: {material: COOKED_BEEF, amount: 64}
+# хит-делей и отдача под комбо
+combat:
+  max-no-damage-ticks: 4
+  knockback:
+    custom: true
+    horizontal: 0.30
+    vertical: 0.32
+    extra-horizontal: 0.45
+    extra-vertical: 0.08
+    vertical-limit: 0.36
+bot:
+  enabled: true
+  heals: 4
+  heal-amount: 6
+  heal-below: 8

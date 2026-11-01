@@ -3,11 +3,10 @@ package dev.tearsmilk.miharu.bots.game;
 import dev.tearsmilk.miharu.arena.Arena;
 import dev.tearsmilk.miharu.bots.BotsModule;
 import dev.tearsmilk.miharu.bots.ai.BotDifficulty;
-import dev.tearsmilk.miharu.bots.kit.Kit;
+import dev.tearsmilk.miharu.core.kit.KitSpec;
 import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.game.GameModule;
 import dev.tearsmilk.miharu.pvp.CombatService;
-import dev.tearsmilk.miharu.pvp.CombatVersion;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -26,15 +25,38 @@ public final class BotDuelGame extends BotGame {
     private Result result;
     private final int maxSeconds;
 
-    public BotDuelGame(BotsModule bots, GameModule games, Arena arena, Player player, CombatVersion version,
-                       BotDifficulty difficulty, Kit kit, CombatService combat) {
-        super(bots, games, MODE, arena, player, version, difficulty, kit, combat);
-        this.maxSeconds = bots.config().getInt("modes.bot-duel.max-duration-seconds", 300);
+    public BotDuelGame(BotsModule bots, GameModule games, Arena arena, Player player, KitSpec spec,
+                       BotDifficulty difficulty, CombatService combat) {
+        super(bots, games, MODE, arena, player, spec, difficulty, combat);
+        this.maxSeconds = spec.rules().maxDurationSeconds();
     }
 
     @Override
     public String displayName() {
         return bots.config().getString("modes.bot-duel.display", "Дуэль с ботом");
+    }
+
+    @Override
+    protected void onPlayerHitBot() {
+        if (rules.hitTarget() > 0 && playerHits >= rules.hitTarget()) {
+            finish(Result.WIN);
+        }
+    }
+
+    @Override
+    protected void onBotHitPlayer() {
+        if (rules.hitTarget() > 0 && botHits >= rules.hitTarget()) {
+            finish(Result.LOSS);
+        }
+    }
+
+    @Override
+    protected boolean onDamage(Player p, EntityDamageEvent e) {
+        if (!damageEnabled()) {
+            e.setCancelled(true);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -78,7 +100,7 @@ public final class BotDuelGame extends BotGame {
     protected void onPlayerLeave(Player p, boolean quit) {
         if (state == State.RUNNING) {
             result = Result.LOSS;
-            bots.stats().recordDuel(player, version, difficulty, Result.LOSS);
+            bots.stats().recordDuel(player, spec.id(), version, difficulty, Result.LOSS);
         }
     }
 
@@ -87,7 +109,7 @@ public final class BotDuelGame extends BotGame {
             return;
         }
         result = r;
-        bots.stats().recordDuel(player, version, difficulty, r);
+        bots.stats().recordDuel(player, spec.id(), version, difficulty, r);
         Map<String, Object> ph = placeholders(player);
         String key = switch (r) {
             case WIN -> "bots.duel.win";

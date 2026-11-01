@@ -107,6 +107,8 @@ game:
   world-failed: '{prefix}<red>Не удалось подготовить арену: <white>{error}'
   command-blocked: '{prefix}<red>Эта команда недоступна в игре. /leave — выйти.'
   restored: '{prefix}<green>Прошлая игра прервалась — вещи возвращены.'
+  spectating: '{prefix}<gray>Ты наблюдаешь: <white>{mode}</white> · {arena}<gray>. Выйти — <white>/leave'
+  spectate-unavailable: '{prefix}<red>Эта игра уже закончилась или недоступна.'
 
 bots:
   help:
@@ -163,3 +165,54 @@ bots:
     header: '{prefix}<gray>Топ клик-теста:'
     empty: ' <gray>Пока пусто — будь первым: /bot clicktest'
     line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{score}</white> <gray>({cps} CPS)'
+
+duels:
+  help:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Дуэли</b></gradient>'
+    - '<white>/duel</white> <gray>— меню китов'
+    - '<white>/duel <кит></white> <gray>— выбрать соперника для кита'
+    - '<white>/duel queue <кит></white>, <white>/duel leave</white> <gray>— очередь'
+    - '<white>/duel kits</white>, <white>/duel stats [игрок]</white>, <white>/spectate</white>'
+  bot-yes: '<green>да'
+  bot-no: '<red>нет'
+  unknown-kit: '{prefix}<red>Киты: <white>{kits}'
+  no-arena: '{prefix}<red>Нет готовой арены для кита {kit}<red>.'
+  kits-header: '{prefix}<gray>Киты ({count}):'
+  kits-line: ' <dark_gray>•</dark_gray> <white>{id}</white> {kit} <gray>· арена {mode} · бот: {bot} ·</gray> {state}'
+  stats-header: '{prefix}<gray>Дуэли <white>{player}</white>: <green>{wins}</green> побед, <red>{losses}</red> поражений'
+  stats-line: ' <dark_gray>•</dark_gray> {kit}<gray>: <green>{wins}</green> / <red>{losses}'
+  killed: '{prefix}<red>{player}</red> <gray>убит игроком</gray> <green>{killer}'
+  goal: '{prefix}<green>{player}</green> <gray>забивает гол!'
+  bed-broken: '{prefix}<green>{player}</green> <gray>ломает кровать!'
+  own-bed: '{prefix}<red>Это твоя кровать.'
+  round-won: '{prefix}<gray>Раунд за <white>{player}</white>. Счёт <green>{score_a}</green> : <red>{score_b}</red>. Раунд {round}.'
+  win:
+    title: '<green><b>ПОБЕДА</b>'
+    subtitle: '<gray>над <white>{opponent}'
+    stay: 2500
+  loss:
+    title: '<red><b>ПОРАЖЕНИЕ</b>'
+    subtitle: '<gray>победил <white>{opponent}'
+    stay: 2500
+  draw:
+    title: '<yellow><b>НИЧЬЯ</b>'
+    subtitle: '<gray>время вышло'
+    stay: 2500
+  summary:
+    - '<dark_gray>───────────────────────'
+    - ' {kit} <gray>· <white>{player_a}</white> vs <white>{player_b}'
+    - ' <gray>Победил: <green>{winner}</green> · счёт <white>{score_a} : {score_b}'
+    - ' <gray>Твои удары: <green>{hits}</green> · его: <red>{opponent_hits}</red> · лучшее комбо <yellow>{best_combo}'
+    - ' <gray>Твоё ❤ <red>{player_hp}</red> · его ❤ <red>{opponent_hp}</red> · время <white>{time}'
+    - '<dark_gray>───────────────────────'
+  queue:
+    joined: '{prefix}<gray>Ищем соперника: {kit}<gray>. Выйти — красный краситель или <white>/duel leave'
+    already: '{prefix}<gray>Ты уже в очереди на {kit}<gray>.'
+    found: '{prefix}<green>Соперник найден: <white>{opponent}</white> <gray>({kit}<gray>)'
+    left: '{prefix}<gray>Ты вышел из очереди.'
+    not-in-queue: '{prefix}<red>Ты не в очереди.'
+    actionbar: '<gray>Поиск соперника · {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> в очереди {size}'
+
+lobby:
+  spawn-set: '{prefix}<green>Спавн лобби сохранён.'
+  not-in-queue: '<gray>—'

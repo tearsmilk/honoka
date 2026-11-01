@@ -3,11 +3,10 @@ package dev.tearsmilk.miharu.bots.game;
 import dev.tearsmilk.miharu.arena.Arena;
 import dev.tearsmilk.miharu.bots.BotsModule;
 import dev.tearsmilk.miharu.bots.ai.BotDifficulty;
-import dev.tearsmilk.miharu.bots.kit.Kit;
+import dev.tearsmilk.miharu.core.kit.KitSpec;
 import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.game.GameModule;
 import dev.tearsmilk.miharu.pvp.CombatService;
-import dev.tearsmilk.miharu.pvp.CombatVersion;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -34,9 +33,9 @@ public final class ClickTestGame extends BotGame {
     private int falls;
     private boolean finished;
 
-    public ClickTestGame(BotsModule bots, GameModule games, Arena arena, Player player, CombatVersion version,
-                         BotDifficulty difficulty, Kit kit, CombatService combat) {
-        super(bots, games, MODE, arena, player, version, difficulty, kit, combat);
+    public ClickTestGame(BotsModule bots, GameModule games, Arena arena, Player player, KitSpec spec,
+                         BotDifficulty difficulty, CombatService combat) {
+        super(bots, games, MODE, arena, player, spec, difficulty, combat);
         this.durationSeconds = Math.max(10, bots.config().getInt("modes.clicktest.duration-seconds", 600));
     }
 
@@ -53,6 +52,11 @@ public final class ClickTestGame extends BotGame {
     @Override
     protected boolean allowHunger() {
         return false;
+    }
+
+    @Override
+    protected boolean liquidLose() {
+        return bots.liquidIsVoid(MODE);
     }
 
     @Override

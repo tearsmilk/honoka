@@ -1,0 +1,33 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<aqua>NoDebuff'
+version: "1.8"
+arena-mode: duel
+arenas: []
+rounds: 1
+armor:
+    helmet: {material: DIAMOND_HELMET, enchants: {protection: 4, unbreaking: 3}}
+    chestplate: {material: DIAMOND_CHESTPLATE, enchants: {protection: 4, unbreaking: 3}}
+    leggings: {material: DIAMOND_LEGGINGS, enchants: {protection: 4, unbreaking: 3}}
+    boots: {material: DIAMOND_BOOTS, enchants: {protection: 4, unbreaking: 3, feather_falling: 4}}
+items:
+  0: {material: DIAMOND_SWORD, enchants: {sharpness: 5, fire_aspect: 2, unbreaking: 3}}
+  1: {material: ENDER_PEARL, amount: 16}
+  2: {material: POTION, potion: strong_swiftness}
+  3: {material: POTION, potion: long_fire_resistance}
+  8: {material: COOKED_BEEF, amount: 64}
+  17: {material: POTION, potion: strong_swiftness}
+  26: {material: POTION, potion: strong_swiftness}
+  35: {material: POTION, potion: strong_swiftness}
+fill: {material: SPLASH_POTION, potion: strong_healing}
+rules:
+  damage: true
+  hunger: true
+  natural-regen: true
+  pearl-cooldown-ticks: 0
+bot:
+  enabled: true
+  heals: 10          # бот «пьёт» хилки
+  heal-amount: 8
+  heal-below: 8

@@ -1,0 +1,18 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<green>Archer'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet: {material: LEATHER_HELMET, unbreakable: true}
+    chestplate: {material: LEATHER_CHESTPLATE, unbreakable: true}
+    leggings: {material: LEATHER_LEGGINGS, unbreakable: true}
+    boots: {material: LEATHER_BOOTS, unbreakable: true}
+items:
+  0: {material: BOW, enchants: {power: 3, infinity: 1}, unbreakable: true}
+  8: {material: COOKED_BEEF, amount: 64}
+  9: {material: ARROW, amount: 1}
+bot:
+  enabled: false

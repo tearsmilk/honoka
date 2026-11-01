@@ -1,5 +1,7 @@
 package dev.tearsmilk.miharu.bots.kit;
 
+import dev.tearsmilk.miharu.core.kit.Kit;
+
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 

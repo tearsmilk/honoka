@@ -57,9 +57,9 @@ public final class BotStats {
     public void createTables() {
         db.schema(
                 "CREATE TABLE IF NOT EXISTS miharu_bot_stats (" +
-                        "uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, version VARCHAR(4) NOT NULL, difficulty VARCHAR(32) NOT NULL, " +
+                        "uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, kit VARCHAR(32) NOT NULL, version VARCHAR(4) NOT NULL, difficulty VARCHAR(32) NOT NULL, " +
                         "wins INT NOT NULL DEFAULT 0, losses INT NOT NULL DEFAULT 0, draws INT NOT NULL DEFAULT 0, " +
-                        "PRIMARY KEY (uuid, version, difficulty))",
+                        "PRIMARY KEY (uuid, kit, version, difficulty))",
                 "CREATE TABLE IF NOT EXISTS miharu_clicktest (" +
                         "id " + db.autoIncrementPk() + ", uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, version VARCHAR(4) NOT NULL, " +
                         "difficulty VARCHAR(32) NOT NULL, clicks INT NOT NULL, hits INT NOT NULL, score INT NOT NULL, max_cps INT NOT NULL, " +
@@ -78,9 +78,9 @@ public final class BotStats {
 
     public void load(UUID id) {
         Summary s = summary(id);
-        db.query("SELECT version, difficulty, wins, losses, draws FROM miharu_bot_stats WHERE uuid = ?", rs -> {
+        db.query("SELECT kit, version, difficulty, wins, losses, draws FROM miharu_bot_stats WHERE uuid = ?", rs -> {
             while (rs.next()) {
-                s.duels.put(rs.getString(1) + ":" + rs.getString(2), new int[]{rs.getInt(3), rs.getInt(4), rs.getInt(5)});
+                s.duels.put(rs.getString(1) + ":" + rs.getString(2) + ":" + rs.getString(3), new int[]{rs.getInt(4), rs.getInt(5), rs.getInt(6)});
             }
             return null;
         }, id.toString());
@@ -97,21 +97,21 @@ public final class BotStats {
         cache.remove(id);
     }
 
-    public void recordDuel(Player p, CombatVersion version, BotDifficulty difficulty, BotDuelGame.Result result) {
+    public void recordDuel(Player p, String kit, CombatVersion version, BotDifficulty difficulty, BotDuelGame.Result result) {
         String col = switch (result) {
             case WIN -> "wins";
             case LOSS -> "losses";
             case DRAW -> "draws";
         };
         int idx = result.ordinal();
-        int[] arr = summary(p.getUniqueId()).duels.computeIfAbsent(version.id() + ":" + difficulty.id(), k -> new int[3]);
+        int[] arr = summary(p.getUniqueId()).duels.computeIfAbsent(kit + ":" + version.id() + ":" + difficulty.id(), k -> new int[3]);
         arr[idx]++;
         String uuid = p.getUniqueId().toString();
         db.upsert(
-                "UPDATE miharu_bot_stats SET " + col + " = " + col + " + 1, name = ? WHERE uuid = ? AND version = ? AND difficulty = ?",
-                new Object[]{p.getName(), uuid, version.id(), difficulty.id()},
-                "INSERT INTO miharu_bot_stats (uuid, name, version, difficulty, wins, losses, draws) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                new Object[]{uuid, p.getName(), version.id(), difficulty.id(), result == BotDuelGame.Result.WIN ? 1 : 0,
+                "UPDATE miharu_bot_stats SET " + col + " = " + col + " + 1, name = ? WHERE uuid = ? AND kit = ? AND version = ? AND difficulty = ?",
+                new Object[]{p.getName(), uuid, kit, version.id(), difficulty.id()},
+                "INSERT INTO miharu_bot_stats (uuid, name, kit, version, difficulty, wins, losses, draws) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                new Object[]{uuid, p.getName(), kit, version.id(), difficulty.id(), result == BotDuelGame.Result.WIN ? 1 : 0,
                         result == BotDuelGame.Result.LOSS ? 1 : 0, result == BotDuelGame.Result.DRAW ? 1 : 0});
     }
 

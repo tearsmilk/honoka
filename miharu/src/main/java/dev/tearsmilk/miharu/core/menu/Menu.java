@@ -1,4 +1,4 @@
-package dev.tearsmilk.miharu.bots.menu;
+package dev.tearsmilk.miharu.core.menu;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;

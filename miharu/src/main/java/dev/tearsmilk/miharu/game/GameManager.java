@@ -38,6 +38,7 @@ public final class GameManager {
     private final Miharu plugin;
     private final Map<Integer, Game> games = new LinkedHashMap<>();
     private final Map<UUID, Game> byPlayer = new HashMap<>();
+    private final Map<UUID, Game> spectating = new HashMap<>();
     private final Map<UUID, PlayerSnapshot> snapshots = new HashMap<>();
     private final AtomicInteger ids = new AtomicInteger();
     private BukkitTask task;
@@ -76,6 +77,72 @@ public final class GameManager {
         return byPlayer.containsKey(p.getUniqueId());
     }
 
+    /** Игра, которую игрок смотрит как зритель (или null). */
+    public Game spectatingOf(Player p) {
+        return spectating.get(p.getUniqueId());
+    }
+
+    /** Игра игрока или та, что он смотрит. */
+    public Game contextOf(Player p) {
+        Game g = byPlayer.get(p.getUniqueId());
+        return g != null ? g : spectating.get(p.getUniqueId());
+    }
+
+    /** Занят ли игрок (играет или смотрит). */
+    public boolean busy(Player p) {
+        return byPlayer.containsKey(p.getUniqueId()) || spectating.containsKey(p.getUniqueId());
+    }
+
+    /** Войти зрителем в идущую игру. */
+    public boolean spectate(Player p, Game game) {
+        if (busy(p)) {
+            plugin.messages().send(p, "game.already-in-game");
+            return false;
+        }
+        if (game.instance == null || game.state() == Game.State.CLOSED || game.state() == Game.State.ENDING) {
+            plugin.messages().send(p, "game.spectate-unavailable");
+            return false;
+        }
+        PlayerSnapshot snap = PlayerSnapshot.capture(p);
+        snapshots.put(p.getUniqueId(), snap);
+        try {
+            snap.save(snapshotFile(p.getUniqueId()));
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Не удалось сохранить снимок игрока " + p.getName(), e);
+        }
+        spectating.put(p.getUniqueId(), game);
+        game.spectators.add(p);
+        Location at = game.players.isEmpty() ? game.instance.origin().clone().add(0, 3, 0) : game.players.getFirst().getLocation().add(0, 2, 0);
+        p.teleport(at);
+        p.getInventory().clear();
+        p.setGameMode(GameMode.SPECTATOR);
+        GameBoard board = new GameBoard(Text.mm(module.config().getString("scoreboard.title", "<b>MIHARU")));
+        game.boards.put(p.getUniqueId(), board);
+        board.show(p);
+        module.visibility().update(p);
+        safe(() -> game.onSpectate(p));
+        plugin.messages().send(p, "game.spectating", "mode", game.displayName(), "arena", game.arena().display());
+        return true;
+    }
+
+    private void unspectate(Game game, Player p) {
+        game.spectators.remove(p);
+        game.boards.remove(p.getUniqueId());
+        spectating.remove(p.getUniqueId());
+        safe(() -> game.onSpectatorLeave(p));
+        PlayerSnapshot snap = snapshots.remove(p.getUniqueId());
+        p.teleport(returnLocation(snap));
+        if (snap != null) {
+            snap.restore(p);
+        }
+        snapshotFile(p.getUniqueId()).delete();
+        p.sendPlayerListHeaderAndFooter(Component.empty(), Component.empty());
+        module.visibility().update(p);
+        for (java.util.function.Consumer<Player> hook : returnHooks) {
+            safe(() -> hook.accept(p));
+        }
+    }
+
     /**
      * Создаёт мир из схематики арены, переносит туда игроков и запускает отсчёт.
      *
@@ -99,7 +166,6 @@ public final class GameManager {
         }
         game.id = ids.incrementAndGet();
         game.instance = instance;
-        game.board = new GameBoard(Text.mm(module.config().getString("scoreboard.title", "<b>MIHARU")));
         games.put(game.id, game);
         for (Player p : list) {
             join(game, p);
@@ -129,12 +195,17 @@ public final class GameManager {
 
         p.teleport(game.spawnFor(p));
         resetState(p);
-        CombatVersion v = game.combatVersion();
         PvpModule pvp = plugin.module(PvpModule.class);
         if (pvp != null) {
-            pvp.combat().force(p, v);
+            if (game.combatProfile() != null) {
+                pvp.combat().force(p, game.combatProfile());
+            } else {
+                pvp.combat().force(p, game.combatVersion());
+            }
         }
-        game.board.show(p);
+        GameBoard board = new GameBoard(Text.mm(module.config().getString("scoreboard.title", "<b>MIHARU")));
+        game.boards.put(p.getUniqueId(), board);
+        board.show(p);
         module.visibility().update(p);
     }
 
@@ -163,6 +234,11 @@ public final class GameManager {
 
     /** Игрок покидает игру (/leave или выход). */
     public void leave(Player p, boolean quit) {
+        Game watched = spectating.get(p.getUniqueId());
+        if (watched != null) {
+            unspectate(watched, p);
+            return;
+        }
         Game game = byPlayer.get(p.getUniqueId());
         if (game == null) {
             return;
@@ -187,10 +263,11 @@ public final class GameManager {
     /** Возвращает игрока в исходное состояние и место. */
     private void remove(Game game, Player p) {
         game.players.remove(p);
+        game.boards.remove(p.getUniqueId());
         byPlayer.remove(p.getUniqueId());
         PvpModule pvp = plugin.module(PvpModule.class);
         if (pvp != null) {
-            pvp.combat().force(p, null);
+            pvp.combat().force(p, (dev.tearsmilk.miharu.pvp.CombatVersion) null);
         }
         PlayerSnapshot snap = snapshots.remove(p.getUniqueId());
         Location back = returnLocation(snap);
@@ -205,6 +282,25 @@ public final class GameManager {
         p.sendPlayerListHeaderAndFooter(Component.empty(), Component.empty());
         module.visibility().update(p);
         sendToProxy(p);
+        for (java.util.function.Consumer<Player> hook : returnHooks) {
+            try {
+                hook.accept(p);
+            } catch (Throwable t) {
+                plugin.getLogger().log(Level.WARNING, "Ошибка в обработчике возврата", t);
+            }
+        }
+    }
+
+    private final List<java.util.function.Consumer<Player>> returnHooks = new ArrayList<>();
+
+    /** Вызывается, когда игрок вернулся из игры (лобби выдаёт предметы и табло). */
+    public void onReturn(java.util.function.Consumer<Player> hook) {
+        returnHooks.add(hook);
+    }
+
+    /** Сколько игроков сейчас в играх. */
+    public int playersInGames() {
+        return byPlayer.size();
     }
 
     private Location returnLocation(PlayerSnapshot snap) {
@@ -284,6 +380,9 @@ public final class GameManager {
             return;
         }
         game.state = Game.State.CLOSED;
+        for (Player sp : List.copyOf(game.spectators)) {
+            unspectate(game, sp);
+        }
         safe(game::onClose);
         games.remove(game.id);
         ArenaModule arenas = plugin.module(ArenaModule.class);
@@ -307,27 +406,29 @@ public final class GameManager {
     }
 
     void refreshBoard(Game game) {
-        if (game.board == null || game.players.isEmpty()) {
-            return;
-        }
-        Player viewer = game.players.getFirst();
-        Map<String, Object> ph = game.placeholders(viewer);
-        if (module.config().getBoolean("scoreboard.enabled", true)) {
-            List<String> raw = module.config().getStringList("scoreboard.modes." + game.mode());
-            if (raw.isEmpty()) {
-                raw = module.config().getStringList("scoreboard.modes.default");
+        List<Player> viewers = new ArrayList<>(game.players);
+        viewers.addAll(game.spectators);
+        for (Player viewer : viewers) {
+            GameBoard board = game.boards.get(viewer.getUniqueId());
+            if (board == null) {
+                continue;
             }
-            List<Component> lines = new ArrayList<>();
-            for (String line : raw) {
-                lines.add(Text.mm(viewer, line, ph));
+            Map<String, Object> ph = game.placeholders(viewer);
+            if (module.config().getBoolean("scoreboard.enabled", true)) {
+                List<String> raw = module.config().getStringList("scoreboard.modes." + game.mode());
+                if (raw.isEmpty()) {
+                    raw = module.config().getStringList("scoreboard.modes.default");
+                }
+                List<Component> lines = new ArrayList<>();
+                for (String line : raw) {
+                    lines.add(Text.mm(viewer, line, ph));
+                }
+                board.lines(lines);
             }
-            game.board.lines(lines);
-        }
-        if (module.config().getBoolean("tab.enabled", true)) {
-            Component header = Text.mm(viewer, String.join("\n", module.config().getStringList("tab.header")), ph);
-            Component footer = Text.mm(viewer, String.join("\n", module.config().getStringList("tab.footer")), ph);
-            for (Player p : game.players) {
-                p.sendPlayerListHeaderAndFooter(header, footer);
+            if (module.config().getBoolean("tab.enabled", true)) {
+                Component header = Text.mm(viewer, String.join("\n", module.config().getStringList("tab.header")), ph);
+                Component footer = Text.mm(viewer, String.join("\n", module.config().getStringList("tab.footer")), ph);
+                viewer.sendPlayerListHeaderAndFooter(header, footer);
             }
         }
     }
@@ -339,7 +440,7 @@ public final class GameManager {
     /** Если сервер упал посреди игры — вернуть игроку вещи при следующем входе. */
     void restoreAfterCrash(Player p) {
         File f = snapshotFile(p.getUniqueId());
-        if (!f.exists() || inGame(p)) {
+        if (!f.exists() || busy(p)) {
             return;
         }
         try {

@@ -89,6 +89,12 @@ final class GameListener implements Listener {
             e.setTo(to);
             return;
         }
+        if (game.state() == Game.State.RUNNING) {
+            game.onMove(p, e.getTo());
+            if (games.of(p) != game || game.state() != Game.State.RUNNING) {
+                return;
+            }
+        }
         if (e.getTo().getY() < game.instance().voidY()) {
             if (game.state() == Game.State.RUNNING) {
                 game.onVoid(p);
@@ -136,14 +142,32 @@ final class GameListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent e) {
-        if (games.inGame(e.getPlayer()) && !module.config().getBoolean("allow-build", false)) {
+        Game game = games.of(e.getPlayer());
+        if (game != null && (game.state() != Game.State.RUNNING || !game.canBreak(e.getPlayer(), e.getBlock()))) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent e) {
-        if (games.inGame(e.getPlayer()) && !module.config().getBoolean("allow-build", false)) {
+        Game game = games.of(e.getPlayer());
+        if (game != null && (game.state() != Game.State.RUNNING || !game.canPlace(e.getPlayer(), e.getBlockPlaced(), e.getBlockReplacedState()))) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBucket(org.bukkit.event.player.PlayerBucketEmptyEvent e) {
+        Game game = games.of(e.getPlayer());
+        if (game != null && (game.state() != Game.State.RUNNING || !game.canPlace(e.getPlayer(), e.getBlock(), e.getBlock().getState()))) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBucketFill(org.bukkit.event.player.PlayerBucketFillEvent e) {
+        Game game = games.of(e.getPlayer());
+        if (game != null && (game.state() != Game.State.RUNNING || !game.canBreak(e.getPlayer(), e.getBlock()))) {
             e.setCancelled(true);
         }
     }
@@ -151,7 +175,7 @@ final class GameListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
-        if (!games.inGame(p) || p.hasPermission("miharu.bypass.commands")) {
+        if (!games.busy(p) || p.hasPermission("miharu.bypass.commands")) {
             return;
         }
         String label = e.getMessage().substring(1).split(" ")[0].toLowerCase(Locale.ROOT);
@@ -168,7 +192,7 @@ final class GameListener implements Listener {
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent e) {
         Player p = e.getPlayer();
-        Game game = games.of(p);
+        Game game = games.contextOf(p);
         if (game != null && game.instance() != null && !p.getWorld().equals(game.instance().world())) {
             games.leave(p, false);
         }

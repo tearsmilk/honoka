@@ -1,0 +1,24 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<gray>Classic'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet: {material: IRON_HELMET, enchants: {protection: 2}}
+    chestplate: {material: IRON_CHESTPLATE, enchants: {protection: 2}}
+    leggings: {material: IRON_LEGGINGS, enchants: {protection: 2}}
+    boots: {material: IRON_BOOTS, enchants: {protection: 2}}
+items:
+  0: {material: IRON_SWORD, enchants: {sharpness: 2}}
+  1: {material: FISHING_ROD}
+  2: {material: BOW, enchants: {power: 2}}
+  3: {material: GOLDEN_APPLE, amount: 4}
+  8: {material: COOKED_BEEF, amount: 64}
+  9: {material: ARROW, amount: 12}
+bot:
+  enabled: true
+  heals: 4
+  heal-amount: 6
+  heal-below: 8

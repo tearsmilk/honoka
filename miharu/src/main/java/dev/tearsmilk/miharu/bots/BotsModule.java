@@ -10,11 +10,12 @@ import dev.tearsmilk.miharu.bots.ai.BotDifficulty;
 import dev.tearsmilk.miharu.bots.game.BotDuelGame;
 import dev.tearsmilk.miharu.bots.game.BotGame;
 import dev.tearsmilk.miharu.bots.game.ClickTestGame;
-import dev.tearsmilk.miharu.bots.kit.Kit;
+import dev.tearsmilk.miharu.core.kit.Kit;
 import dev.tearsmilk.miharu.bots.kit.KitManager;
 import dev.tearsmilk.miharu.bots.menu.BotMenu;
-import dev.tearsmilk.miharu.bots.menu.Menu;
 import dev.tearsmilk.miharu.bots.stats.BotStats;
+import dev.tearsmilk.miharu.core.kit.KitRules;
+import dev.tearsmilk.miharu.core.kit.KitSpec;
 import dev.tearsmilk.miharu.core.module.MiharuModule;
 import dev.tearsmilk.miharu.game.GameModule;
 import dev.tearsmilk.miharu.pvp.CombatVersion;
@@ -27,8 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -192,10 +191,42 @@ public final class BotsModule extends MiharuModule implements Listener {
         }
         String kitId = config().getString("modes." + mode + ".kits." + version.id(), config().getString("modes." + mode + ".kit", ""));
         Kit kit = kits.get(kitId);
+        KitRules base = KitRules.load(null, 1);
+        KitRules rules = new KitRules(base.damage(), base.hunger(), base.naturalRegen(), base.fallDamage(), false, true, false,
+                liquidIsVoid(mode), true, 0, KitRules.Objective.NONE, 2.5, KitRules.DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true,
+                config().getInt("modes.bot-duel.max-duration-seconds", 300));
+        KitSpec spec = new KitSpec(kitId.isEmpty() ? "default" : kitId, config().getString("modes." + mode + ".display", mode), version,
+                pvp.combat().profile(version), kit, rules, mode, List.of(), KitSpec.Bot.DEFAULT);
         BotGame game = mode.equals(ClickTestGame.MODE)
-                ? new ClickTestGame(this, games, arena, p, version, difficulty, kit, pvp.combat())
-                : new BotDuelGame(this, games, arena, p, version, difficulty, kit, pvp.combat());
+                ? new ClickTestGame(this, games, arena, p, spec, difficulty, pvp.combat())
+                : new BotDuelGame(this, games, arena, p, spec, difficulty, pvp.combat());
         plugin.messages().send(p, "bots.starting", "mode", game.displayName(), "version", version.id(),
+                "difficulty", difficulty.display(), "arena", arena.display());
+        return games.games().start(game, List.of(p));
+    }
+
+    /**
+     * Дуэль с ботом по киту из модуля дуэлей. Арена — по режиму кита (duel/sumo/...) и его белому списку.
+     */
+    public boolean startKit(Player p, KitSpec spec, BotDifficulty difficulty) {
+        GameModule games = plugin.module(GameModule.class);
+        ArenaModule arenas = plugin.module(ArenaModule.class);
+        PvpModule pvp = plugin.module(PvpModule.class);
+        if (games.games().inGame(p)) {
+            plugin.messages().send(p, "game.already-in-game");
+            return false;
+        }
+        List<Arena> list = arenas.arenas().forMode(spec.arenaMode()).stream()
+                .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
+                .filter(a -> (a.spawn("p1") != null || a.spawn("player") != null) && (a.spawn("p2") != null || a.spawn("bot") != null))
+                .toList();
+        if (list.isEmpty()) {
+            plugin.messages().send(p, "bots.no-arena", "mode", spec.display());
+            return false;
+        }
+        Arena arena = list.get(ThreadLocalRandom.current().nextInt(list.size()));
+        BotDuelGame game = new BotDuelGame(this, games, arena, p, spec, difficulty, pvp.combat());
+        plugin.messages().send(p, "bots.starting", "mode", spec.display(), "version", spec.version().id(),
                 "difficulty", difficulty.display(), "arena", arena.display());
         return games.games().start(game, List.of(p));
     }
@@ -249,23 +280,6 @@ public final class BotsModule extends MiharuModule implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onKnockback(EntityKnockbackEvent e) {
         if (suppressKnockback.contains(e.getEntity().getUniqueId())) {
-            e.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMenuClick(InventoryClickEvent e) {
-        if (e.getInventory().getHolder(false) instanceof Menu menu) {
-            e.setCancelled(true);
-            if (e.getWhoClicked() instanceof Player p && e.getClickedInventory() == e.getInventory()) {
-                menu.click(p, e.getRawSlot());
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMenuDrag(InventoryDragEvent e) {
-        if (e.getInventory().getHolder(false) instanceof Menu) {
             e.setCancelled(true);
         }
     }

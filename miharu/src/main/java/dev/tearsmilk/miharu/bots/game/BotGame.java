@@ -5,7 +5,9 @@ import dev.tearsmilk.miharu.bots.BotsModule;
 import dev.tearsmilk.miharu.bots.ai.BotBody;
 import dev.tearsmilk.miharu.bots.ai.BotBrain;
 import dev.tearsmilk.miharu.bots.ai.BotDifficulty;
-import dev.tearsmilk.miharu.bots.kit.Kit;
+import dev.tearsmilk.miharu.core.kit.Kit;
+import dev.tearsmilk.miharu.core.kit.KitRules;
+import dev.tearsmilk.miharu.core.kit.KitSpec;
 import dev.tearsmilk.miharu.bots.nms.PacketBot;
 import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.game.Game;
@@ -35,7 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /** Общая часть игр против пакетного бота: физика, ИИ, удары в обе стороны. */
-public abstract class BotGame extends Game {
+public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.kit.KitGame {
 
     protected final BotsModule bots;
     protected final Player player;
@@ -44,6 +46,8 @@ public abstract class BotGame extends Game {
     protected final CombatService combat;
     protected final BotDifficulty difficulty;
     protected final Kit kit;
+    protected final KitSpec spec;
+    protected final KitRules rules;
 
     protected PacketBot bot;
     protected BotBody body;
@@ -61,17 +65,27 @@ public abstract class BotGame extends Game {
     protected int combo;
     protected int bestCombo;
     protected double lastReach;
+    protected int botHealsLeft;
+    protected int botHealCooldown;
 
     protected BotGame(BotsModule bots, GameModule games, String mode, Arena arena, Player player,
-                      CombatVersion version, BotDifficulty difficulty, Kit kit, CombatService combat) {
+                      KitSpec spec, BotDifficulty difficulty, CombatService combat) {
         super(games, mode, arena);
         this.bots = bots;
         this.player = player;
-        this.version = version;
+        this.spec = spec;
+        this.version = spec.version();
         this.combat = combat;
-        this.profile = combat.profile(version);
+        this.profile = spec.profile();
+        this.rules = spec.rules();
         this.difficulty = difficulty;
-        this.kit = kit;
+        this.kit = spec.kit();
+        this.botHealsLeft = spec.bot().heals();
+    }
+
+    @Override
+    public KitSpec kitSpec() {
+        return spec;
     }
 
     @Override
@@ -80,23 +94,40 @@ public abstract class BotGame extends Game {
     }
 
     @Override
+    public CombatProfile combatProfile() {
+        return profile;
+    }
+
+    @Override
     protected Location spawnFor(Player p) {
-        return instance.spawn("player");
+        return instance.spawn("player", "p1");
     }
 
     protected Location botSpawn() {
-        return instance.spawn("bot");
+        return instance.spawn("bot", "p2");
     }
 
-    /** Наносит ли бой урон (в клик-тесте — нет). */
+    /** Наносит ли бой урон (в клик-тесте, сумо и боксе — нет). */
     protected boolean damageEnabled() {
-        return true;
+        return rules.damage();
+    }
+
+    /** Вода = падение. */
+    protected boolean liquidLose() {
+        return rules.liquidLose();
+    }
+
+    @Override
+    protected boolean allowHunger() {
+        return rules.hunger();
     }
 
     @Override
     protected void onSetup() {
+        instance.world().setGameRule(org.bukkit.GameRules.NATURAL_HEALTH_REGENERATION, rules.naturalRegen());
+        instance.world().setGameRule(org.bukkit.GameRules.FALL_DAMAGE, rules.fallDamage());
         if (kit != null) {
-            kit.apply(player, combat, profile);
+            kit.apply(player, combat, profile, Kit.Team.RED);
         }
         botHealth = difficulty.health();
         body = new BotBody(botSpawn());
@@ -113,9 +144,9 @@ public abstract class BotGame extends Game {
                 bot.equip(EquipmentSlot.HAND, combat.prepare(kit.weapon().clone(), profile));
             }
         }
-        board.team("miharu_bot", Text.mm(difficulty.namePrefix())).addEntry(bot.name());
+        eachBoard(b -> b.team("miharu_bot", Text.mm(difficulty.namePrefix())).addEntry(bot.name()));
         if (damageEnabled()) {
-            board.belowName(bot.name(), (int) Math.ceil(botHealth), Text.mm(bots.config().getString("bot.below-name", "<red>❤")));
+            eachBoard(b -> b.belowName(bot.name(), (int) Math.ceil(botHealth), Text.mm(bots.config().getString("bot.below-name", "<red>❤"))));
         }
         bot.show(player);
     }
@@ -159,10 +190,22 @@ public abstract class BotGame extends Game {
         if (running && out.click()) {
             botClick(sprint, out.block());
         }
+        if (botHealCooldown > 0) {
+            botHealCooldown--;
+        }
+        if (running && botAlive && damageEnabled() && botHealsLeft > 0 && botHealCooldown <= 0 && botHealth < spec.bot().healBelow()) {
+            botHealsLeft--;
+            botHealCooldown = spec.bot().healCooldownTicks();
+            botHealth = Math.min(difficulty.health(), botHealth + spec.bot().healAmount());
+            Location at = body.location();
+            at.getWorld().spawnParticle(Particle.HEART, at.clone().add(0, 2, 0), 5, 0.3, 0.3, 0.3);
+            at.getWorld().playSound(at, Sound.ENTITY_SPLASH_POTION_BREAK, 1f, 1f);
+            eachBoard(b -> b.belowName(bot.name(), (int) Math.ceil(botHealth), null));
+        }
         if (running && botAlive) {
-            if (body.y < instance.voidY() || (bots.liquidIsVoid(mode) && body.inLiquid())) {
+            if (body.y < instance.voidY() || (liquidLose() && body.inLiquid())) {
                 onBotVoid();
-            } else if (bots.liquidIsVoid(mode) && player.isInWater()) {
+            } else if (liquidLose() && player.isInWater()) {
                 onVoid(player);
             }
         }
@@ -304,11 +347,14 @@ public abstract class BotGame extends Game {
         if (damageEnabled()) {
             double dmg = CombatMath.playerDamage(p, profile, cooldown, crit);
             dmg = CombatMath.applyArmor(dmg, kit == null ? 0 : kit.armorPoints(), kit == null ? 0 : kit.toughness());
+            if (kit != null) {
+                dmg *= 1.0 - Math.min(20, kit.protectionLevels()) / 25.0;
+            }
             if (botBlockingNow && profile.swordBlocking) {
                 dmg *= 1.0 - profile.blockReduction;
             }
             botHealth -= dmg;
-            board.belowName(bot.name(), (int) Math.ceil(Math.max(0, botHealth)), null);
+            eachBoard(b -> b.belowName(bot.name(), (int) Math.ceil(Math.max(0, botHealth)), null));
             if (botHealth <= 0) {
                 botHealth = 0;
                 botAlive = false;
@@ -364,9 +410,26 @@ public abstract class BotGame extends Game {
     }
 
     @Override
+    protected void onSpectate(Player p) {
+        if (bot != null) {
+            bot.show(p);
+        }
+    }
+
+    @Override
+    protected void onSpectatorLeave(Player p) {
+        if (bot != null) {
+            bot.hide(p);
+        }
+    }
+
+    @Override
     public Map<String, Object> placeholders(Player viewer) {
         Map<String, Object> map = super.placeholders(viewer);
         map.put("version", version.id());
+        map.put("kit", spec.display());
+        map.put("bot_heals", botHealsLeft);
+        map.put("hit_target", rules.hitTarget());
         map.put("difficulty", difficulty.display());
         map.put("bot_name", bot == null ? "" : bot.name());
         map.put("bot_hp", Text.num(Math.max(0, Math.round(botHealth * 10) / 10.0)));

@@ -6,6 +6,8 @@
 #   modules/arena/config.yml  — схематики и временные миры
 #   modules/game/config.yml   — табло, таб, возврат игроков
 #   modules/bots/config.yml   — боты, сложности, режимы (+ kits.yml, menu.yml)
+#   modules/duels/config.yml  — дуэли, очередь, меню; киты — modules/duels/kits/
+#   modules/lobby/config.yml  — предметы, табло и таб лобби
 
 # Модули можно выключать (нужен перезапуск). bots зависит от pvp, arena, game.
 modules:
@@ -13,6 +15,8 @@ modules:
   arena: true
   game: true
   bots: true
+  duels: true
+  lobby: true
 
 # Хранилище. sqlite — файл data.db в папке плагина (для теста/одного сервера).
 # Для сети под Velocity используйте mysql (MySQL/MariaDB), чтобы статистика была общей.

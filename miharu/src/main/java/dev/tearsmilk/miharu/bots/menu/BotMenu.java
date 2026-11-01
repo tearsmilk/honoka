@@ -2,6 +2,7 @@ package dev.tearsmilk.miharu.bots.menu;
 
 import dev.tearsmilk.miharu.bots.BotsModule;
 import dev.tearsmilk.miharu.bots.ai.BotDifficulty;
+import dev.tearsmilk.miharu.core.menu.Menu;
 import dev.tearsmilk.miharu.core.util.Items;
 import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.pvp.CombatVersion;

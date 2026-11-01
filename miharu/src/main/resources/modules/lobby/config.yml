@@ -1,0 +1,93 @@
+# ═══ Модуль лобби ═══
+# Лобби = все миры, кроме миров игр (или только перечисленные в worlds).
+worlds: []
+
+# Спавн лобби: /setlobby
+spawn:
+  set: false
+  world: world
+  x: 0.5
+  y: 100
+  z: 0.5
+  yaw: 0
+  pitch: 0
+teleport-on-join: true
+teleport-on-return: false   # после игры — на спавн лобби (иначе туда, где стоял)
+
+on-join:
+  clear-inventory: true
+  gamemode: ADVENTURE
+  heal: true
+
+# Защита лобби (право miharu.lobby.bypass — игнорировать)
+protect:
+  damage: true
+  hunger: true
+  drop: true
+  build: true
+  inventory: true
+  void-y: -64
+
+# Предметы. action: duels | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# show: always | in-queue | not-in-queue
+items:
+  duels:
+    slot: 0
+    show: not-in-queue
+    action: duels
+    material: STONE_SWORD
+    hide-attributes: true
+    name: '<#ff9ecf><b>Дуэли</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>Выбери кит и сыграй'
+      - '<gray>с ботом или с игроком.'
+  leave-queue:
+    slot: 4
+    show: in-queue
+    action: leave-queue
+    material: RED_DYE
+    name: '<red><b>Выйти из очереди</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>Ищем соперника: {queue_kit}'
+  spectate:
+    slot: 8
+    show: always
+    action: spectate
+    material: ENDER_EYE
+    name: '<#c9a7ff><b>Наблюдать</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>Смотреть активные игры.'
+      - '<gray>Выйти — <white>/leave'
+
+scoreboard:
+  enabled: true
+  update-ticks: 20
+  title: '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+  lines:
+    - '<dark_gray>лобби'
+    - ''
+    - '<white>Игрок: <#ff9ecf>{player}'
+    - '<white>Онлайн: <green>{online}'
+    - '<white>В играх: <aqua>{in_game}'
+    - ''
+    - '<white>Дуэли: <green>{duel_wins}<gray> / <red>{duel_losses}'
+    - '<white>Боты: <green>{bot_wins}</green> побед'
+    - '<white>Клик-тест: <#c9a7ff>{clicktest_best}'
+    - ''
+    - '<white>Очередь: {queue_kit}'
+    - '<white>Ищем: <gray>{queue_time}'
+    - ''
+    - '<gray>Пинг {ping} мс'
+
+tab:
+  enabled: true
+  header:
+    - ''
+    - '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+    - '<gray>Онлайн <white>{online}</white> · в играх <white>{in_game}'
+    - ''
+  footer:
+    - ''
+    - '<gray>Каменный меч — дуэли · глаз Эндера — наблюдать'
+    - '<gray>Пинг <white>{ping}</white> мс'
+    - ''

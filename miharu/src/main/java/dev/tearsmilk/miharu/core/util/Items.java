@@ -72,6 +72,30 @@ public final class Items {
                 meta.setItemModel(key);
             }
         }
+        if (meta instanceof org.bukkit.inventory.meta.PotionMeta pm) {
+            if (s.contains("potion")) {
+                try {
+                    pm.setBasePotionType(org.bukkit.potion.PotionType.valueOf(s.getString("potion", "").toUpperCase(Locale.ROOT)));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+            for (PotionEffect e : effects(s.getStringList("potion-effects"))) {
+                pm.addCustomEffect(e, true);
+            }
+        }
+        if (meta instanceof org.bukkit.inventory.meta.LeatherArmorMeta lm && s.contains("color")) {
+            String c = s.getString("color", "#FFFFFF").replace("#", "");
+            try {
+                lm.setColor(org.bukkit.Color.fromRGB(Integer.parseInt(c, 16)));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (s.getBoolean("golden-head", false)) {
+            meta.getPersistentDataContainer().set(Keys.GOLDEN_HEAD, org.bukkit.persistence.PersistentDataType.BYTE, (byte) 1);
+            if (!s.contains("name")) {
+                meta.displayName(Text.item("<gold>Золотая голова", placeholders));
+            }
+        }
         if (s.getBoolean("hide-attributes", false)) {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         }

@@ -1,0 +1,269 @@
+# Меню китов (каменный меч в лобби / команда /duel).
+# kits.<id>: enabled — показывать кит, slot — слот в меню, icon — предмет (material или "nexo:id", name, lore, glow...).
+# Сам кит (вещи и правила) — в файле <id>.yml рядом. Новый кит: создай <id>.yml и при желании добавь его сюда.
+# Плейсхолдеры иконки: {kit} {version} {queue} (в очереди) {playing} (играют) {wins} {losses} {bot} (можно ли с ботом)
+menu:
+  title: '<dark_gray>Дуэли <gray>· выбери кит'
+  rows: 5
+  filler: {enabled: true, material: GRAY_STAINED_GLASS_PANE, name: ' '}
+  default-icon:
+    material: PAPER
+    name: '{kit}'
+    lore: ['<gray>В очереди: <white>{queue}', '<gray>Играют: <white>{playing}']
+kits:
+  nodebuff:
+    enabled: true
+    slot: 10
+    icon:
+      material: SPLASH_POTION
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Хилки, жемчуг, скорость'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  debuff:
+    enabled: true
+    slot: 11
+    icon:
+      material: FERMENTED_SPIDER_EYE
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Хилки + яд и замедление'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  gapple:
+    enabled: true
+    slot: 12
+    icon:
+      material: GOLDEN_APPLE
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Золотые яблоки и комбо'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  builduhc:
+    enabled: true
+    slot: 13
+    icon:
+      material: LAVA_BUCKET
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Лук, удочка, вёдра, стройка'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  combo:
+    enabled: true
+    slot: 14
+    icon:
+      material: PUFFERFISH
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Короткий хит-делей, серии ударов'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  boxing:
+    enabled: true
+    slot: 15
+    icon:
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Первым до 100 ударов'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  sumo:
+    enabled: true
+    slot: 16
+    icon:
+      material: SLIME_BALL
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Вытолкни соперника с платформы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  classic:
+    enabled: true
+    slot: 19
+    icon:
+      material: IRON_SWORD
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Меч, лук и удочка'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  archer:
+    enabled: true
+    slot: 20
+    icon:
+      material: BOW
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Только лук'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  soup:
+    enabled: true
+    slot: 21
+    icon:
+      material: MUSHROOM_STEW
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Лечение супом'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  bridge:
+    enabled: true
+    slot: 22
+    icon:
+      material: BLUE_TERRACOTTA
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Забей 5 голов в ворота'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  mlgrush:
+    enabled: true
+    slot: 23
+    icon:
+      material: WHITE_BED
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Сломай кровать соперника'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  leather:
+    enabled: true
+    slot: 24
+    icon:
+      material: LEATHER_CHESTPLATE
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Кожа и каменный меч'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  opdiamond:
+    enabled: true
+    slot: 25
+    icon:
+      material: ENCHANTED_GOLDEN_APPLE
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Защита IV, Острота V, 128 жемчуга'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  diamond:
+    enabled: true
+    slot: 28
+    icon:
+      material: DIAMOND_CHESTPLATE
+      hide-attributes: true
+      glow: false
+      name: '{kit}'
+      lore:
+        - '<gray>Алмазы без чар'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  uhc:
+    enabled: true
+    slot: 29
+    icon:
+      material: GOLDEN_APPLE
+      hide-attributes: true
+      glow: true
+      name: '{kit}'
+      lore:
+        - '<gray>Без регенерации, головы и лук'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

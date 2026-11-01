@@ -50,8 +50,11 @@ public final class Miharu extends JavaPlugin {
         modules.register(new ArenaModule(this));
         modules.register(new GameModule(this));
         modules.register(new BotsModule(this));
+        modules.register(new dev.tearsmilk.miharu.duels.DuelsModule(this));
+        modules.register(new dev.tearsmilk.miharu.lobby.LobbyModule(this));
         modules.enableAll();
 
+        getServer().getPluginManager().registerEvents(new dev.tearsmilk.miharu.core.menu.MenuListener(), this);
         hooks.enable();
         MiharuCommand.register(this);
 

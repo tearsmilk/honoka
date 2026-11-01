@@ -14,6 +14,11 @@ public final class GameModule extends MiharuModule {
 
     private GameManager games;
     private VisibilityService visibility;
+    private SpectateMenu spectateMenu;
+
+    public SpectateMenu spectateMenu() {
+        return spectateMenu;
+    }
 
     public GameModule(Miharu plugin) {
         super(plugin, "game");
@@ -34,7 +39,7 @@ public final class GameModule extends MiharuModule {
 
         BasicCommand leave = (source, args) -> {
             if (source.getSender() instanceof Player p) {
-                if (!games.inGame(p)) {
+                if (!games.busy(p)) {
                     plugin.messages().send(p, "game.not-in-game");
                     return;
                 }
@@ -44,6 +49,8 @@ public final class GameModule extends MiharuModule {
         };
         plugin.registerCommand("leave", "Выйти из игры", List.of("l", "hub", "quit-game"), leave);
 
+        spectateMenu = new SpectateMenu(this);
+        plugin.registerCommand("spectate", "Наблюдать за игрой", List.of("spec", "watch"), new SpectateCommand(this));
         plugin.hooks().placeholder("ingame", (p, rest) -> p != null && p.isOnline() && games.inGame(p.getPlayer()) ? "true" : "false");
         plugin.hooks().placeholder("game_mode", (p, rest) -> {
             Game g = p != null && p.isOnline() ? games.of(p.getPlayer()) : null;

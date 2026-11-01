@@ -29,7 +29,8 @@ public final class CombatService {
     private static final double VANILLA_ATTACK_SPEED = 4.0;
 
     private final Map<CombatVersion, CombatProfile> profiles = new EnumMap<>(CombatVersion.class);
-    private final Map<UUID, CombatVersion> forced = new ConcurrentHashMap<>();
+    private final Map<UUID, CombatProfile> forced = new ConcurrentHashMap<>();
+    private final Map<CombatVersion, ConfigurationSection> sections = new EnumMap<>(CombatVersion.class);
     private final Map<String, CombatVersion> worlds = new HashMap<>();
     private @Nullable CombatVersion defaultVersion;
 
@@ -41,6 +42,7 @@ public final class CombatService {
                 s = cfg.createSection("versions." + v.id());
             }
             profiles.put(v, new CombatProfile(v, s));
+            sections.put(v, s);
         }
         worlds.clear();
         ConfigurationSection w = cfg.getConfigurationSection("worlds");
@@ -61,31 +63,61 @@ public final class CombatService {
     }
 
     public @Nullable CombatVersion version(Player p) {
-        CombatVersion v = forced.get(p.getUniqueId());
-        if (v != null) {
-            return v;
+        CombatProfile f = forced.get(p.getUniqueId());
+        if (f != null) {
+            return f.version;
         }
-        v = worlds.get(p.getWorld().getName());
+        CombatVersion v = worlds.get(p.getWorld().getName());
         return v != null ? v : defaultVersion;
     }
 
     public @Nullable CombatProfile profile(Player p) {
+        CombatProfile f = forced.get(p.getUniqueId());
+        if (f != null) {
+            return f;
+        }
         CombatVersion v = version(p);
         return v == null ? null : profiles.get(v);
     }
 
-    public @Nullable CombatVersion forcedVersion(Player p) {
-        return forced.get(p.getUniqueId());
-    }
-
     /** Принудительно ставит версию (null — снять). Используется играми и /pvp. */
     public void force(Player p, @Nullable CombatVersion version) {
-        if (version == null) {
+        force(p, version == null ? null : profiles.get(version));
+    }
+
+    /** Принудительно ставит готовый профиль (например, с настройками кита). */
+    public void force(Player p, @Nullable CombatProfile profile) {
+        if (profile == null) {
             forced.remove(p.getUniqueId());
         } else {
-            forced.put(p.getUniqueId(), version);
+            forced.put(p.getUniqueId(), profile);
         }
         refresh(p);
+    }
+
+    /**
+     * Профиль версии с переопределениями (секция combat: в ките).
+     * Ключи те же, что в modules/pvp/config.yml → versions.&lt;версия&gt;.
+     */
+    public CombatProfile derive(CombatVersion version, @Nullable ConfigurationSection overrides) {
+        if (overrides == null || overrides.getKeys(true).isEmpty()) {
+            return profiles.get(version);
+        }
+        org.bukkit.configuration.MemoryConfiguration merged = new org.bukkit.configuration.MemoryConfiguration();
+        ConfigurationSection base = sections.get(version);
+        if (base != null) {
+            for (String key : base.getKeys(true)) {
+                if (!base.isConfigurationSection(key)) {
+                    merged.set(key, base.get(key));
+                }
+            }
+        }
+        for (String key : overrides.getKeys(true)) {
+            if (!overrides.isConfigurationSection(key)) {
+                merged.set(key, overrides.get(key));
+            }
+        }
+        return new CombatProfile(version, merged);
     }
 
     public void forget(Player p) {

@@ -19,7 +19,7 @@ hide-other-players: true
 
 allow-drop: false
 allow-build: false
-allowed-commands: [leave, l, hub, msg, tell, w, r, reply, pvp]
+allowed-commands: [leave, l, hub, lobby, spawn, msg, tell, w, r, reply, pvp]
 
 scoreboard:
   enabled: true
@@ -27,10 +27,24 @@ scoreboard:
   title: '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
   # строки по режимам; доступны {плейсхолдеры} игры и %papi%
   modes:
+    duel:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Кит: {kit}'
+      - '<white>Соперник: <#c9a7ff>{opponent}'
+      - ''
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - '<white>Его ❤ <red>{opponent_hp}'
+      - '<white>Счёт <green>{score}<gray> : <red>{opponent_score} <gray>(до {score_to_win})'
+      - '<white>Удары <green>{hits}<gray> / <red>{opponent_hits}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} <dark_gray>/</dark_gray> {opponent_ping} мс'
     bot-duel:
       - '<dark_gray>#{game_id} · {arena}'
       - ''
-      - '<white>Режим: <#ff9ecf>{mode}'
+      - '<white>Кит: {kit}'
       - '<white>PvP: <#ff9ecf>{version}'
       - '<white>Бот: {difficulty}'
       - ''
@@ -69,3 +83,35 @@ tab:
     - ''
     - '<gray>Пинг <white>{ping}</white> мс · /leave — выйти'
     - ''
+
+# Наблюдение за играми (предмет в лобби, /spectate [игрок])
+spectate:
+  menu:
+    title: '<dark_gray>Активные игры'
+    rows: 6
+    game-icon:
+      material: ENDER_EYE
+      name: '<#ff9ecf>{mode}'
+      lore:
+        - '<gray>{players}'
+        - '<gray>Арена: <white>{arena}'
+        - '<gray>Время: <white>{time}</white> · зрителей: <white>{spectators}'
+        - ''
+        - '<yellow>▶ Смотреть'
+    game-icons:
+      bot-duel:
+        material: ZOMBIE_HEAD
+        name: '<#ff9ecf>{mode}'
+        lore: ['<gray>{players} <gray>vs бот', '<gray>Арена: <white>{arena}', '<gray>Время: <white>{time}', '', '<yellow>▶ Смотреть']
+      clicktest:
+        material: SLIME_BALL
+        name: '<#c9a7ff>{mode}'
+        lore: ['<gray>{players}', '<gray>Время: <white>{time}', '', '<yellow>▶ Смотреть']
+    empty:
+      slot: 22
+      material: BARRIER
+      name: '<gray>Сейчас никто не играет'
+    refresh:
+      slot: 49
+      material: SUNFLOWER
+      name: '<yellow>Обновить'
