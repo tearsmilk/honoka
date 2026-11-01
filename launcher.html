@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лаунчер Эта — mc-ru.org</title>
+  <meta name="description" content="Эта — лаунчер Minecraft от сообщества mc-ru.org для Windows и macOS: сборки Modrinth и CurseForge, HD-скины и плащи, Microsoft-аккаунт, список серверов.">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="acc-body">
+
+<header class="topbar">
+  <a class="logo" href="/">
+    <img src="/assets/logo.svg" alt="" width="36" height="36">
+    <span>MC-RU.ORG</span>
+  </a>
+  <nav class="nav nav--acc">
+    <a href="/">На главную</a>
+    <a href="#features">Возможности</a>
+    <a href="#req">Требования</a>
+    <a href="#install">Установка</a>
+    <a href="/account">Кабинет</a>
+  </nav>
+  <div class="topbar__auth" data-auth></div>
+  <button class="burger" aria-label="Меню" data-burger>☰</button>
+</header>
+
+<main class="dl">
+  <section class="dl__hero">
+    <div>
+      <p class="acc__hello">Лаунчер сообщества</p>
+      <h1 class="dl__title">Эта (η)</h1>
+      <p class="dl__lead">Свой лаунчер Minecraft: Java Edition для Windows и macOS. Сборки в один клик, твой скин и плащ с mc-ru.org (HD и анимация), лицензионный вход через Microsoft и список серверов сообщества прямо в меню.</p>
+      <div class="dl__buttons">
+        <a class="btn btn--big btn--green" href="/api/launcher/download/windows" data-dl="windows">Скачать для Windows</a>
+        <a class="btn btn--big" href="/api/launcher/download/macos" data-dl="macos">Скачать для macOS</a>
+      </div>
+      <p class="dl__ver" data-ver>Проверяем последнюю версию…</p>
+    </div>
+    <div class="dl__shot" aria-hidden="true">
+      <h4>Серверы сообщества</h4>
+      <div class="dl__row"><span class="dl__ico"></span><div><b>Ферма mc-ru</b><small>Выживание без приватов · ивенты по выходным</small></div><span class="dl__play">Играть</span></div>
+      <div class="dl__row"><span class="dl__ico" style="background:#4fd9d0"></span><div><b>Творческий</b><small>Плоский мир, WorldEdit, конкурсы построек</small></div><span class="dl__play">Играть</span></div>
+      <div class="dl__row"><span class="dl__ico" style="background:#c0191c"></span><div><b>Бед-варс</b><small>Турниры по пятницам</small></div><span class="dl__play">Играть</span></div>
+    </div>
+  </section>
+
+  <section id="features">
+    <h2 class="section__title">Что умеет</h2>
+    <div class="dl__features">
+      <article class="card"><div class="card__icon card__icon--iron"></div><h3>Сборки</h3><p>Каталог Modrinth и CurseForge, установка .mrpack, импорт из Modrinth App, свои сборки с Fabric / Quilt / Forge / NeoForge, управление модами, шейдерами и ресурспаками.</p></article>
+      <article class="card"><div class="card__icon card__icon--diamond"></div><h3>Скины и плащи</h3><p>Вход аккаунтом mc-ru.org — скин и плащ из кабинета подтягиваются в игру, включая HD и анимацию.</p></article>
+      <article class="card"><div class="card__icon card__icon--gold"></div><h3>Microsoft-аккаунт</h3><p>Лицензионный вход по коду устройства: любые серверы, официальные скины.</p></article>
+      <article class="card"><div class="card__icon card__icon--grass"></div><h3>Серверы сообщества</h3><p>Список серверов mc-ru.org внизу главного меню — выбрал и играешь, адреса вводить не надо.</p></article>
+      <article class="card"><div class="card__icon card__icon--redstone"></div><h3>Discord</h3><p>Rich Presence показывает друзьям, в какую сборку ты играешь.</p></article>
+      <article class="card"><div class="card__icon card__icon--obsidian"></div><h3>Java сама</h3><p>Нужную Java скачивает лаунчер, память и аргументы JVM — в настройках.</p></article>
+    </div>
+  </section>
+
+  <div class="dl__cols">
+    <section class="panel" id="req">
+      <h2 class="panel__title">Требования</h2>
+      <ul>
+        <li><b>Windows</b> 10 / 11, 64-бит. Один файл <code>Eta.exe</code>, установка не нужна.</li>
+        <li><b>macOS</b> 11 Big Sur и новее, Intel. На Apple Silicon — через Rosetta (система предложит сама).</li>
+        <li>4 ГБ ОЗУ минимум, для модов — 8 ГБ. Java скачивается автоматически.</li>
+      </ul>
+    </section>
+    <section class="panel" id="install">
+      <h2 class="panel__title">Установка</h2>
+      <h3 class="panel__sub">Windows</h3>
+      <ol>
+        <li>Скачай <code>Eta.exe</code> и запусти.</li>
+        <li>SmartScreen может предупредить (сборка не подписана): нажми <b>Подробнее → Выполнить в любом случае</b>.</li>
+        <li>Данные лаунчера лежат в <code>%APPDATA%\Eta</code>.</li>
+      </ol>
+      <h3 class="panel__sub">macOS</h3>
+      <ol>
+        <li>Открой <code>.dmg</code>, перетащи <b>Eta</b> в Программы.</li>
+        <li>При первом запуске: <b>ПКМ по Eta → Открыть → Открыть</b> (Gatekeeper).</li>
+      </ol>
+      <p class="form__hint">Не нашёл кнопку скачивания или что-то не запускается — пиши в Discord, канал #помощь.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>© <span data-year></span> mc-ru.org. Не является официальным продуктом Minecraft. Не одобрено и не связано с Mojang/Microsoft.</p>
+</footer>
+
+<script src="/script.js"></script>
+<script>
+(async () => {
+  const ver = document.querySelector('[data-ver]');
+  const fmt = n => n > 1e6 ? (n / 1e6).toFixed(0) + ' МБ' : (n / 1e3).toFixed(0) + ' КБ';
+  try {
+    const d = await mcru.api('/launcher/latest');
+    if (!d.version) { ver.textContent = 'Сборка скоро появится — следи за Discord.'; return; }
+    const date = d.published ? new Date(d.published).toLocaleDateString('ru-RU') : '';
+    ver.textContent = `Версия ${d.version}${date ? ' · ' + date : ''}`;
+    for (const p of ['windows', 'macos']) {
+      const a = document.querySelector(`[data-dl="${p}"]`);
+      if (d[p]) a.title = `${d[p].name} · ${fmt(d[p].size)}`;
+      else { a.classList.add('btn--disabled'); a.title = 'Для этой платформы сборки пока нет'; a.addEventListener('click', e => e.preventDefault()); }
+    }
+  } catch { ver.textContent = 'Не удалось узнать версию — кнопки всё равно ведут на последнюю сборку.'; }
+})();
+</script>
+</body>
+</html>
