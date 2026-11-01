@@ -65,7 +65,7 @@ public final class ArenaWorlds {
         Location o = pasteOrigin(null);
         WorldCreator wc = new WorldCreator(name)
                 .environment(World.Environment.NORMAL)
-                .type(WorldType.FLAT)
+                .type(WorldType.NORMAL)
                 .generateStructures(false)
                 .generator(new VoidGenerator(o.getX() + 0.5, o.getY() + 1, o.getZ() + 0.5))
                 .keepSpawnLoaded(TriState.FALSE);

@@ -104,6 +104,31 @@ public final class Database {
         }).join();
     }
 
+    /** Есть ли колонка в таблице (для миграций старых data.db). */
+    public boolean hasColumn(String table, String column) {
+        return run(() -> {
+            open();
+            try (ResultSet rs = connection.getMetaData().getColumns(null, null, table, null)) {
+                while (rs.next()) {
+                    if (column.equalsIgnoreCase(rs.getString("COLUMN_NAME"))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }).join();
+    }
+
+    /** Есть ли таблица. */
+    public boolean hasTable(String table) {
+        return run(() -> {
+            open();
+            try (ResultSet rs = connection.getMetaData().getTables(null, null, table, null)) {
+                return rs.next();
+            }
+        }).join();
+    }
+
     public CompletableFuture<Integer> update(String sql, Object... params) {
         return run(() -> {
             open();

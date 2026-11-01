@@ -45,6 +45,11 @@ public final class BotStats {
     public record TopEntry(String name, int score, int maxCps, String version) {
     }
 
+    private static final String BOT_STATS_TABLE = "CREATE TABLE IF NOT EXISTS miharu_bot_stats (" +
+            "uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, kit VARCHAR(32) NOT NULL, version VARCHAR(4) NOT NULL, difficulty VARCHAR(32) NOT NULL, " +
+            "wins INT NOT NULL DEFAULT 0, losses INT NOT NULL DEFAULT 0, draws INT NOT NULL DEFAULT 0, " +
+            "PRIMARY KEY (uuid, kit, version, difficulty))";
+
     private final BotsModule module;
     private final Database db;
     private final Map<UUID, Summary> cache = new ConcurrentHashMap<>();
@@ -55,11 +60,17 @@ public final class BotStats {
     }
 
     public void createTables() {
+        // data.db от 0.1.0: в miharu_bot_stats ещё не было колонки kit — переносим записи с kit = 'default'
+        if (db.hasTable("miharu_bot_stats") && !db.hasColumn("miharu_bot_stats", "kit")) {
+            db.schema("ALTER TABLE miharu_bot_stats RENAME TO miharu_bot_stats_old");
+            db.schema(BOT_STATS_TABLE,
+                    "INSERT INTO miharu_bot_stats (uuid, name, kit, version, difficulty, wins, losses, draws) "
+                            + "SELECT uuid, name, 'default', version, difficulty, wins, losses, draws FROM miharu_bot_stats_old",
+                    "DROP TABLE miharu_bot_stats_old");
+            module.plugin().getLogger().info("data.db: таблица miharu_bot_stats обновлена (добавлена колонка kit)");
+        }
         db.schema(
-                "CREATE TABLE IF NOT EXISTS miharu_bot_stats (" +
-                        "uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, kit VARCHAR(32) NOT NULL, version VARCHAR(4) NOT NULL, difficulty VARCHAR(32) NOT NULL, " +
-                        "wins INT NOT NULL DEFAULT 0, losses INT NOT NULL DEFAULT 0, draws INT NOT NULL DEFAULT 0, " +
-                        "PRIMARY KEY (uuid, kit, version, difficulty))",
+                BOT_STATS_TABLE,
                 "CREATE TABLE IF NOT EXISTS miharu_clicktest (" +
                         "id " + db.autoIncrementPk() + ", uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, version VARCHAR(4) NOT NULL, " +
                         "difficulty VARCHAR(32) NOT NULL, clicks INT NOT NULL, hits INT NOT NULL, score INT NOT NULL, max_cps INT NOT NULL, " +
