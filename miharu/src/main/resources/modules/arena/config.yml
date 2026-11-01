@@ -1,0 +1,24 @@
+# ═══ Модуль арен ═══
+# Арены: modules/arena/arenas/<id>.yml, схематики: modules/arena/schematics/
+# Каждая игра получает свой временный пустой мир, куда вставляется схематика.
+
+# auto — WorldEdit/FAWE (.schem), если установлен, иначе ванильные структуры (.nbt)
+# worldedit | structure — принудительно
+schematic-engine: auto
+
+delete-schematic-with-arena: true
+
+instance:
+  world-prefix: 'miharu_game_'   # миры игр: miharu_game_<n>_<id>
+  edit-prefix: 'miharu_edit_'    # мир для /arena edit
+  paste-origin: {x: 0, y: 100, z: 0}  # куда ставится нижний угол схематики
+  delete-delay-seconds: 5        # удалить мир через N секунд после конца игры / выхода
+  cleanup-on-start: true         # удалить миры, оставшиеся после краша
+  difficulty: NORMAL
+  time: 6000
+  # любые правила игры: имя из /gamerule (minecraft:...)
+  gamerules:
+    natural_health_regeneration: true
+    fall_damage: true
+    fire_damage: true
+    drowning_damage: true

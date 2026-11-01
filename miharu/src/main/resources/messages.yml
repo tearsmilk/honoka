@@ -1,0 +1,165 @@
+# Тексты Miharu. Формат — MiniMessage (https://docs.advntr.dev/minimessage/format.html)
+# {ключ} — подстановки. Пустая строка = сообщение не отправляется.
+prefix: '<gradient:#ff9ecf:#c9a7ff><b>Miharu</b></gradient> <dark_gray>»</dark_gray> '
+
+no-permission: '{prefix}<red>Недостаточно прав.'
+players-only: '{prefix}<red>Только для игроков.'
+player-not-found: '{prefix}<red>Игрок <white>{player}</white> не найден.'
+bad-number: '{prefix}<red>Ожидалось число.'
+
+admin:
+  help:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Miharu</b></gradient> <gray>v{version} · tearsmilk'
+    - '<white>/miharu reload</white> <gray>— перечитать все конфиги'
+    - '<white>/miharu modules</white> <gray>— состояние модулей'
+    - '<white>/miharu games</white> <gray>— идущие игры'
+    - '<white>/miharu start <игрок> <duel|clicktest> <1.8|1.9> <сложность> [арена]</white> <gray>— запустить игру'
+    - '<white>/miharu stop <id|игрок|all></white> <gray>— остановить игру'
+    - '<white>/arena</white> <gray>— настройка арен · <white>/bot</white> <gray>— игры с ботами · <white>/pvp</white> <gray>— версия боя'
+  reloaded: '{prefix}<green>Конфиги перезагружены.'
+  module-line: '{prefix}<white>{module}</white> <dark_gray>—</dark_gray> {state}'
+  no-games: '{prefix}<gray>Сейчас игр нет.'
+  game-line: '{prefix}<white>#{id}</white> <gray>{mode} · {arena} · {state} ·</gray> <white>{players}'
+  usage-start: '{prefix}<red>/miharu start <игрок> <duel|clicktest> <1.8|1.9> <сложность> [арена]'
+  usage-stop: '{prefix}<red>/miharu stop <id|игрок|all>'
+  started: '{prefix}<green>Игра для <white>{player}</white> запускается.'
+  stopped: '{prefix}<green>Остановлено игр: <white>{count}'
+  game-not-found: '{prefix}<red>Игра <white>{game}</white> не найдена.'
+
+pvp:
+  current: '{prefix}<gray>Твоя версия боя: <white>{version}'
+  set: '{prefix}<green>{player}: версия боя <white>{version}'
+  reset: '{prefix}<green>{player}: версия боя сброшена (мир / по умолчанию).'
+  usage: '{prefix}<red>/pvp <1.8|1.9|off> [игрок]'
+
+arena:
+  help:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Арены</b></gradient>'
+    - '<white>/arena create <id></white> <gray>— новая арена (строишь в любом мире)'
+    - '<white>/arena pos1</white>, <white>/arena pos2</white> <gray>[x y z] — углы области (по умолчанию — где стоишь)'
+    - '<white>/arena spawn <точка></white> <gray>— точка спавна: player, bot, p1, p2...'
+    - '<white>/arena void [y]</white> <gray>— высота пустоты (ниже — падение)'
+    - '<white>/arena mode <режим></white> <gray>— включить/выключить режим (bot-duel, clicktest)'
+    - '<white>/arena display <текст></white>, <white>/arena icon [материал]</white>'
+    - '<white>/arena info [id]</white> <gray>— что уже настроено'
+    - '<white>/arena save</white> <gray>— сохранить схематику и арену'
+    - '<white>/arena edit <id></white> <gray>— открыть арену в отдельном мире и поправить'
+    - '<white>/arena cancel</white>, <white>/arena list</white>, <white>/arena delete <id></white>, <white>/arena enable|disable <id></white>'
+  no-setup: '{prefix}<red>Сначала /arena create <id> или /arena edit <id>.'
+  usage-create: '{prefix}<red>/arena create <id> <gray>(латиница, цифры, _ и -)'
+  usage-spawn: '{prefix}<red>/arena spawn <точка> <gray>(например player или bot)'
+  usage-display: '{prefix}<red>/arena display <текст>'
+  exists: '{prefix}<red>Арена <white>{arena}</white> уже есть. Используй /arena edit {arena}.'
+  created: '{prefix}<green>Создаю арену <white>{arena}</white>. Отметь /arena pos1 и /arena pos2, точки и режимы, потом /arena save.'
+  pos-set: '{prefix}<green>Точка {pos}: <white>{x} {y} {z}'
+  spawn-set: '{prefix}<green>Спавн <white>{spawn}</white>: <gray>{x} {y} {z}'
+  void-set: '{prefix}<green>Пустота ниже Y <white>{y}'
+  unknown-mode: '{prefix}<red>Режимы: <white>{modes}'
+  mode-added: '{prefix}<green>Режим <white>{mode}</white> включён. Нужны точки: <white>{spawns}'
+  mode-removed: '{prefix}<yellow>Режим <white>{mode}</white> убран.'
+  display-set: '{prefix}<green>Название: {display}'
+  bad-material: '{prefix}<red>Неверный материал.'
+  icon-set: '{prefix}<green>Иконка: <white>{icon}'
+  setup-info:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Арена {arena}</b></gradient> <gray>(настройка)'
+    - '<gray>Название: <white>{display}'
+    - '<gray>Углы: <white>{pos1}</white> → <white>{pos2}'
+    - '<gray>Режимы: <white>{modes}'
+    - '<gray>Точки: <white>{spawns}'
+    - '<gray>Пустота: <white>{void}'
+    - '<gray>Не хватает точек: <red>{missing}'
+  info:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Арена {arena}</b></gradient> <gray>· включена: <white>{enabled}'
+    - '<gray>Название: <white>{display}'
+    - '<gray>Режимы: <white>{modes}'
+    - '<gray>Точки: <white>{spawns}'
+    - '<gray>Схематика: <white>{schematic}</white> <gray>({size})'
+    - '<gray>Пустота: <white>{void}</white> <gray>от низа схематики'
+  need-region: '{prefix}<red>Отметь оба угла в одном мире: /arena pos1, /arena pos2.'
+  need-mode: '{prefix}<red>Включи хотя бы один режим: /arena mode <режим>.'
+  missing-spawns: '{prefix}<red>Не хватает точек: <white>{spawns}'
+  spawn-other-world: '{prefix}<red>Точка {spawn} в другом мире.'
+  save-failed: '{prefix}<red>Ошибка: <white>{error}'
+  saved: '{prefix}<green>Арена <white>{arena}</white> сохранена ({size}, движок {engine}).'
+  cancelled: '{prefix}<yellow>Настройка отменена.'
+  editing: '{prefix}<green>Арена <white>{arena}</white> открыта в отдельном мире. Правь и /arena save, или /arena cancel.'
+  not-found: '{prefix}<red>Арена <white>{arena}</white> не найдена.'
+  deleted: '{prefix}<green>Арена <white>{arena}</white> удалена.'
+  list-empty: '{prefix}<gray>Арен пока нет. /arena create <id>'
+  list-header: '{prefix}<gray>Арены ({count}):'
+  list-line: ' <dark_gray>•</dark_gray> <white>{arena}</white> <gray>{display} · {modes} ·</gray> {state}'
+  enabled: '{prefix}<green>Арена {arena} включена.'
+  disabled: '{prefix}<yellow>Арена {arena} выключена.'
+
+game:
+  countdown:
+    title: '<gradient:#ff9ecf:#c9a7ff><b>{seconds}</b></gradient>'
+    subtitle: '<gray>приготовься'
+    stay: 900
+  go:
+    title: '<green><b>В бой!</b>'
+    subtitle: ''
+    stay: 700
+  already-in-game: '{prefix}<red>Ты уже в игре. /leave — выйти.'
+  not-in-game: '{prefix}<red>Ты не в игре.'
+  left: '{prefix}<gray>Ты вышел из игры.'
+  stopped: '{prefix}<yellow>Игра остановлена администратором.'
+  world-failed: '{prefix}<red>Не удалось подготовить арену: <white>{error}'
+  command-blocked: '{prefix}<red>Эта команда недоступна в игре. /leave — выйти.'
+  restored: '{prefix}<green>Прошлая игра прервалась — вещи возвращены.'
+
+bots:
+  help:
+    - '<gradient:#ff9ecf:#c9a7ff><b>Боты</b></gradient>'
+    - '<white>/bot</white> <gray>— меню выбора'
+    - '<white>/bot duel [1.8|1.9] [easy|medium|hard] [арена]</white> <gray>— дуэль с ботом'
+    - '<white>/bot clicktest [1.8|1.9] [сложность] [арена]</white> <gray>— клик-тест: бесконечное сумо 10 минут'
+    - '<white>/bot stats [игрок]</white>, <white>/bot top</white>, <white>/leave</white>'
+  bad-version: '{prefix}<red>Версия: 1.8 или 1.9.'
+  bad-difficulty: '{prefix}<red>Сложности: <white>{list}'
+  mode-disabled: '{prefix}<red>Этот режим сейчас выключен.'
+  no-arena: '{prefix}<red>Нет готовых арен для режима <white>{mode}</white>.'
+  arena-unavailable: '{prefix}<red>Арена <white>{arena}</white> не подходит для этого режима.'
+  starting: '{prefix}<gray>{mode} · PvP <white>{version}</white> · {difficulty} <gray>· {arena}'
+  duel:
+    win:
+      title: '<green><b>ПОБЕДА</b>'
+      subtitle: '<gray>бот {difficulty} <gray>повержен'
+      stay: 2500
+    loss:
+      title: '<red><b>ПОРАЖЕНИЕ</b>'
+      subtitle: '<gray>у бота осталось <red>{bot_hp}❤'
+      stay: 2500
+    draw:
+      title: '<yellow><b>НИЧЬЯ</b>'
+      subtitle: '<gray>время вышло'
+      stay: 2500
+    summary:
+      - '<dark_gray>───────────────────────'
+      - ' <gradient:#ff9ecf:#c9a7ff><b>Дуэль с ботом</b></gradient> <gray>· PvP {version} · {difficulty}'
+      - ' <gray>Удары: <green>{hits}</green> <dark_gray>/</dark_gray> <red>{bot_hits}</red> <gray>· лучшее комбо <yellow>{best_combo}'
+      - ' <gray>Твоё ❤: <red>{player_hp}</red> <gray>· бот ❤: <red>{bot_hp}</red> <gray>· время <white>{time}'
+      - '<dark_gray>───────────────────────'
+  clicktest:
+    fell: '<red>Ты упал! <gray>Возвращаю на точку.'
+    knockoff: '<green>Бот скинут! <gray>Всего: <white>{knockoffs}'
+    finished:
+      title: '<gradient:#ff9ecf:#c9a7ff><b>{score}</b></gradient>'
+      subtitle: '<gray>кликов за {time} · макс <white>{max_cps}</white> CPS'
+      stay: 3000
+    summary:
+      - '<dark_gray>───────────────────────'
+      - ' <gradient:#ff9ecf:#c9a7ff><b>Клик-тест</b></gradient> <gray>· PvP {version} · {difficulty}'
+      - ' <gray>Клики: <white>{clicks}</white> <gray>· удары: <white>{hits}</white> <gray>· точность <white>{accuracy}%'
+      - ' <gray>CPS: средний <white>{avg_cps}</white> <gray>· максимум <white>{max_cps}'
+      - ' <gray>Скинул бота: <green>{knockoffs}</green> <gray>· упал сам: <red>{falls}'
+      - '<dark_gray>───────────────────────'
+    new-best: '{prefix}<gold>Новый рекорд: <white>{score}</white> <gray>(было {previous})'
+  stats:
+    header: '{prefix}<gray>Статистика <white>{player}</white>:'
+    line: ' <dark_gray>•</dark_gray> {difficulty}<gray>: <green>{wins}</green> побед, <red>{losses}</red> поражений'
+    clicktest: ' <dark_gray>•</dark_gray> <gray>Клик-тест: рекорд <white>{best}</white>, макс <white>{cps}</white> CPS'
+  top:
+    header: '{prefix}<gray>Топ клик-теста:'
+    empty: ' <gray>Пока пусто — будь первым: /bot clicktest'
+    line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{score}</white> <gray>({cps} CPS)'

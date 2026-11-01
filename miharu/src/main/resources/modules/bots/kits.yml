@@ -1,0 +1,25 @@
+# Киты для игр с ботом. Бот надевает ту же броню и берёт оружие из слота 0 (или bot-weapon).
+# Предмет: material (или "nexo:id"), amount, name, lore, enchants {sharpness: 1}, unbreakable, glow, model
+kits:
+  duel-1.8:
+    armor:
+      helmet: {material: DIAMOND_HELMET, unbreakable: true}
+      chestplate: {material: DIAMOND_CHESTPLATE, unbreakable: true}
+      leggings: {material: DIAMOND_LEGGINGS, unbreakable: true}
+      boots: {material: DIAMOND_BOOTS, unbreakable: true}
+    items:
+      0: {material: DIAMOND_SWORD, unbreakable: true}
+    effects: []
+  duel-1.9:
+    armor:
+      helmet: {material: DIAMOND_HELMET, unbreakable: true}
+      chestplate: {material: DIAMOND_CHESTPLATE, unbreakable: true}
+      leggings: {material: DIAMOND_LEGGINGS, unbreakable: true}
+      boots: {material: DIAMOND_BOOTS, unbreakable: true}
+    items:
+      0: {material: DIAMOND_SWORD, unbreakable: true}
+      1: {material: DIAMOND_AXE, unbreakable: true}
+    effects: []
+  clicktest:
+    items: {}
+    effects: []

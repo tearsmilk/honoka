@@ -1,0 +1,71 @@
+# ═══ Модуль игр: табло, таб, вход/выход ═══
+
+countdown-seconds: 3
+freeze-on-countdown: true     # не двигаться во время отсчёта
+end-delay-seconds: 3          # пауза после конца игры перед возвратом
+gamemode: ADVENTURE           # режим игрока в игре (ADVENTURE не даёт «кликать» по блокам зажатой ЛКМ)
+
+# Куда возвращать игрока:
+#   previous — туда, где стоял до игры
+#   location — точка ниже
+#   velocity — как previous + отправить на сервер velocity-server через Velocity/BungeeCord
+return:
+  mode: previous
+  location: {world: world, x: 0.5, y: 100, z: 0.5, yaw: 0, pitch: 0}
+  velocity-server: lobby
+
+# Игроки видят в мире и в табе только свою игру
+hide-other-players: true
+
+allow-drop: false
+allow-build: false
+allowed-commands: [leave, l, hub, msg, tell, w, r, reply, pvp]
+
+scoreboard:
+  enabled: true
+  update-ticks: 10
+  title: '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+  # строки по режимам; доступны {плейсхолдеры} игры и %papi%
+  modes:
+    bot-duel:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Режим: <#ff9ecf>{mode}'
+      - '<white>PvP: <#ff9ecf>{version}'
+      - '<white>Бот: {difficulty}'
+      - ''
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - '<white>Бот ❤ <red>{bot_hp}'
+      - '<white>Удары <green>{hits}<gray> / <red>{bot_hits}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} мс'
+    clicktest:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>PvP: <#ff9ecf>{version} <gray>· {difficulty}'
+      - '<white>Осталось <aqua>{time_left}'
+      - ''
+      - '<white>Клики <#ff9ecf>{clicks}'
+      - '<white>CPS <white>{cps} <gray>(макс {max_cps})'
+      - '<white>Средний <gray>{avg_cps}'
+      - '<white>Удары <green>{hits} <gray>· {accuracy}%'
+      - ''
+      - '<white>Скинул <green>{knockoffs} <gray>· упал <red>{falls}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+    default:
+      - '<white>{mode}'
+      - '<white>Время <aqua>{time}'
+
+tab:
+  enabled: true
+  header:
+    - ''
+    - '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+    - '<gray>{mode} · {arena}'
+    - ''
+  footer:
+    - ''
+    - '<gray>Пинг <white>{ping}</white> мс · /leave — выйти'
+    - ''
