@@ -20,6 +20,8 @@ public final class EloStore {
     private final Database db;
     /** uuid → кит → {elo, победы, поражения}. */
     private final Map<UUID, Map<String, int[]>> cache = new ConcurrentHashMap<>();
+    /** Ручные тиры: uuid → кит → тир. */
+    private final Map<UUID, Map<String, String>> overrides = new ConcurrentHashMap<>();
 
     EloStore(DuelsModule module, Database db) {
         this.module = module;
@@ -28,7 +30,27 @@ public final class EloStore {
 
     void createTables() {
         db.schema("CREATE TABLE IF NOT EXISTS miharu_elo (uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, kit VARCHAR(32) NOT NULL, "
-                + "elo INT NOT NULL, wins INT NOT NULL DEFAULT 0, losses INT NOT NULL DEFAULT 0, PRIMARY KEY (uuid, kit))");
+                + "elo INT NOT NULL, wins INT NOT NULL DEFAULT 0, losses INT NOT NULL DEFAULT 0, PRIMARY KEY (uuid, kit))",
+                "CREATE TABLE IF NOT EXISTS miharu_tier_override (uuid VARCHAR(36) NOT NULL, name VARCHAR(16) NOT NULL, kit VARCHAR(32) NOT NULL, "
+                        + "tier VARCHAR(8) NOT NULL, PRIMARY KEY (uuid, kit))");
+    }
+
+    public String override(UUID id, String kit) {
+        Map<String, String> m = overrides.get(id);
+        return m == null ? null : m.get(kit);
+    }
+
+    /** Ручной тир (null — снять, тир снова из ELO). */
+    public void setOverride(UUID id, String name, String kit, String tier) {
+        Map<String, String> m = overrides.computeIfAbsent(id, k -> new ConcurrentHashMap<>());
+        if (tier == null) {
+            m.remove(kit);
+            db.update("DELETE FROM miharu_tier_override WHERE uuid = ? AND kit = ?", id.toString(), kit);
+            return;
+        }
+        m.put(kit, tier);
+        db.upsert("UPDATE miharu_tier_override SET tier = ?, name = ? WHERE uuid = ? AND kit = ?", new Object[]{tier, name, id.toString(), kit},
+                "INSERT INTO miharu_tier_override (uuid, name, kit, tier) VALUES (?, ?, ?, ?)", new Object[]{id.toString(), name, kit, tier});
     }
 
     private int start() {
@@ -43,10 +65,18 @@ public final class EloStore {
             }
             return null;
         }, id.toString());
+        Map<String, String> o = overrides.computeIfAbsent(id, k -> new ConcurrentHashMap<>());
+        db.query("SELECT kit, tier FROM miharu_tier_override WHERE uuid = ?", rs -> {
+            while (rs.next()) {
+                o.put(rs.getString(1), rs.getString(2));
+            }
+            return null;
+        }, id.toString());
     }
 
     void unload(UUID id) {
         cache.remove(id);
+        overrides.remove(id);
     }
 
     private int[] row(UUID id, String kit) {

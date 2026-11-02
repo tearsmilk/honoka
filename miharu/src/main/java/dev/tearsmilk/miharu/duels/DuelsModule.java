@@ -35,6 +35,8 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private DuelMenus menus;
     private EloStore elo;
     private Ranked ranked;
+    private Tiers tiers;
+    private StatsMenu statsMenu;
     private BukkitTask task;
 
     public DuelsModule(Miharu plugin) {
@@ -55,6 +57,10 @@ public final class DuelsModule extends MiharuModule implements Listener {
         elo = new EloStore(this, plugin.database());
         elo.createTables();
         ranked = new Ranked(this);
+        tiers = new Tiers(this);
+        statsMenu = new StatsMenu(this);
+        plugin.registerCommand("tier", "PvP-тиры по режимам", List.of("tiers"), new TierCommand(plugin, this));
+        plugin.registerCommand("stats", "Статистика игрока", List.of("stat"), new StatsMenu.Command(this));
         queue = new DuelQueue(this);
         menus = new DuelMenus(this);
         ArenaModule arenas = plugin.module(ArenaModule.class);
@@ -71,6 +77,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
         Bukkit.getOnlinePlayers().forEach(p -> {
             stats.load(p.getUniqueId());
             elo.load(p.getUniqueId());
+        });
+        plugin.hooks().placeholder("tier", (p, rest) -> {
+            if (p == null) {
+                return "";
+            }
+            String kit = rest.isEmpty() ? (ranked.allIds().isEmpty() ? "diamond" : ranked.allIds().getFirst()) : rest;
+            Tiers.Tier t = tiers.of(p.getUniqueId(), kit);
+            return t == null ? "" : t.id();
         });
         plugin.hooks().placeholder("elo", (p, rest) -> {
             if (p == null) {
@@ -156,6 +170,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
 
     public Ranked ranked() {
         return ranked;
+    }
+
+    public Tiers tiers() {
+        return tiers;
+    }
+
+    public StatsMenu statsMenu() {
+        return statsMenu;
     }
 
     public BotsModule bots() {

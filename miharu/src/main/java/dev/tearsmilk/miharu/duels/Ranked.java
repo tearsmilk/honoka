@@ -100,6 +100,7 @@ public final class Ranked {
             ph.put("kit", spec.display());
             ph.put("version", spec.version().id());
             ph.put("elo", module.elo().elo(p.getUniqueId(), spec.id()));
+            ph.put("tier", module.tiers().display(p.getUniqueId(), spec.id()));
             ph.put("wins", module.elo().wins(p.getUniqueId(), spec.id()));
             ph.put("losses", module.elo().losses(p.getUniqueId(), spec.id()));
             ph.put("queue", module.queue().rankedSize(spec.id()));

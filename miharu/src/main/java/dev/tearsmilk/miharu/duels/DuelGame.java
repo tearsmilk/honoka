@@ -334,9 +334,13 @@ public final class DuelGame extends Game implements KitGame {
         winner = w;
         if (ranked && !eloApplied) {
             eloApplied = true;
+            Tiers.Tier ta = duels.tiers().of(a.getUniqueId(), spec.id());
+            Tiers.Tier tb = duels.tiers().of(b.getUniqueId(), spec.id());
             int[] d = duels.elo().apply(a, b, spec.id(), w);
             eloDeltaA = d[0];
             eloDeltaB = d[1];
+            tierChanged(a, ta);
+            tierChanged(b, tb);
         }
         if (w != null) {
             Player loser = opponent(w);
@@ -374,6 +378,17 @@ public final class DuelGame extends Game implements KitGame {
             }
         }
         end();
+    }
+
+    private void tierChanged(Player p, Tiers.Tier before) {
+        Tiers.Tier now = duels.tiers().of(p.getUniqueId(), spec.id());
+        if (now != null && (before == null || !before.id().equals(now.id())) && p.isOnline()) {
+            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (p.isOnline()) {
+                    plugin.messages().send(p, "ranked.tier-changed", "tier", now.display(), "tier_name", now.name(), "kit", spec.display());
+                }
+            }, 20L);
+        }
     }
 
     private Object[] kv(Player viewer) {
@@ -420,6 +435,8 @@ public final class DuelGame extends Game implements KitGame {
         map.put("ranked", ranked ? plugin.messages().raw("ranked.label") : "");
         map.put("elo", duels.elo().elo(me.getUniqueId(), spec.id()));
         map.put("opponent_elo", duels.elo().elo(op.getUniqueId(), spec.id()));
+        map.put("tier", duels.tiers().display(me.getUniqueId(), spec.id()));
+        map.put("opponent_tier", duels.tiers().display(op.getUniqueId(), spec.id()));
         map.put("elo_change", (myDelta >= 0 ? "+" : "") + myDelta);
         map.put("elo_before", duels.elo().elo(me.getUniqueId(), spec.id()) - (eloApplied ? myDelta : 0));
         return map;

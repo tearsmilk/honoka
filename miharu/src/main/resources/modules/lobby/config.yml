@@ -28,7 +28,7 @@ protect:
   inventory: true
   void-y: -64
 
-# Предметы. action: duels (1.8) | duels-1.9 | ranked | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# Предметы. action: duels (1.8) | duels-1.9 | ranked | stats | spectate | leave-queue | bots | clicktest | command:<команда> | none
 # show: always | in-queue | not-in-queue
 items:
   duels:
@@ -69,6 +69,15 @@ items:
     name: '<red><b>Выйти из очереди</b> <gray>(ПКМ)'
     lore:
       - '<gray>Ищем соперника: {queue_kit}'
+  stats:
+    slot: 6
+    show: always
+    action: stats
+    material: BOOK
+    name: '<#ffd23b><b>Статистика</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>Тиры по режимам, ELO, победы.'
+      - '<gray>1.8: {tier_fast} <gray>· 1.9: {tier_slow}'
   spectate:
     slot: 8
     show: always
@@ -91,7 +100,8 @@ scoreboard:
     - '<white>В играх: <aqua>{in_game}'
     - ''
     - '<white>Дуэли: <green>{duel_wins}<gray> / <red>{duel_losses}'
-    - '<white>ELO 1.8: <#ff5c8a>{elo_fast} <gray>· 1.9: <gold>{elo_slow}'
+    - '<white>1.8: {tier_fast} <gray>· <#ff5c8a>{elo_fast} ELO'
+    - '<white>1.9: {tier_slow} <gray>· <gold>{elo_slow} ELO'
     - '<white>Боты: <green>{bot_wins}</green> побед'
     - '<white>Клик-тест: <#c9a7ff>{clicktest_best}'
     - ''

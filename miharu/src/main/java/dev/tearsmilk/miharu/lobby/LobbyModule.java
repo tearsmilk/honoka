@@ -277,6 +277,11 @@ public final class LobbyModule extends MiharuModule {
                     duels.menus().openKits(p, duels.modernKits());
                 }
             }
+            case "stats" -> {
+                if (duels != null) {
+                    duels.statsMenu().open(p, p);
+                }
+            }
             case "ranked" -> {
                 if (duels != null) {
                     duels.ranked().open(p);
@@ -377,9 +382,13 @@ public final class LobbyModule extends MiharuModule {
             java.util.List<KitSpec> slow = duels.ranked().kits(dev.tearsmilk.miharu.pvp.CombatVersion.MODERN);
             ph.put("elo_fast", fast.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), fast.getFirst().id()));
             ph.put("elo_slow", slow.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), slow.getFirst().id()));
+            ph.put("tier_fast", fast.isEmpty() ? "" : duels.tiers().display(p.getUniqueId(), fast.getFirst().id()));
+            ph.put("tier_slow", slow.isEmpty() ? "" : duels.tiers().display(p.getUniqueId(), slow.getFirst().id()));
         } else {
             ph.put("elo_fast", 0);
             ph.put("elo_slow", 0);
+            ph.put("tier_fast", "");
+            ph.put("tier_slow", "");
         }
         ph.put("queue_mode", e != null && e.ranked() ? plugin.messages().raw("ranked.label") : "");
         ph.put("duel_wins", duels == null ? 0 : duels.stats().wins(p.getUniqueId(), null));

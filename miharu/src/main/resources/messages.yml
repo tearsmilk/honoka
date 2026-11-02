@@ -229,3 +229,15 @@ ranked:
   top-header: '{prefix}<gray>Топ ELO · {kit}<gray>:'
   top-empty: ' <gray>Пока пусто.'
   top-line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{elo}</white> <gray>({wins}/{losses})'
+  tier-changed: '{prefix}<gray>Новый тир в {kit}<gray>: {tier} <dark_gray>({tier_name})'
+
+tiers:
+  header: '{prefix}<gray>Тиры <white>{player}</white>:'
+  line: ' <dark_gray>•</dark_gray> {kit} <gray>({version}): {tier} <gray>· {elo} ELO {manual}'
+  manual: '<dark_gray>[вручную]'
+  no-tier-name: 'мало игр'
+  list-header: '{prefix}<gray>Шкала тиров:'
+  list-line: ' <dark_gray>•</dark_gray> {tier} <gray>{name} · от <white>{elo}</white> ELO'
+  usage: '{prefix}<red>/tier set <игрок> <кит> <HT1..LT5|auto>'
+  set: '{prefix}<green>{player}: тир в {kit} — {tier}'
+  reset: '{prefix}<green>{player}: тир в {kit} снова считается из ELO'
