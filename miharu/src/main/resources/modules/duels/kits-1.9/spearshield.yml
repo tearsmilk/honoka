@@ -5,14 +5,24 @@ version: "1.9"
 arena-mode: duel
 rounds: 1
 armor:
-  helmet: {material: IRON_HELMET}
-  chestplate: {material: IRON_CHESTPLATE}
-  leggings: {material: IRON_LEGGINGS}
-  boots: {material: IRON_BOOTS}
-  offhand: {material: SHIELD}
+  helmet:
+    material: IRON_HELMET
+  chestplate:
+    material: IRON_CHESTPLATE
+  leggings:
+    material: IRON_LEGGINGS
+  boots:
+    material: IRON_BOOTS
+  offhand:
+    material: SHIELD
 items:
-  0: {material: IRON_SPEAR}
-  1: {material: GOLDEN_APPLE, amount: 8}
-  8: {material: COOKED_BEEF, amount: 32}
+  0:
+    material: IRON_SPEAR
+  1:
+    material: GOLDEN_APPLE
+    amount: 8
+  8:
+    material: COOKED_BEEF
+    amount: 32
 bot:
   enabled: false           # дальний бой / копья / кристаллы — только против игроков

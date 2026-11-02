@@ -2,7 +2,11 @@
 # Боты — фейк-игроки из пакетов: на сервере сущности нет, физика и ИИ считаются плагином.
 
 bot:
-  names: ['Miharu', 'MiharuBot', 'Hikari', 'Sakura']
+  names:
+    - Miharu
+    - MiharuBot
+    - Hikari
+    - Sakura
   show-in-tab: false
   below-name: '<red>❤'
   # Скин: none (по UUID) | opponent (как у игрока) | fixed (value/signature ниже) | name (скачать скин ника)
@@ -48,21 +52,32 @@ difficulties:
     name-prefix: '<green>[Лёгкий] '
     health: 20
     reach: 2.6
-    cps: {min: 4, max: 6}
+    cps:
+      min: 4
+      max: 6
     miss-chance: 0.35
-    aim: {hit-angle: 35, turn-speed: 9, error: 7, reaction-ticks: 6, lead: 0}
+    aim:
+      hit-angle: 35
+      turn-speed: 9
+      error: 7
+      reaction-ticks: 6
+      lead: 0
     movement:
       speed: 0.92
       keep-distance: 0.8
       strafe-chance: 0.0
-      strafe-ticks: {min: 20, max: 40}
+      strafe-ticks:
+        min: 20
+        max: 40
       jump-chance: 0.0
       w-tap: false
     combat:
       crit-jump: false
       cooldown-aware: false
       cooldown-threshold: 0.75  # 1.9: бьёт при 75% зарядки (удары слабее)
-      charge-delay-ticks: {min: 3, max: 8}   # 1.9: опаздывает с кликом после зарядки
+      charge-delay-ticks:  # 1.9: опаздывает с кликом после зарядки
+        min: 3
+        max: 8
       block-hit: false
       swing-out-of-range: true
   medium:
@@ -70,21 +85,32 @@ difficulties:
     name-prefix: '<yellow>[Средний] '
     health: 20
     reach: 2.9
-    cps: {min: 7, max: 10}
+    cps:
+      min: 7
+      max: 10
     miss-chance: 0.18
-    aim: {hit-angle: 28, turn-speed: 16, error: 4, reaction-ticks: 4, lead: 1}
+    aim:
+      hit-angle: 28
+      turn-speed: 16
+      error: 4
+      reaction-ticks: 4
+      lead: 1
     movement:
       speed: 1.0
       keep-distance: 0.6
       strafe-chance: 0.45
-      strafe-ticks: {min: 15, max: 35}
+      strafe-ticks:
+        min: 15
+        max: 35
       jump-chance: 0.01
       w-tap: false
     combat:
       crit-jump: false
       cooldown-aware: true
       cooldown-threshold: 0.9
-      charge-delay-ticks: {min: 1, max: 4}
+      charge-delay-ticks:
+        min: 1
+        max: 4
       block-hit: false
       swing-out-of-range: true
   hard:
@@ -92,22 +118,35 @@ difficulties:
     name-prefix: '<red>[Сложный] '
     health: 20
     reach: 3.0
-    cps: {min: 11, max: 14}
+    cps:
+      min: 11
+      max: 14
     miss-chance: 0.07
-    aim: {hit-angle: 22, turn-speed: 28, error: 2, reaction-ticks: 2, lead: 2}
+    aim:
+      hit-angle: 22
+      turn-speed: 28
+      error: 2
+      reaction-ticks: 2
+      lead: 2
     movement:
       speed: 1.0
       keep-distance: 0.4
       strafe-chance: 0.75
-      strafe-ticks: {min: 10, max: 25}
+      strafe-ticks:
+        min: 10
+        max: 25
       jump-chance: 0.02
       w-tap: true               # сброс спринта после удара — каждая атака с полной отдачей
-      w-tap-ticks: {min: 2, max: 4}
+      w-tap-ticks:
+        min: 2
+        max: 4
     combat:
       crit-jump: true           # 1.9: прыгает под крит
       cooldown-aware: true
       cooldown-threshold: 0.97
-      charge-delay-ticks: {min: 0, max: 1}
+      charge-delay-ticks:
+        min: 0
+        max: 1
       block-hit: true           # 1.8: блок мечом между ударами
       block-chance: 0.25
       swing-out-of-range: false

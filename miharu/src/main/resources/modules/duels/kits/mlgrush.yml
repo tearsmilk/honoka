@@ -6,9 +6,19 @@ version: "1.8"
 arena-mode: mlg           # арена с точками p1, p2, bed1, bed2 (кровати команд)
 rounds: 5                 # сломанных кроватей до победы
 items:
-  0: {material: STICK, enchants: {knockback: 1}, name: '<yellow>Палка'}
-  1: {material: WOODEN_PICKAXE, enchants: {efficiency: 1}, unbreakable: true}
-  2: {material: SANDSTONE, amount: 64}
+  0:
+    material: STICK
+    enchants:
+      knockback: 1
+    name: '<yellow>Палка'
+  1:
+    material: WOODEN_PICKAXE
+    enchants:
+      efficiency: 1
+    unbreakable: true
+  2:
+    material: SANDSTONE
+    amount: 64
 rules:
   damage: false
   build: true

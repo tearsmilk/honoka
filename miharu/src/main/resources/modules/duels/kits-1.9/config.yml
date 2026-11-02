@@ -4,11 +4,16 @@
 menu:
   title: '<dark_gray>Дуэли 1.9 <gray>· выбери кит'
   rows: 5
-  filler: {enabled: true, material: YELLOW_STAINED_GLASS_PANE, name: ' '}
+  filler:
+    enabled: true
+    material: YELLOW_STAINED_GLASS_PANE
+    name: ' '
   default-icon:
     material: PAPER
     name: '{kit}'
-    lore: ['<gray>В очереди: <white>{queue}', '<gray>Играют: <white>{playing}']
+    lore:
+      - '<gray>В очереди: <white>{queue}'
+      - '<gray>Играют: <white>{playing}'
 kits:
   swordshield:
     enabled: true

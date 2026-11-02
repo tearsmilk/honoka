@@ -6,13 +6,29 @@ version: "1.8"
 arena-mode: duel
 rounds: 1
 armor:
-    helmet: {material: IRON_HELMET, enchants: {protection: 1}}
-    chestplate: {material: IRON_CHESTPLATE, enchants: {protection: 1}}
-    leggings: {material: IRON_LEGGINGS, enchants: {protection: 1}}
-    boots: {material: IRON_BOOTS, enchants: {protection: 1}}
+    helmet:
+      material: IRON_HELMET
+      enchants:
+        protection: 1
+    chestplate:
+      material: IRON_CHESTPLATE
+      enchants:
+        protection: 1
+    leggings:
+      material: IRON_LEGGINGS
+      enchants:
+        protection: 1
+    boots:
+      material: IRON_BOOTS
+      enchants:
+        protection: 1
 items:
-  0: {material: DIAMOND_SWORD, enchants: {sharpness: 2}}
-fill: {material: MUSHROOM_STEW}
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 2
+fill:
+  material: MUSHROOM_STEW
 rules:
   natural-regen: false
   hunger: false

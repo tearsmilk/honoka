@@ -4,22 +4,44 @@
 kits:
   duel-1.8:
     armor:
-      helmet: {material: DIAMOND_HELMET, unbreakable: true}
-      chestplate: {material: DIAMOND_CHESTPLATE, unbreakable: true}
-      leggings: {material: DIAMOND_LEGGINGS, unbreakable: true}
-      boots: {material: DIAMOND_BOOTS, unbreakable: true}
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
     items:
-      0: {material: DIAMOND_SWORD, unbreakable: true}
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
     effects: []
   duel-1.9:
     armor:
-      helmet: {material: DIAMOND_HELMET, unbreakable: true}
-      chestplate: {material: DIAMOND_CHESTPLATE, unbreakable: true}
-      leggings: {material: DIAMOND_LEGGINGS, unbreakable: true}
-      boots: {material: DIAMOND_BOOTS, unbreakable: true}
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
     items:
-      0: {material: DIAMOND_SWORD, unbreakable: true}
-      1: {material: DIAMOND_AXE, unbreakable: true}
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+      1:
+        material: DIAMOND_AXE
+        unbreakable: true
     effects: []
   clicktest:
     items: {}
@@ -27,5 +49,7 @@ kits:
   # 1.9: деревянный меч — удар раз в 12.5 тиков у игрока и бота
   clicktest-1.9:
     items:
-      0: {material: WOODEN_SWORD, unbreakable: true}
+      0:
+        material: WOODEN_SWORD
+        unbreakable: true
     effects: []

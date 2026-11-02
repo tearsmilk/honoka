@@ -5,22 +5,58 @@ version: "1.9"
 arena-mode: duel
 rounds: 1
 armor:
-  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
-  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4}}
-  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
-  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4}}
-  offhand: {material: TOTEM_OF_UNDYING}
+  helmet:
+    material: NETHERITE_HELMET
+    enchants:
+      protection: 4
+  chestplate:
+    material: NETHERITE_CHESTPLATE
+    enchants:
+      protection: 4
+  leggings:
+    material: NETHERITE_LEGGINGS
+    enchants:
+      protection: 4
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+  offhand:
+    material: TOTEM_OF_UNDYING
 items:
-  0: {material: NETHERITE_SWORD, enchants: {sharpness: 5}}
-  1: {material: NETHERITE_AXE, enchants: {sharpness: 5}}
-  2: {material: BOW, enchants: {power: 5, flame: 1}}   # горящая стрела подрывает вагонетку
-  3: {material: TNT_MINECART, amount: 16}
-  4: {material: RAIL, amount: 32}
-  5: {material: ACTIVATOR_RAIL, amount: 16}
-  6: {material: GOLDEN_APPLE, amount: 16}
-  8: {material: COOKED_BEEF, amount: 32}
-  9: {material: ARROW, amount: 64}
-  17: {material: TOTEM_OF_UNDYING}
+  0:
+    material: NETHERITE_SWORD
+    enchants:
+      sharpness: 5
+  1:
+    material: NETHERITE_AXE
+    enchants:
+      sharpness: 5
+  2:  # горящая стрела подрывает вагонетку
+    material: BOW
+    enchants:
+      power: 5
+      flame: 1
+  3:
+    material: TNT_MINECART
+    amount: 16
+  4:
+    material: RAIL
+    amount: 32
+  5:
+    material: ACTIVATOR_RAIL
+    amount: 16
+  6:
+    material: GOLDEN_APPLE
+    amount: 16
+  8:
+    material: COOKED_BEEF
+    amount: 32
+  9:
+    material: ARROW
+    amount: 64
+  17:
+    material: TOTEM_OF_UNDYING
 rules:
   build: true                    # рельсы
   break-placed-only: true

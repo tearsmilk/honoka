@@ -11,7 +11,10 @@ delete-schematic-with-arena: true
 instance:
   world-prefix: 'miharu_game_'   # миры игр: miharu_game_<n>_<id>
   edit-prefix: 'miharu_edit_'    # мир для /arena edit
-  paste-origin: {x: 0, y: 100, z: 0}  # куда ставится нижний угол схематики
+  paste-origin:  # куда ставится нижний угол схематики
+    x: 0
+    y: 100
+    z: 0
   delete-delay-seconds: 5        # удалить мир через N секунд после конца игры / выхода
   cleanup-on-start: true         # удалить миры, оставшиеся после краша
   difficulty: NORMAL

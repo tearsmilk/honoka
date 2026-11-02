@@ -57,8 +57,14 @@ versions:
       reduction: 0.5            # доля поглощённого урона
     golden-apple:
       legacy: true
-      effects: ["regeneration:1:100", "absorption:0:2400"]
-      enchanted-effects: ["regeneration:4:600", "resistance:0:6000", "fire_resistance:0:6000", "absorption:0:2400"]
+      effects:
+        - regeneration:1:100
+        - absorption:0:2400
+      enchanted-effects:
+        - regeneration:4:600
+        - resistance:0:6000
+        - fire_resistance:0:6000
+        - absorption:0:2400
     regen:
       legacy: true              # 1 ❤/2 раз в 4 секунды при сытости >= 18, как в 1.8
       interval-ticks: 80

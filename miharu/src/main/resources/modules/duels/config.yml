@@ -9,7 +9,9 @@ spectate-on-loss: true
 
 # Золотая голова (golden-head: true в предмете кита): эффекты после съедания
 golden-head:
-  effects: ["regeneration:1:180", "absorption:0:2400"]
+  effects:
+    - regeneration:1:180
+    - absorption:0:2400
 
 # Отдача от удочки, как в 1.8
 rod:
@@ -17,7 +19,10 @@ rod:
   vertical: 0.36
 
 menus:
-  filler: {enabled: true, material: GRAY_STAINED_GLASS_PANE, name: ' '}
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '
   # Шаг 2: с кем играть
   opponent:
     title: '<dark_gray>{kit} <gray>· соперник'
@@ -49,17 +54,27 @@ menus:
         slot: 11
         material: LIME_DYE
         name: '{difficulty}'
-        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '', '<yellow>▶ Играть']
+        lore:
+          - '<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+          - ''
+          - '<yellow>▶ Играть'
       medium:
         slot: 13
         material: YELLOW_DYE
         name: '{difficulty}'
-        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '', '<yellow>▶ Играть']
+        lore:
+          - '<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+          - ''
+          - '<yellow>▶ Играть'
       hard:
         slot: 15
         material: RED_DYE
         name: '{difficulty}'
-        lore: ['<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}', '<gray>Стрейфы, w-tap, блок-хит.', '', '<yellow>▶ Играть']
+        lore:
+          - '<gray>CPS <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+          - '<gray>Стрейфы, w-tap, блок-хит.'
+          - ''
+          - '<yellow>▶ Играть'
     back:
       slot: 22
       material: ARROW
@@ -81,34 +96,98 @@ ranked:
     min-games: 3
     unranked: '<gray>Без тира'
     list:
-      - {id: HT1, name: 'Высший уровень',  display: '<#ff3b3b><b>HT1</b>', min-elo: 1000}
-      - {id: LT1, name: 'Очень высокий',   display: '<#ff6a3b><b>LT1</b>', min-elo: 800}
-      - {id: HT2, name: 'Сильный',         display: '<#ffa23b>HT2', min-elo: 600}
-      - {id: LT2, name: 'Выше среднего',   display: '<#ffd23b>LT2', min-elo: 450}
-      - {id: HT3, name: 'Средний',         display: '<#b6e34a>HT3', min-elo: 300}
-      - {id: LT3, name: 'Ниже среднего',   display: '<#5fd68a>LT3', min-elo: 200}
-      - {id: HT4, name: 'Слабый',          display: '<#4ac7e3>HT4', min-elo: 100}
-      - {id: LT4, name: 'Очень слабый',    display: '<#6a8cff>LT4', min-elo: 0}
-      - {id: HT5, name: 'Начальный',       display: '<#a07bff>HT5', min-elo: -100}
-      - {id: LT5, name: 'Самый низкий',    display: '<#9a9a9a>LT5', min-elo: -1000000}
+      - id: HT1
+        name: Высший уровень
+        display: '<#ff3b3b><b>HT1</b>'
+        min-elo: 1000
+      - id: LT1
+        name: Очень высокий
+        display: '<#ff6a3b><b>LT1</b>'
+        min-elo: 800
+      - id: HT2
+        name: Сильный
+        display: '<#ffa23b>HT2'
+        min-elo: 600
+      - id: LT2
+        name: Выше среднего
+        display: '<#ffd23b>LT2'
+        min-elo: 450
+      - id: HT3
+        name: Средний
+        display: '<#b6e34a>HT3'
+        min-elo: 300
+      - id: LT3
+        name: Ниже среднего
+        display: '<#5fd68a>LT3'
+        min-elo: 200
+      - id: HT4
+        name: Слабый
+        display: '<#4ac7e3>HT4'
+        min-elo: 100
+      - id: LT4
+        name: Очень слабый
+        display: '<#6a8cff>LT4'
+        min-elo: 0
+      - id: HT5
+        name: Начальный
+        display: '<#a07bff>HT5'
+        min-elo: -100
+      - id: LT5
+        name: Самый низкий
+        display: '<#9a9a9a>LT5'
+        min-elo: -1000000
   # какие киты рейтинговые (id из kits/ и kits-1.9/; у китов 1.9 приставка m-)
-  kits-1.8: [diamond]
-  kits-1.9: [m-diamond]
+  kits-1.8:
+    - diamond
+  kits-1.9:
+    - m-diamond
   menu:
     title: '<dark_gray>Рейтинг <gray>· PvP {version}'
     rows: 4
-    filler: {enabled: true, material: BLACK_STAINED_GLASS_PANE, name: ' '}
+    filler:
+      enabled: true
+      material: BLACK_STAINED_GLASS_PANE
+      name: ' '
     # переключатель сверху
     tab-1.8:
       slot: 3
-      normal: {material: STONE_SWORD, hide-attributes: true, name: '<gray>1.8 · быстрое', lore: ['<yellow>▶ Показать киты 1.8']}
-      selected: {material: STONE_SWORD, hide-attributes: true, glow: true, name: '<#ff9ecf><b>1.8 · быстрое</b>', lore: ['<green>✔ Выбрано']}
+      normal:
+        material: STONE_SWORD
+        hide-attributes: true
+        name: '<gray>1.8 · быстрое'
+        lore:
+          - '<yellow>▶ Показать киты 1.8'
+      selected:
+        material: STONE_SWORD
+        hide-attributes: true
+        glow: true
+        name: '<#ff9ecf><b>1.8 · быстрое</b>'
+        lore:
+          - '<green>✔ Выбрано'
     tab-1.9:
       slot: 5
-      normal: {material: GOLDEN_SWORD, hide-attributes: true, name: '<gray>1.9 · медленное', lore: ['<yellow>▶ Показать киты 1.9']}
-      selected: {material: GOLDEN_SWORD, hide-attributes: true, glow: true, name: '<gold><b>1.9 · медленное</b>', lore: ['<green>✔ Выбрано']}
+      normal:
+        material: GOLDEN_SWORD
+        hide-attributes: true
+        name: '<gray>1.9 · медленное'
+        lore:
+          - '<yellow>▶ Показать киты 1.9'
+      selected:
+        material: GOLDEN_SWORD
+        hide-attributes: true
+        glow: true
+        name: '<gold><b>1.9 · медленное</b>'
+        lore:
+          - '<green>✔ Выбрано'
     # слоты под киты выбранной версии (по порядку из kits-1.8 / kits-1.9)
-    kit-slots: [22, 21, 23, 20, 24, 19, 25]
+    kit-slots:
+      - 22
+      - 21
+      - 23
+      - 20
+      - 24
+      - 19
+      - 25
     kit-icon:
       material: NETHERITE_SWORD
       hide-attributes: true
@@ -125,13 +204,23 @@ ranked:
         material: DIAMOND_SWORD
         hide-attributes: true
         name: '{kit} <gray>· 1.8 рейтинг'
-        lore: ['<gray>Тир: {tier} <gray>· ELO <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}', '<gray>В очереди: <white>{queue}', '', '<yellow>▶ Искать соперника']
+        lore:
+          - '<gray>Тир: {tier} <gray>· ELO <white>{elo}'
+          - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+          - '<gray>В очереди: <white>{queue}'
+          - ''
+          - '<yellow>▶ Искать соперника'
       m_diamond:
         material: DIAMOND_SWORD
         hide-attributes: true
         glow: true
         name: '{kit} <gray>· 1.9 рейтинг'
-        lore: ['<gray>Тир: {tier} <gray>· ELO <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}', '<gray>В очереди: <white>{queue}', '', '<yellow>▶ Искать соперника']
+        lore:
+          - '<gray>Тир: {tier} <gray>· ELO <white>{elo}'
+          - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+          - '<gray>В очереди: <white>{queue}'
+          - ''
+          - '<yellow>▶ Искать соперника'
     empty:
       slot: 22
       material: BARRIER
@@ -141,7 +230,10 @@ ranked:
 stats-menu:
   title: '<dark_gray>Статистика <gray>· {player}'
   rows: 5
-  filler: {enabled: true, material: GRAY_STAINED_GLASS_PANE, name: ' '}
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '
   head:
     slot: 4
     material: PLAYER_HEAD
@@ -151,7 +243,17 @@ stats-menu:
       - '<gray>Дуэли: <green>{duel_wins}</green> / <red>{duel_losses}'
       - '<gray>Боты: <green>{bot_wins}</green> / <red>{bot_losses}'
   # тиры по рейтинговым режимам (по порядку ranked.kits-1.8, потом kits-1.9)
-  ranked-slots: [20, 21, 22, 23, 24, 29, 30, 31, 32, 33]
+  ranked-slots:
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
   ranked-icon:
     material: NETHERITE_SWORD
     hide-attributes: true
@@ -161,10 +263,51 @@ stats-menu:
       - '<gray>ELO: <white>{elo}'
       - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
   ranked-icons:
-    diamond: {material: DIAMOND_SWORD, hide-attributes: true, name: '{kit} <gray>· 1.8', lore: ['<gray>Тир: {tier} <dark_gray>({tier_name})', '<gray>ELO: <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}']}
-    m_diamond: {material: DIAMOND_SWORD, glow: true, hide-attributes: true, name: '{kit} <gray>· 1.9', lore: ['<gray>Тир: {tier} <dark_gray>({tier_name})', '<gray>ELO: <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}']}
+    diamond:
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      name: '{kit} <gray>· 1.8'
+      lore:
+        - '<gray>Тир: {tier} <dark_gray>({tier_name})'
+        - '<gray>ELO: <white>{elo}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+    m_diamond:
+      material: DIAMOND_SWORD
+      glow: true
+      hide-attributes: true
+      name: '{kit} <gray>· 1.9'
+      lore:
+        - '<gray>Тир: {tier} <dark_gray>({tier_name})'
+        - '<gray>ELO: <white>{elo}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
   summary:
-    duels-fast: {slot: 38, material: STONE_SWORD, hide-attributes: true, name: '<#ff9ecf>Дуэли 1.8', lore: ['<gray>Победы: <green>{duel_wins_fast}', '<gray>Поражения: <red>{duel_losses_fast}']}
-    duels-slow: {slot: 39, material: GOLDEN_SWORD, hide-attributes: true, name: '<gold>Дуэли 1.9', lore: ['<gray>Победы: <green>{duel_wins_slow}', '<gray>Поражения: <red>{duel_losses_slow}']}
-    bots: {slot: 41, material: ZOMBIE_HEAD, name: '<#c9a7ff>Боты', lore: ['<gray>Победы: <green>{bot_wins}', '<gray>Поражения: <red>{bot_losses}']}
-    clicktest: {slot: 42, material: SLIME_BALL, name: '<#c9a7ff>Клик-тест', lore: ['<gray>Рекорд: <white>{clicktest_best}', '<gray>Макс CPS: <white>{clicktest_cps}']}
+    duels-fast:
+      slot: 38
+      material: STONE_SWORD
+      hide-attributes: true
+      name: '<#ff9ecf>Дуэли 1.8'
+      lore:
+        - '<gray>Победы: <green>{duel_wins_fast}'
+        - '<gray>Поражения: <red>{duel_losses_fast}'
+    duels-slow:
+      slot: 39
+      material: GOLDEN_SWORD
+      hide-attributes: true
+      name: '<gold>Дуэли 1.9'
+      lore:
+        - '<gray>Победы: <green>{duel_wins_slow}'
+        - '<gray>Поражения: <red>{duel_losses_slow}'
+    bots:
+      slot: 41
+      material: ZOMBIE_HEAD
+      name: '<#c9a7ff>Боты'
+      lore:
+        - '<gray>Победы: <green>{bot_wins}'
+        - '<gray>Поражения: <red>{bot_losses}'
+    clicktest:
+      slot: 42
+      material: SLIME_BALL
+      name: '<#c9a7ff>Клик-тест'
+      lore:
+        - '<gray>Рекорд: <white>{clicktest_best}'
+        - '<gray>Макс CPS: <white>{clicktest_cps}'

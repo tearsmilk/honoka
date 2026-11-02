@@ -6,15 +6,43 @@ version: "1.8"
 arena-mode: duel
 rounds: 1
 armor:
-    helmet: {material: DIAMOND_HELMET, enchants: {protection: 4, unbreaking: 3}}
-    chestplate: {material: DIAMOND_CHESTPLATE, enchants: {protection: 4, unbreaking: 3}}
-    leggings: {material: DIAMOND_LEGGINGS, enchants: {protection: 4, unbreaking: 3}}
-    boots: {material: DIAMOND_BOOTS, enchants: {protection: 4, unbreaking: 3, feather_falling: 4}}
+    helmet:
+      material: DIAMOND_HELMET
+      enchants:
+        protection: 4
+        unbreaking: 3
+    chestplate:
+      material: DIAMOND_CHESTPLATE
+      enchants:
+        protection: 4
+        unbreaking: 3
+    leggings:
+      material: DIAMOND_LEGGINGS
+      enchants:
+        protection: 4
+        unbreaking: 3
+    boots:
+      material: DIAMOND_BOOTS
+      enchants:
+        protection: 4
+        unbreaking: 3
+        feather_falling: 4
 items:
-  0: {material: DIAMOND_SWORD, enchants: {sharpness: 5, fire_aspect: 2, unbreaking: 3}}
-  1: {material: GOLDEN_APPLE, amount: 64}
-  2: {material: ENCHANTED_GOLDEN_APPLE, amount: 2}
-  8: {material: COOKED_BEEF, amount: 64}
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 5
+      fire_aspect: 2
+      unbreaking: 3
+  1:
+    material: GOLDEN_APPLE
+    amount: 64
+  2:
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 2
+  8:
+    material: COOKED_BEEF
+    amount: 64
 bot:
   enabled: true
   heals: 8

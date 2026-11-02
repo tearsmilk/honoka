@@ -6,21 +6,53 @@ version: "1.8"
 arena-mode: duel
 rounds: 1
 armor:
-    helmet: {material: DIAMOND_HELMET, enchants: {protection: 2}}
-    chestplate: {material: DIAMOND_CHESTPLATE, enchants: {protection: 2}}
-    leggings: {material: DIAMOND_LEGGINGS, enchants: {protection: 2}}
-    boots: {material: DIAMOND_BOOTS, enchants: {protection: 2}}
+    helmet:
+      material: DIAMOND_HELMET
+      enchants:
+        protection: 2
+    chestplate:
+      material: DIAMOND_CHESTPLATE
+      enchants:
+        protection: 2
+    leggings:
+      material: DIAMOND_LEGGINGS
+      enchants:
+        protection: 2
+    boots:
+      material: DIAMOND_BOOTS
+      enchants:
+        protection: 2
 items:
-  0: {material: DIAMOND_SWORD, enchants: {sharpness: 3}}
-  1: {material: FISHING_ROD}
-  2: {material: BOW, enchants: {power: 2}}
-  3: {material: WATER_BUCKET}
-  4: {material: LAVA_BUCKET}
-  5: {material: GOLDEN_APPLE, amount: 6}
-  6: {material: GOLDEN_APPLE, amount: 1, golden-head: true}
-  7: {material: COBBLESTONE, amount: 64}
-  8: {material: COOKED_BEEF, amount: 64}
-  9: {material: ARROW, amount: 32}
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 3
+  1:
+    material: FISHING_ROD
+  2:
+    material: BOW
+    enchants:
+      power: 2
+  3:
+    material: WATER_BUCKET
+  4:
+    material: LAVA_BUCKET
+  5:
+    material: GOLDEN_APPLE
+    amount: 6
+  6:
+    material: GOLDEN_APPLE
+    amount: 1
+    golden-head: true
+  7:
+    material: COBBLESTONE
+    amount: 64
+  8:
+    material: COOKED_BEEF
+    amount: 64
+  9:
+    material: ARROW
+    amount: 32
 rules:
   natural-regen: false
   build: true

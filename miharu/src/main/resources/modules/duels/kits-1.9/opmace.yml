@@ -6,30 +6,97 @@ version: "1.9"
 arena-mode: duel
 rounds: 1
 armor:
-  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4, unbreaking: 3}}
-  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4, unbreaking: 3}}
-  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4, unbreaking: 3}}
-  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4, unbreaking: 3, feather_falling: 4}}
-  offhand: {material: SHIELD, enchants: {unbreaking: 3, mending: 1}}
+  helmet:
+    material: NETHERITE_HELMET
+    enchants:
+      protection: 4
+      unbreaking: 3
+  chestplate:
+    material: NETHERITE_CHESTPLATE
+    enchants:
+      protection: 4
+      unbreaking: 3
+  leggings:
+    material: NETHERITE_LEGGINGS
+    enchants:
+      protection: 4
+      unbreaking: 3
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+      unbreaking: 3
+      feather_falling: 4
+  offhand:
+    material: SHIELD
+    enchants:
+      unbreaking: 3
+      mending: 1
 items:
   # хотбар
-  0: {material: NETHERITE_SWORD, enchants: {sharpness: 5, unbreaking: 3}}
-  1: {material: ENDER_PEARL, amount: 16}
-  2: {material: GOLDEN_APPLE, amount: 64}
-  3: {material: ELYTRA}
-  4: {material: WIND_CHARGE, amount: 64}
-  5: {material: MACE, enchants: {density: 5, wind_burst: 1, unbreaking: 3, mending: 1}}
-  6: {material: MACE, enchants: {breach: 4, wind_burst: 1, unbreaking: 3, mending: 1}}
-  7: {material: POTION, potion: strong_swiftness, amount: 64, max-stack: 64}
-  8: {material: POTION, potion: strong_strength, amount: 64, max-stack: 64}
+  0:
+    material: NETHERITE_SWORD
+    enchants:
+      sharpness: 5
+      unbreaking: 3
+  1:
+    material: ENDER_PEARL
+    amount: 16
+  2:
+    material: GOLDEN_APPLE
+    amount: 64
+  3:
+    material: ELYTRA
+  4:
+    material: WIND_CHARGE
+    amount: 64
+  5:
+    material: MACE
+    enchants:
+      density: 5
+      wind_burst: 1
+      unbreaking: 3
+      mending: 1
+  6:
+    material: MACE
+    enchants:
+      breach: 4
+      wind_burst: 1
+      unbreaking: 3
+      mending: 1
+  7:
+    material: POTION
+    potion: strong_swiftness
+    amount: 64
+    max-stack: 64
+  8:
+    material: POTION
+    potion: strong_strength
+    amount: 64
+    max-stack: 64
   # инвентарь
-  10: {material: ENDER_PEARL, amount: 16}
-  13: {material: TOTEM_OF_UNDYING}
-  19: {material: ENDER_PEARL, amount: 16}
-  22: {material: TOTEM_OF_UNDYING}
-  27: {material: NETHERITE_AXE, enchants: {sharpness: 5, unbreaking: 3, mending: 1}}
-  28: {material: ENDER_PEARL, amount: 16}
-  31: {material: WIND_CHARGE, amount: 64}
+  10:
+    material: ENDER_PEARL
+    amount: 16
+  13:
+    material: TOTEM_OF_UNDYING
+  19:
+    material: ENDER_PEARL
+    amount: 16
+  22:
+    material: TOTEM_OF_UNDYING
+  27:
+    material: NETHERITE_AXE
+    enchants:
+      sharpness: 5
+      unbreaking: 3
+      mending: 1
+  28:
+    material: ENDER_PEARL
+    amount: 16
+  31:
+    material: WIND_CHARGE
+    amount: 64
 bot:
   enabled: true
   heals: 8

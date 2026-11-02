@@ -6,17 +6,42 @@ version: "1.8"
 arena-mode: duel
 rounds: 1
 armor:
-    helmet: {material: IRON_HELMET, enchants: {protection: 2}}
-    chestplate: {material: IRON_CHESTPLATE, enchants: {protection: 2}}
-    leggings: {material: IRON_LEGGINGS, enchants: {protection: 2}}
-    boots: {material: IRON_BOOTS, enchants: {protection: 2}}
+    helmet:
+      material: IRON_HELMET
+      enchants:
+        protection: 2
+    chestplate:
+      material: IRON_CHESTPLATE
+      enchants:
+        protection: 2
+    leggings:
+      material: IRON_LEGGINGS
+      enchants:
+        protection: 2
+    boots:
+      material: IRON_BOOTS
+      enchants:
+        protection: 2
 items:
-  0: {material: IRON_SWORD, enchants: {sharpness: 2}}
-  1: {material: FISHING_ROD}
-  2: {material: BOW, enchants: {power: 2}}
-  3: {material: GOLDEN_APPLE, amount: 4}
-  8: {material: COOKED_BEEF, amount: 64}
-  9: {material: ARROW, amount: 12}
+  0:
+    material: IRON_SWORD
+    enchants:
+      sharpness: 2
+  1:
+    material: FISHING_ROD
+  2:
+    material: BOW
+    enchants:
+      power: 2
+  3:
+    material: GOLDEN_APPLE
+    amount: 4
+  8:
+    material: COOKED_BEEF
+    amount: 64
+  9:
+    material: ARROW
+    amount: 12
 bot:
   enabled: true
   heals: 4

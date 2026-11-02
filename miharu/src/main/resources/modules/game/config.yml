@@ -11,7 +11,13 @@ gamemode: ADVENTURE           # режим игрока в игре (ADVENTURE �
 #   velocity — как previous + отправить на сервер velocity-server через Velocity/BungeeCord
 return:
   mode: previous
-  location: {world: world, x: 0.5, y: 100, z: 0.5, yaw: 0, pitch: 0}
+  location:
+    world: world
+    x: 0.5
+    y: 100
+    z: 0.5
+    yaw: 0
+    pitch: 0
   velocity-server: lobby
 
 # Игроки видят в мире и в табе только свою игру
@@ -19,7 +25,18 @@ hide-other-players: true
 
 allow-drop: false
 allow-build: false
-allowed-commands: [leave, l, hub, lobby, spawn, msg, tell, w, r, reply, pvp]
+allowed-commands:
+  - leave
+  - l
+  - hub
+  - lobby
+  - spawn
+  - msg
+  - tell
+  - w
+  - r
+  - reply
+  - pvp
 
 scoreboard:
   enabled: true
@@ -117,11 +134,20 @@ spectate:
       bot-duel:
         material: ZOMBIE_HEAD
         name: '<#ff9ecf>{mode}'
-        lore: ['<gray>{players} <gray>vs бот', '<gray>Арена: <white>{arena}', '<gray>Время: <white>{time}', '', '<yellow>▶ Смотреть']
+        lore:
+          - '<gray>{players} <gray>vs бот'
+          - '<gray>Арена: <white>{arena}'
+          - '<gray>Время: <white>{time}'
+          - ''
+          - '<yellow>▶ Смотреть'
       clicktest:
         material: SLIME_BALL
         name: '<#c9a7ff>{mode}'
-        lore: ['<gray>{players}', '<gray>Время: <white>{time}', '', '<yellow>▶ Смотреть']
+        lore:
+          - '<gray>{players}'
+          - '<gray>Время: <white>{time}'
+          - ''
+          - '<yellow>▶ Смотреть'
     empty:
       slot: 22
       material: BARRIER

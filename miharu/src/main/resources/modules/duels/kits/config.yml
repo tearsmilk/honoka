@@ -5,11 +5,16 @@
 menu:
   title: '<dark_gray>Дуэли <gray>· выбери кит'
   rows: 5
-  filler: {enabled: true, material: GRAY_STAINED_GLASS_PANE, name: ' '}
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '
   default-icon:
     material: PAPER
     name: '{kit}'
-    lore: ['<gray>В очереди: <white>{queue}', '<gray>Играют: <white>{playing}']
+    lore:
+      - '<gray>В очереди: <white>{queue}'
+      - '<gray>Играют: <white>{playing}'
 kits:
   nodebuff:
     enabled: true

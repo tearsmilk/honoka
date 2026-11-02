@@ -5,16 +5,27 @@ version: "1.9"
 arena-mode: duel
 rounds: 1
 armor:
-  helmet: {material: DIAMOND_HELMET}
-  chestplate: {material: DIAMOND_CHESTPLATE}
-  leggings: {material: DIAMOND_LEGGINGS}
-  boots: {material: DIAMOND_BOOTS}
-  offhand: {material: SHIELD}
+  helmet:
+    material: DIAMOND_HELMET
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+  leggings:
+    material: DIAMOND_LEGGINGS
+  boots:
+    material: DIAMOND_BOOTS
+  offhand:
+    material: SHIELD
 items:
-  0: {material: DIAMOND_AXE}
-  1: {material: DIAMOND_SWORD}
-  2: {material: GOLDEN_APPLE, amount: 8}
-  8: {material: COOKED_BEEF, amount: 32}
+  0:
+    material: DIAMOND_AXE
+  1:
+    material: DIAMOND_SWORD
+  2:
+    material: GOLDEN_APPLE
+    amount: 8
+  8:
+    material: COOKED_BEEF
+    amount: 32
 bot:
   enabled: true
   heals: 4

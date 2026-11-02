@@ -7,18 +7,42 @@ arena-mode: bridge        # арена с точками p1, p2, goal1 (воро
 rounds: 5                 # голов до победы
 team-color: true          # кожа и WHITE_* блоки красятся в цвет команды
 armor:
-    helmet: {material: LEATHER_HELMET, unbreakable: true}
-    chestplate: {material: LEATHER_CHESTPLATE, unbreakable: true}
-    leggings: {material: LEATHER_LEGGINGS, unbreakable: true}
-    boots: {material: LEATHER_BOOTS, unbreakable: true}
+    helmet:
+      material: LEATHER_HELMET
+      unbreakable: true
+    chestplate:
+      material: LEATHER_CHESTPLATE
+      unbreakable: true
+    leggings:
+      material: LEATHER_LEGGINGS
+      unbreakable: true
+    boots:
+      material: LEATHER_BOOTS
+      unbreakable: true
 items:
-  0: {material: IRON_SWORD, unbreakable: true}
-  1: {material: BOW, unbreakable: true}
-  2: {material: DIAMOND_PICKAXE, enchants: {efficiency: 2}, unbreakable: true}
-  3: {material: WHITE_TERRACOTTA, amount: 64}
-  4: {material: WHITE_TERRACOTTA, amount: 64}
-  5: {material: GOLDEN_APPLE, amount: 8}
-  8: {material: ARROW, amount: 8}
+  0:
+    material: IRON_SWORD
+    unbreakable: true
+  1:
+    material: BOW
+    unbreakable: true
+  2:
+    material: DIAMOND_PICKAXE
+    enchants:
+      efficiency: 2
+    unbreakable: true
+  3:
+    material: WHITE_TERRACOTTA
+    amount: 64
+  4:
+    material: WHITE_TERRACOTTA
+    amount: 64
+  5:
+    material: GOLDEN_APPLE
+    amount: 8
+  8:
+    material: ARROW
+    amount: 8
 rules:
   build: true
   break-placed-only: true
