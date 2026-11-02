@@ -31,6 +31,8 @@ public final class BotBrain {
     private double yawNoise;
     private double pitchNoise;
     private int idleTicks;
+    /** 1.9: сколько ещё тиков подождать после зарядки (реакция). -1 — не выбрано. */
+    private int chargeWait = -1;
 
     public BotBrain(BotDifficulty d) {
         this.d = d;
@@ -124,23 +126,30 @@ public final class BotBrain {
             cps = d.cpsMin() + r.nextDouble() * Math.max(0, d.cpsMax() - d.cpsMin());
             cpsRollIn = 20;
         }
-        clickBudget = Math.min(1.5, clickBudget + cps / 20.0);
         boolean inRange = realDist < d.reach() + 0.8;
         boolean click = false;
-        if (clickBudget >= 1) {
-            boolean want = inRange || (d.swingOutOfRange() && realDist < 6);
-            if (modern && d.cooldownAware()) {
-                // умный бот в 1.9 бьёт только заряженным ударом и не машет в воздух
-                want = inRange && charge >= d.cooldownThreshold();
-                if (d.critJump() && !body.falling() && !body.onGround) {
-                    want = false;
+        if (modern) {
+            // 1.9: бьём только заряженным ударом. Лёгкий бьёт раньше полной зарядки и с запаздыванием,
+            // сложный — почти ровно на 100%. Взмах в воздух сбрасывает зарядку, поэтому вне дистанции не машем.
+            clickBudget = 0;
+            if (inRange && charge >= d.cooldownThreshold()) {
+                if (chargeWait < 0) {
+                    chargeWait = rnd(d.chargeDelayMin(), d.chargeDelayMax());
                 }
+                boolean critWait = d.critJump() && !body.onGround && !body.falling();
+                if (chargeWait-- <= 0 && !critWait) {
+                    click = true;
+                    chargeWait = -1;
+                }
+            } else if (!inRange) {
+                chargeWait = -1;
             }
-            if (want) {
-                click = true;
+        } else {
+            clickBudget = Math.min(1.5, clickBudget + cps / 20.0);
+            if (clickBudget >= 1) {
+                boolean want = inRange || (d.swingOutOfRange() && realDist < 6);
                 clickBudget -= 1;
-            } else if (!modern || !d.cooldownAware()) {
-                clickBudget -= 1;
+                click = want;
             }
         }
 

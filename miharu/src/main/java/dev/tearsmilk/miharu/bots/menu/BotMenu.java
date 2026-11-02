@@ -36,7 +36,7 @@ public final class BotMenu {
         ConfigurationSection items = s.getConfigurationSection("items");
         if (items != null) {
             for (String mode : items.getKeys(false)) {
-                ConfigurationSection it = items.getConfigurationSection(mode);
+                ConfigurationSection it = dev.tearsmilk.miharu.core.config.Configs.child(items, mode);
                 menu.set(it.getInt("slot"), Items.parse(it, Map.of()), pl -> {
                     click(pl);
                     openVersions(pl, mode);
@@ -57,7 +57,7 @@ public final class BotMenu {
                 if (v == null) {
                     continue;
                 }
-                ConfigurationSection it = items.getConfigurationSection(key);
+                ConfigurationSection it = dev.tearsmilk.miharu.core.config.Configs.child(items, key);
                 menu.set(it.getInt("slot"), Items.parse(it, Map.of("mode", modeName(mode))), pl -> {
                     click(pl);
                     openDifficulties(pl, mode, v);
@@ -80,7 +80,7 @@ public final class BotMenu {
                 if (d == null) {
                     continue;
                 }
-                ConfigurationSection it = items.getConfigurationSection(key);
+                ConfigurationSection it = dev.tearsmilk.miharu.core.config.Configs.child(items, key);
                 var stats = module.stats().summary(p.getUniqueId());
                 Map<String, Object> iph = Map.of("mode", modeName(mode), "version", version.id(), "difficulty", d.display(),
                         "wins", stats.wins(d.id()), "losses", stats.losses(d.id()), "cps_min", Text.num(d.cpsMin()),

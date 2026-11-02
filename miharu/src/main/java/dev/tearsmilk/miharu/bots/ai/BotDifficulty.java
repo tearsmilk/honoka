@@ -31,7 +31,9 @@ public record BotDifficulty(
         double cooldownThreshold,
         boolean blockHit,
         double blockChance,
-        boolean swingOutOfRange
+        boolean swingOutOfRange,
+        int chargeDelayMin,
+        int chargeDelayMax
 ) {
 
     public static BotDifficulty load(String id, ConfigurationSection s) {
@@ -63,7 +65,9 @@ public record BotDifficulty(
                 s.getDouble("combat.cooldown-threshold", 0.95),
                 s.getBoolean("combat.block-hit", false),
                 s.getDouble("combat.block-chance", 0.0),
-                s.getBoolean("combat.swing-out-of-range", true)
+                s.getBoolean("combat.swing-out-of-range", true),
+                s.getInt("combat.charge-delay-ticks.min", 0),
+                s.getInt("combat.charge-delay-ticks.max", 2)
         );
     }
 }

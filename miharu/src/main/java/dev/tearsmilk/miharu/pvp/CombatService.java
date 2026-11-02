@@ -37,9 +37,9 @@ public final class CombatService {
     public void load(YamlConfiguration cfg) {
         profiles.clear();
         for (CombatVersion v : CombatVersion.values()) {
-            ConfigurationSection s = cfg.getConfigurationSection("versions." + v.id());
+            ConfigurationSection s = dev.tearsmilk.miharu.core.config.Configs.child(cfg.getConfigurationSection("versions"), v.id());
             if (s == null) {
-                s = cfg.createSection("versions." + v.id());
+                s = new org.bukkit.configuration.MemoryConfiguration();
             }
             profiles.put(v, new CombatProfile(v, s));
             sections.put(v, s);
@@ -48,7 +48,7 @@ public final class CombatService {
         ConfigurationSection w = cfg.getConfigurationSection("worlds");
         if (w != null) {
             for (String world : w.getKeys(false)) {
-                CombatVersion v = CombatVersion.parse(w.getString(world));
+                CombatVersion v = CombatVersion.parse(String.valueOf(dev.tearsmilk.miharu.core.config.Configs.value(w, world)));
                 if (v != null) {
                     worlds.put(world, v);
                 }

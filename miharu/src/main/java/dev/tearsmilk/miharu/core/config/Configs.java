@@ -16,6 +16,30 @@ public final class Configs {
     }
 
     /**
+     * Дочерняя секция по «сырому» ключу. Нужна для ключей с точкой ("1.8", "1.9"):
+     * обычный getConfigurationSection("1.8") понимает точку как разделитель пути.
+     */
+    public static org.bukkit.configuration.ConfigurationSection child(org.bukkit.configuration.ConfigurationSection parent, String key) {
+        if (parent == null) {
+            return null;
+        }
+        Object v = parent.getValues(false).get(key);
+        if (v instanceof org.bukkit.configuration.ConfigurationSection cs) {
+            return cs;
+        }
+        return parent.getConfigurationSection(key);
+    }
+
+    /** Значение по «сырому» ключу (ключи с точкой). */
+    public static Object value(org.bukkit.configuration.ConfigurationSection parent, String key) {
+        if (parent == null) {
+            return null;
+        }
+        Object v = parent.getValues(false).get(key);
+        return v != null && !(v instanceof org.bukkit.configuration.ConfigurationSection) ? v : parent.get(key);
+    }
+
+    /**
      * Загружает файл из папки плагина. Если файла нет — копирует дефолт из jar.
      * Если в дефолте появились новые ключи — дописывает их, не трогая значения пользователя.
      */

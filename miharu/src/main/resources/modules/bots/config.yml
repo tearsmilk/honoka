@@ -40,6 +40,8 @@ modes:
 # aim.hit-angle — макс. угол от прицела до цели для попадания, aim.turn-speed — градусов поворота за тик,
 # aim.error — дрожание прицела, aim.reaction-ticks — с какой задержкой бот «видит» игрока,
 # aim.lead — упреждение по скорости цели (тиков), movement.* — движение, combat.* — тактика.
+# В 1.9 бот всегда ждёт зарядку удара: cooldown-threshold — с какой зарядки бьёт, charge-delay-ticks — реакция.
+# Скорость атаки оружия — modules/pvp/config.yml → versions."1.9".weapon-speed (меч 1.6 = удар раз в 12.5 тиков).
 difficulties:
   easy:
     display: '<green>Лёгкий'
@@ -58,7 +60,9 @@ difficulties:
       w-tap: false
     combat:
       crit-jump: false
-      cooldown-aware: false     # 1.9: бьёт не дожидаясь зарядки (слабые удары)
+      cooldown-aware: false
+      cooldown-threshold: 0.75  # 1.9: бьёт при 75% зарядки (удары слабее)
+      charge-delay-ticks: {min: 3, max: 8}   # 1.9: опаздывает с кликом после зарядки
       block-hit: false
       swing-out-of-range: true
   medium:
@@ -80,6 +84,7 @@ difficulties:
       crit-jump: false
       cooldown-aware: true
       cooldown-threshold: 0.9
+      charge-delay-ticks: {min: 1, max: 4}
       block-hit: false
       swing-out-of-range: true
   hard:
@@ -101,7 +106,8 @@ difficulties:
     combat:
       crit-jump: true           # 1.9: прыгает под крит
       cooldown-aware: true
-      cooldown-threshold: 0.95
+      cooldown-threshold: 0.97
+      charge-delay-ticks: {min: 0, max: 1}
       block-hit: true           # 1.8: блок мечом между ударами
       block-chance: 0.25
       swing-out-of-range: false

@@ -149,6 +149,11 @@ public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.
             eachBoard(b -> b.belowName(bot.name(), (int) Math.ceil(botHealth), Text.mm(bots.config().getString("bot.below-name", "<red>❤"))));
         }
         bot.show(player);
+        if (plugin.debug()) {
+            plugin.getLogger().info("[debug] бот: кит=" + (kit == null ? "нет" : kit.id()) + " оружие=" + (kit == null ? "-" : kit.weaponType())
+                    + " скорость=" + profile.attackSpeedOf(kit == null ? Material.AIR : kit.weaponType())
+                    + " урон=" + profile.baseDamage(kit == null ? Material.AIR : kit.weaponType()) + " версия=" + version.id());
+        }
     }
 
     @Override

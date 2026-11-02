@@ -189,7 +189,8 @@ public final class BotsModule extends MiharuModule implements Listener {
             plugin.messages().send(p, "bots.no-arena", "mode", config().getString("modes." + mode + ".display", mode));
             return false;
         }
-        String kitId = config().getString("modes." + mode + ".kits." + version.id(), config().getString("modes." + mode + ".kit", ""));
+        Object perVersion = dev.tearsmilk.miharu.core.config.Configs.value(config().getConfigurationSection("modes." + mode + ".kits"), version.id());
+        String kitId = perVersion != null ? String.valueOf(perVersion) : config().getString("modes." + mode + ".kit", "");
         Kit kit = kits.get(kitId);
         KitRules base = KitRules.load(null, 1);
         KitRules rules = new KitRules(base.damage(), base.hunger(), base.naturalRegen(), base.fallDamage(), false, true, false,
