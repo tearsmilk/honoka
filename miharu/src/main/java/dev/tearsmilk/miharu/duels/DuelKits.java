@@ -30,7 +30,8 @@ public final class DuelKits {
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "sumo", "classic",
             "archer", "soup", "bridge", "mlgrush", "leather", "opdiamond", "diamond", "uhc");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
-            "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal");
+            "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal",
+            "elytramace", "tntminecart", "anchor");
 
     private final DuelsModule module;
     /** Папка в modules/duels (kits — 1.8, kits-1.9 — медленное PvP). */
@@ -62,11 +63,35 @@ public final class DuelKits {
 
     void load(CombatService combat) {
         File dir = new File(module.folder(), folder);
-        if (!dir.exists()) {
-            dir.mkdirs();
-            for (String id : defaults) {
-                module.plugin().saveResource("modules/duels/" + folder + "/" + id + ".yml", false);
+        boolean fresh = !dir.exists();
+        dir.mkdirs();
+        // новые встроенные киты докладываются один раз (удалённые вручную не возвращаются)
+        java.util.Set<String> known = new java.util.HashSet<>();
+        File marker = new File(dir, ".installed");
+        try {
+            if (marker.exists()) {
+                known.addAll(java.nio.file.Files.readAllLines(marker.toPath()));
+            } else if (!fresh) {
+                File[] existing = dir.listFiles((d, n) -> n.endsWith(".yml"));
+                if (existing != null) {
+                    for (File f : existing) {
+                        known.add(name(f));
+                    }
+                }
+                if (folder.equals("kits")) {
+                    known.addAll(LEGACY_DEFAULTS);
+                } else {
+                    known.addAll(MODERN_DEFAULTS.subList(0, 16));
+                }
             }
+            for (String id : defaults) {
+                if (known.add(id) && !new File(dir, id + ".yml").exists()) {
+                    module.plugin().saveResource("modules/duels/" + folder + "/" + id + ".yml", false);
+                }
+            }
+            java.nio.file.Files.write(marker.toPath(), known);
+        } catch (java.io.IOException e) {
+            module.plugin().getLogger().warning("Не удалось обновить список китов: " + e.getMessage());
         }
         menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();

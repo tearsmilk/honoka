@@ -137,6 +137,34 @@ final class KitMechanics implements Listener {
         victim.setNoDamageTicks(victim.getMaximumNoDamageTicks());
     }
 
+    /** Правило explosion-block-damage: false — взрывы (TNT, якоря, кристаллы) не ломают арену. */
+    private boolean protectBlocks(org.bukkit.World world) {
+        GameModule games = module.plugin().module(GameModule.class);
+        if (games == null) {
+            return false;
+        }
+        for (Game g : games.games().games()) {
+            if (g instanceof KitGame kg && g.instance() != null && g.instance().world().equals(world)) {
+                return !kg.kitSpec().rules().explosionBlocks();
+            }
+        }
+        return false;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityExplode(org.bukkit.event.entity.EntityExplodeEvent e) {
+        if (protectBlocks(e.getLocation().getWorld())) {
+            e.blockList().clear();
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(org.bukkit.event.block.BlockExplodeEvent e) {
+        if (protectBlocks(e.getBlock().getWorld())) {
+            e.blockList().clear();
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent e) {
         KitRules r = rules(e.getPlayer());

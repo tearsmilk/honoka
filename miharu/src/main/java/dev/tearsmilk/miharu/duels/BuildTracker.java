@@ -49,5 +49,11 @@ final class BuildTracker {
         for (Projectile p : world.getEntitiesByClass(Projectile.class)) {
             p.remove();
         }
+        for (org.bukkit.entity.Minecart m : world.getEntitiesByClass(org.bukkit.entity.Minecart.class)) {
+            m.remove();
+        }
+        for (org.bukkit.entity.EnderCrystal c : world.getEntitiesByClass(org.bukkit.entity.EnderCrystal.class)) {
+            c.remove();
+        }
     }
 }

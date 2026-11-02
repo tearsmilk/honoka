@@ -1,0 +1,27 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит/тотем — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<#c9a7ff>Elytra Mace'
+version: "1.9"
+arena-mode: duel          # точки p1/p2 можно ставить в воздухе или на платформах
+rounds: 1
+armor:
+  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
+  chestplate: {material: ELYTRA, unbreakable: true}
+  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
+  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4, feather_falling: 4}}
+  offhand: {material: TOTEM_OF_UNDYING}
+items:
+  0: {material: MACE, enchants: {density: 5, wind_burst: 3}}
+  1: {material: NETHERITE_SWORD, enchants: {sharpness: 5}}
+  2: {material: WIND_CHARGE, amount: 32}
+  3: {material: FIREWORK_ROCKET, amount: 32}
+  4: {material: GOLDEN_APPLE, amount: 16}
+  5: {material: ENCHANTED_GOLDEN_APPLE, amount: 2}
+  6: {material: POTION, potion: slow_falling}
+  7: {material: POTION, potion: slow_falling}
+  8: {material: COOKED_BEEF, amount: 32}
+  9: {material: POTION, potion: slow_falling}
+rules:
+  fall-damage: true
+bot:
+  enabled: false           # бот не летает на элитрах

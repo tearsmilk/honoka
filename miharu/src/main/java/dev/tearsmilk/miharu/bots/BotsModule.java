@@ -201,7 +201,7 @@ public final class BotsModule extends MiharuModule implements Listener {
         KitRules base = KitRules.load(null, 1);
         KitRules rules = new KitRules(base.damage(), base.hunger(), base.naturalRegen(), base.fallDamage(), false, true, false,
                 liquidIsVoid(mode), true, 0, KitRules.Objective.NONE, 2.5, KitRules.DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true,
-                config().getInt("modes.bot-duel.max-duration-seconds", 300));
+                config().getInt("modes.bot-duel.max-duration-seconds", 300), true);
         KitSpec spec = new KitSpec(kitId.isEmpty() ? "default" : kitId, config().getString("modes." + mode + ".display", mode), version,
                 pvp.combat().profile(version), kit, rules, mode, List.of(), KitSpec.Bot.DEFAULT);
         BotGame game = mode.equals(ClickTestGame.MODE)

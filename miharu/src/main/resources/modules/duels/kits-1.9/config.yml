@@ -250,3 +250,48 @@ kits:
         - '<gray>С ботом: {bot}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  elytramace:
+    enabled: true
+    slot: 30
+    icon:
+      material: ELYTRA
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Элитры, булава, заряды ветра'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  tntminecart:
+    enabled: true
+    slot: 31
+    icon:
+      material: TNT_MINECART
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Рельсы, TNT-вагонетки, лук'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  anchor:
+    enabled: true
+    slot: 32
+    icon:
+      material: RESPAWN_ANCHOR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Якоря, светокамень, тотемы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

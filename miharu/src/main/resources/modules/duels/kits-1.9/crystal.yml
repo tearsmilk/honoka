@@ -25,5 +25,6 @@ rules:
   build: true             # обсидиан под кристаллы
   break-placed-only: true
   natural-regen: true
+  explosion-block-damage: false  # кристаллы не ломают арену
 bot:
   enabled: false           # дальний бой / копья / кристаллы — только против игроков

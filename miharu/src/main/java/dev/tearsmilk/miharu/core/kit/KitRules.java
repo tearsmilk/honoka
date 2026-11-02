@@ -25,7 +25,8 @@ public record KitRules(
         double soupHeal,
         int pearlCooldownTicks,
         boolean rodKnockback,
-        int maxDurationSeconds
+        int maxDurationSeconds,
+        boolean explosionBlocks
 ) {
 
     public enum Objective { NONE, GOAL, BED }
@@ -34,12 +35,12 @@ public record KitRules(
     public enum DeathAction { LOSE_ROUND, RESPAWN }
 
     public static final KitRules DEFAULT = new KitRules(true, true, true, true, false, true, false, false, true, 0,
-            Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7.0, 0, true, 600);
+            Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7.0, 0, true, 600, true);
 
     public static KitRules load(ConfigurationSection s, int rounds) {
         if (s == null) {
             return new KitRules(true, true, true, true, false, true, false, false, true, 0, Objective.NONE, 2.5,
-                    DeathAction.LOSE_ROUND, Math.max(1, rounds), 3, false, 7.0, 0, true, 600);
+                    DeathAction.LOSE_ROUND, Math.max(1, rounds), 3, false, 7.0, 0, true, 600, true);
         }
         Objective obj;
         try {
@@ -68,7 +69,8 @@ public record KitRules(
                 s.getDouble("soup.heal", 7.0),
                 s.getInt("pearl-cooldown-ticks", 0),
                 s.getBoolean("rod-knockback", true),
-                s.getInt("max-duration-seconds", 600)
+                s.getInt("max-duration-seconds", 600),
+                s.getBoolean("explosion-block-damage", true)
         );
     }
 }
