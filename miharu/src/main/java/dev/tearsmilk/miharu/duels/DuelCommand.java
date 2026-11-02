@@ -44,9 +44,9 @@ final class DuelCommand extends SubCommands {
                 return;
             }
             String id = a[0].toLowerCase(java.util.Locale.ROOT);
-            boolean modern = id.startsWith("m-");
-            String file = modern ? id.substring(2) : id;
-            String path = "modules/duels/" + (modern ? "kits-1.9" : "kits") + "/" + file + ".yml";
+            String folder = id.startsWith("mg-") ? "minigames" : id.startsWith("m-") ? "kits-1.9" : "kits";
+            String file = id.startsWith("mg-") ? id.substring(3) : id.startsWith("m-") ? id.substring(2) : id;
+            String path = "modules/duels/" + folder + "/" + file + ".yml";
             if (plugin.getResource(path) == null) {
                 plugin.messages().send(s, "duels.reset-unknown", "kit", id);
                 return;

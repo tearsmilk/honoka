@@ -160,9 +160,15 @@ public final class DuelKits {
                 ConfigurationSection icon = m != null && m.isConfigurationSection("icon") ? m.getConfigurationSection("icon")
                         : y.getConfigurationSection("icon");
                 List<KitSpec> variants = new ArrayList<>();
+                boolean byPlayers = "players".equalsIgnoreCase(y.getString("variants-type", "rounds"));
                 for (int n : y.getIntegerList("variants")) {
-                    KitSpec v = new KitSpec(id + "-" + n, spec.display() + " " + y.getString("variant-suffix", "<gray>· {count}").replace("{count}", String.valueOf(n)),
-                            spec.version(), spec.profile(), spec.kit(), rules.withRounds(n), spec.arenaMode(), spec.arenas(), spec.bot());
+                    String format = n <= 2 ? "1x1" : "1x" + n;
+                    String suffix = y.getString("variant-suffix", byPlayers ? "<gray>· {format}" : "<gray>· {count}")
+                            .replace("{count}", String.valueOf(n)).replace("{format}", format)
+                            .replace("{opponents}", String.valueOf(Math.max(1, n - 1)));
+                    KitSpec v = new KitSpec(id + "-" + n, spec.display() + " " + suffix,
+                            spec.version(), spec.profile(), spec.kit(), byPlayers ? rules.withPlayers(n) : rules.withRounds(n),
+                            spec.arenaMode(), spec.arenas(), spec.bot());
                     variants.add(v);
                     variantSpecs.put(v.id(), v);
                 }

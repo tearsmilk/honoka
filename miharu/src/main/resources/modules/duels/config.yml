@@ -94,7 +94,8 @@ loot-tables:
         weight: 3
 
 menus:
-  # Выбор длины матча (The Bridge 3/5/7, MLG Rush 5/10/20)
+  # Выбор варианта: длина матча (The Bridge 3/5/7, MLG Rush 5/10/20) или число игроков (SkyWars 1x1/1x3/1x4)
+  # {variant_info} — «Играем до 5 голов» или «Игроков в матче: 4»
   variants:
     title: '<dark_gray>{kit} <gray>· до скольких'
     rows: 3
@@ -106,7 +107,7 @@ menus:
       material: TARGET
       name: '{kit}'
       lore:
-        - '<gray>Играем до <white>{count}</white> {goal}'
+        - '{variant_info}'
         - '<gray>В очереди: <white>{queue}'
         - ''
         - '<yellow>▶ Искать соперника'

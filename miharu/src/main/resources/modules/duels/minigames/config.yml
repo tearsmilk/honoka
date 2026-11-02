@@ -36,7 +36,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>Острова, сундуки с лутом, последний живой побеждает'
+        - '<gray>1x1, 1x3, 1x4 · сундуки с лутом, последний живой побеждает'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'

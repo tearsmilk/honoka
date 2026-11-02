@@ -62,7 +62,7 @@ public final class DuelStats {
         add(loser, kit, false);
     }
 
-    private void add(Player p, String kit, boolean win) {
+    void add(Player p, String kit, boolean win) {
         int[] v = cache.computeIfAbsent(p.getUniqueId(), k -> new ConcurrentHashMap<>()).computeIfAbsent(kit, k -> new int[2]);
         v[win ? 0 : 1]++;
         String col = win ? "wins" : "losses";

@@ -263,6 +263,28 @@ minigames:
   goal-bed: 'кроватей'
   goal-bedwars: 'побед'
   goal-none: 'побед'
+  goal-players: 'игроков'
+  variant-rounds: '<gray>Играем до <white>{count}</white> {goal}'
+  variant-players: '<gray>Игроков в матче: <white>{count}</white> <gray>(каждый сам за себя)'
+  ffa-found: '{prefix}<green>Игроки собраны: {kit} <gray>({count} игроков)'
+  ffa-killed: '{prefix}<red>{player}</red> <gray>выбит игроком <white>{killer}</white> <dark_gray>·</dark_gray> осталось <white>{alive}'
+  ffa-died: '{prefix}<red>{player}</red> <gray>выбыл <dark_gray>·</dark_gray> осталось <white>{alive}'
+  ffa-alive: '<green>в игре'
+  ffa-dead: '<red>выбыл'
+  ffa-out:
+    title: '<red><b>Ты выбыл</b>'
+    subtitle: '<gray>Место: <white>#{place}</white> · смотри до конца или /leave'
+    stay: 2500
+  ffa-end:
+    title: '<gray><b>Игра окончена</b>'
+    subtitle: '<gray>Победил <white>{winner}'
+    stay: 2500
+  ffa-summary:
+    - '<dark_gray>───────────────────────'
+    - ' {kit} <gray>· игроков <white>{total}'
+    - ' <gray>Победил: <green>{winner}</green> · твои убийства: <white>{kills}'
+    - ' <gray>Время: <white>{time}'
+    - '<dark_gray>───────────────────────'
   bed-destroyed: '{prefix}<red><b>КРОВАТЬ</b></red> <white>{victim}</white> <gray>сломал <white>{player}</white>!'
   bed-lost:
     title: '<red><b>Кровать сломана!</b>'

@@ -69,10 +69,16 @@ public final class DuelMenus {
         for (int i = 0; i < entry.variants().size() && i < slots.size(); i++) {
             KitSpec v = entry.variants().get(i);
             Map<String, Object> vph = placeholders(p, v);
-            vph.put("count", v.rules().scoreToWin());
-            vph.put("goal", Text.plain(Text.mm(module.plugin().messages().raw("minigames.goal-" + v.rules().objective().name().toLowerCase()))));
+            boolean byPlayers = v.rules().players() > 2 || entry.variants().stream().anyMatch(x -> x.rules().players() > 2);
+            int count = byPlayers ? v.rules().players() : v.rules().scoreToWin();
+            vph.put("count", count);
+            vph.put("opponents", Math.max(1, v.rules().players() - 1));
+            vph.put("goal", Text.plain(Text.mm(module.plugin().messages().raw(byPlayers ? "minigames.goal-players"
+                    : "minigames.goal-" + v.rules().objective().name().toLowerCase()))));
+            vph.put("variant_info", Text.apply(module.plugin().messages().raw(byPlayers ? "minigames.variant-players" : "minigames.variant-rounds"), vph));
+            vph.put("queue", module.queue().size(v.id()) + (byPlayers ? "/" + v.rules().players() : ""));
             ItemStack icon = Items.parse(s.getConfigurationSection("icon"), vph);
-            icon.setAmount(Math.max(1, Math.min(64, v.rules().scoreToWin())));
+            icon.setAmount(Math.max(1, Math.min(64, byPlayers ? (v.rules().players() <= 2 ? 1 : v.rules().players()) : count)));
             menu.set(slots.get(i), icon, pl -> {
                 click(pl);
                 chooseKit(pl, v);

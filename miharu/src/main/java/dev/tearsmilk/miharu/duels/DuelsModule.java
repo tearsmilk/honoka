@@ -264,8 +264,17 @@ public final class DuelsModule extends MiharuModule implements Listener {
     /** Свободная (случайная подходящая) арена под кит. */
     public Arena arenaFor(KitSpec spec) {
         ArenaModule arenas = plugin.module(ArenaModule.class);
+        int need = spec.rules().players();
         List<Arena> list = arenas.arenas().forMode(spec.arenaMode()).stream()
                 .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
+                .filter(a -> {
+                    for (int i = 1; i <= need; i++) {
+                        if (a.spawn("p" + i) == null) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
                 .toList();
         return list.isEmpty() ? null : list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
@@ -284,6 +293,18 @@ public final class DuelsModule extends MiharuModule implements Listener {
         GameModule games = plugin.module(GameModule.class);
         DuelGame game = new DuelGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), a, b, rankedMatch);
         return games.games().start(game, List.of(a, b));
+    }
+
+    /** Игра «каждый сам за себя» на N игроков (SkyWars 1x3, 1x4). */
+    boolean startFfa(List<Player> players, KitSpec spec) {
+        Arena arena = arenaFor(spec);
+        if (arena == null) {
+            players.forEach(p -> plugin.messages().send(p, "duels.no-arena", "kit", spec.display()));
+            return false;
+        }
+        GameModule games = plugin.module(GameModule.class);
+        FfaGame game = new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        return games.games().start(game, players);
     }
 
     @EventHandler

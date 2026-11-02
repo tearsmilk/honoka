@@ -30,7 +30,8 @@ public record KitRules(
         int respawnSeconds,
         boolean fireball,
         boolean autoTnt,
-        String chestLoot
+        String chestLoot,
+        int players
 ) {
 
     /**
@@ -52,14 +53,21 @@ public record KitRules(
         KitRules d = DEFAULT;
         return new KitRules(d.damage, d.hunger, d.naturalRegen, d.fallDamage, false, true, false, liquidLose, true, 0,
                 Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true, maxDurationSeconds,
-                ExplosionMode.ALL, 0, false, false, "");
+                ExplosionMode.ALL, 0, false, false, "", 2);
     }
 
     /** Та же игра, но до другого числа очков (варианты 3/5/7). */
     public KitRules withRounds(int rounds) {
         return new KitRules(damage, hunger, naturalRegen, fallDamage, build, breakPlacedOnly, infiniteBlocks, liquidLose, voidLose,
                 hitTarget, objective, goalRadius, onDeath, Math.max(1, rounds), roundCountdown, soup, soupHeal, pearlCooldownTicks,
-                rodKnockback, maxDurationSeconds, explosions, respawnSeconds, fireball, autoTnt, chestLoot);
+                rodKnockback, maxDurationSeconds, explosions, respawnSeconds, fireball, autoTnt, chestLoot, players);
+    }
+
+    /** Та же игра на другое число игроков (SkyWars 1x3, 1x4 — каждый сам за себя). */
+    public KitRules withPlayers(int n) {
+        return new KitRules(damage, hunger, naturalRegen, fallDamage, build, breakPlacedOnly, infiniteBlocks, liquidLose, voidLose,
+                hitTarget, objective, goalRadius, onDeath, scoreToWin, roundCountdown, soup, soupHeal, pearlCooldownTicks,
+                rodKnockback, maxDurationSeconds, explosions, respawnSeconds, fireball, autoTnt, chestLoot, Math.max(2, n));
     }
 
     public static KitRules load(ConfigurationSection s, int rounds) {
@@ -104,7 +112,8 @@ public record KitRules(
                 s.getInt("respawn-seconds", 0),
                 s.getBoolean("fireball", false),
                 s.getBoolean("auto-tnt", false),
-                s.getString("chest-loot", "")
+                s.getString("chest-loot", ""),
+                Math.max(2, s.getInt("players", 2))
         );
     }
 }

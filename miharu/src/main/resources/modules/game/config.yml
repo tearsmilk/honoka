@@ -58,6 +58,18 @@ scoreboard:
       - ''
       - '<white>Время <aqua>{time}'
       - '<white>Пинг <gray>{ping} <dark_gray>/</dark_gray> {opponent_ping} мс'
+    ffa:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Статус: {status}'
+      - ''
+      - '<white>Живых <green>{alive}<gray>/{total}'
+      - '<white>Убийства <red>{kills}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} мс'
     minigame:
       - '<dark_gray>#{game_id} · {arena}'
       - ''

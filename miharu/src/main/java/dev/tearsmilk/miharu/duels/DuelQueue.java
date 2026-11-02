@@ -108,6 +108,23 @@ public final class DuelQueue {
         if (q == null || q.size() < 2) {
             return;
         }
+        Entry first = entries.get(q.peekFirst());
+        KitSpec fs = first == null ? null : module.spec(first.kit());
+        if (fs != null && fs.rules().players() > 2 && !first.ranked()) {
+            if (q.size() >= fs.rules().players()) {
+                List<Entry> group = new java.util.ArrayList<>();
+                for (UUID id : List.copyOf(q)) {
+                    Entry e = entries.get(id);
+                    if (e != null && group.size() < fs.rules().players()) {
+                        group.add(e);
+                    }
+                }
+                if (group.size() == fs.rules().players()) {
+                    matchGroup(group, fs);
+                }
+            }
+            return;
+        }
         List<UUID> list = List.copyOf(q);
         for (int i = 0; i < list.size(); i++) {
             for (int j = i + 1; j < list.size(); j++) {
@@ -153,6 +170,30 @@ public final class DuelQueue {
         module.startDuel(a, b, spec, ea.ranked());
     }
 
+    private void matchGroup(List<Entry> group, KitSpec spec) {
+        List<Player> players = new java.util.ArrayList<>();
+        for (Entry e : group) {
+            Player p = Bukkit.getPlayer(e.id());
+            if (p == null) {
+                return;
+            }
+            players.add(p);
+        }
+        for (Entry e : group) {
+            entries.remove(e.id());
+            Deque<UUID> q = byKey.get(e.key());
+            if (q != null) {
+                q.remove(e.id());
+            }
+        }
+        for (Player p : players) {
+            module.plugin().messages().send(p, "minigames.ffa-found", "kit", spec.display(), "count", players.size());
+            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
+            module.changed(p);
+        }
+        module.startFfa(players, spec);
+    }
+
     void tick() {
         GameModule games = module.plugin().module(GameModule.class);
         for (Entry e : List.copyOf(entries.values())) {
@@ -171,14 +212,13 @@ public final class DuelQueue {
                 module.plugin().messages().actionBar(p, "ranked.actionbar", "kit", spec == null ? e.kit() : spec.display(), "time", time,
                         "size", rankedSize(e.kit()), "range", module.ranked().range(e), "elo", module.elo().elo(p.getUniqueId(), e.kit()));
             } else {
+                String size = spec != null && spec.rules().players() > 2 ? size(e.kit()) + "/" + spec.rules().players() : String.valueOf(size(e.kit()));
                 module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
-                        "time", time, "size", size(e.kit()));
+                        "time", time, "size", size);
             }
         }
         for (String key : List.copyOf(byKey.keySet())) {
-            if (key.startsWith("ranked:")) {
-                tryMatch(key);
-            }
+            tryMatch(key);
         }
     }
 
