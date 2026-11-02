@@ -267,9 +267,14 @@ public final class LobbyModule extends MiharuModule {
         BotsModule bots = plugin.module(BotsModule.class);
         GameModule games = plugin.module(GameModule.class);
         switch (action.toLowerCase(Locale.ROOT)) {
-            case "duels" -> {
+            case "duels", "duels-1.8" -> {
                 if (duels != null) {
-                    duels.menus().openKits(p);
+                    duels.menus().openKits(p, duels.kits());
+                }
+            }
+            case "duels-1.9", "duels-modern" -> {
+                if (duels != null) {
+                    duels.menus().openKits(p, duels.modernKits());
                 }
             }
             case "leave-queue" -> {
@@ -359,7 +364,7 @@ public final class LobbyModule extends MiharuModule {
         ph.put("games", games == null ? 0 : games.games().games().size());
         ph.put("queue_total", duels == null ? 0 : duels.queue().total());
         DuelQueue.Entry e = duels == null ? null : duels.queue().entry(p);
-        KitSpec spec = e == null ? null : duels.kits().spec(e.kit());
+        KitSpec spec = e == null ? null : duels.spec(e.kit());
         ph.put("queue_kit", spec == null ? plugin.messages().raw("lobby.not-in-queue") : spec.display());
         ph.put("queue_time", e == null ? "-" : Text.time((System.currentTimeMillis() - e.since()) / 1000));
         ph.put("duel_wins", duels == null ? 0 : duels.stats().wins(p.getUniqueId(), null));

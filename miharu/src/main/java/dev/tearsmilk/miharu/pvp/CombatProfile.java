@@ -122,7 +122,27 @@ public final class CombatProfile {
         if (weapon == null || weapon.isAir()) {
             return fistDamage;
         }
-        return weaponDamage.getOrDefault(weapon, fistDamage);
+        Double v = weaponDamage.get(weapon);
+        if (v != null) {
+            return v;
+        }
+        // нет в таблице (булава, копья...) — берём ванильные атрибуты предмета
+        return version == CombatVersion.MODERN ? 1.0 + attribute(weapon, org.bukkit.attribute.Attribute.ATTACK_DAMAGE) : fistDamage;
+    }
+
+    private static double attribute(Material m, org.bukkit.attribute.Attribute attr) {
+        try {
+            var mods = m.getDefaultAttributeModifiers(org.bukkit.inventory.EquipmentSlot.HAND).get(attr);
+            double sum = 0;
+            for (var mod : mods) {
+                if (mod.getOperation() == org.bukkit.attribute.AttributeModifier.Operation.ADD_NUMBER) {
+                    sum += mod.getAmount();
+                }
+            }
+            return sum;
+        } catch (Throwable t) {
+            return 0;
+        }
     }
 
     /** Скорость атаки оружия (ударов в секунду) — для кулдауна ботов в 1.9. */
@@ -130,6 +150,11 @@ public final class CombatProfile {
         if (weapon == null || weapon.isAir()) {
             return fistSpeed;
         }
-        return weaponSpeed.getOrDefault(weapon, fistSpeed);
+        Double v = weaponSpeed.get(weapon);
+        if (v != null) {
+            return v;
+        }
+        double speed = 4.0 + attribute(weapon, org.bukkit.attribute.Attribute.ATTACK_SPEED);
+        return version == CombatVersion.MODERN && speed > 0 ? speed : fistSpeed;
     }
 }

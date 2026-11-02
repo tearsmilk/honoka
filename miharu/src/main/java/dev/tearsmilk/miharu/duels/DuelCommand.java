@@ -16,13 +16,13 @@ final class DuelCommand extends SubCommands {
         super(plugin, "miharu.duel");
         this.module = module;
         sub("queue", "miharu.duel", true, (s, a) -> {
-            KitSpec spec = a.length > 0 ? module.kits().spec(a[0]) : null;
+            KitSpec spec = a.length > 0 ? module.spec(a[0]) : null;
             if (spec == null) {
-                plugin.messages().send(s, "duels.unknown-kit", "kits", String.join(", ", module.kits().enabledIds()));
+                plugin.messages().send(s, "duels.unknown-kit", "kits", String.join(", ", module.enabledIds()));
                 return;
             }
             module.queue().join((Player) s, spec);
-        }, (s, a) -> module.kits().enabledIds());
+        }, (s, a) -> module.enabledIds());
         sub("leave", "miharu.duel", true, (s, a) -> {
             if (module.queue().inQueue((Player) s)) {
                 module.queue().leave((Player) s, false);
@@ -31,13 +31,15 @@ final class DuelCommand extends SubCommands {
             }
         });
         sub("kits", "miharu.duel", false, (s, a) -> {
-            plugin.messages().send(s, "duels.kits-header", "count", module.kits().enabledIds().size());
-            for (DuelKits.Entry e : module.kits().all()) {
+            plugin.messages().send(s, "duels.kits-header", "count", module.enabledIds().size());
+            for (DuelKits.Entry e : module.allEntries()) {
                 plugin.messages().send(s, "duels.kits-line", "id", e.spec().id(), "kit", e.spec().display(),
                         "mode", e.spec().arenaMode(), "state", e.enabled() ? "<green>вкл" : "<red>выкл",
                         "bot", e.spec().bot().enabled() ? plugin.messages().raw("duels.bot-yes") : plugin.messages().raw("duels.bot-no"));
             }
         });
+        sub("1.8", "miharu.duel", true, (s, a) -> module.menus().openKits((Player) s, module.kits()));
+        sub("1.9", "miharu.duel", true, (s, a) -> module.menus().openKits((Player) s, module.modernKits()));
         sub("stats", "miharu.duel", false, (s, a) -> {
             Player t = a.length > 0 ? Bukkit.getPlayerExact(a[0]) : s instanceof Player p ? p : null;
             if (t == null) {
@@ -46,7 +48,7 @@ final class DuelCommand extends SubCommands {
             }
             plugin.messages().send(s, "duels.stats-header", "player", t.getName(),
                     "wins", module.stats().wins(t.getUniqueId(), null), "losses", module.stats().losses(t.getUniqueId(), null));
-            for (DuelKits.Entry e : module.kits().all()) {
+            for (DuelKits.Entry e : module.allEntries()) {
                 int w = module.stats().wins(t.getUniqueId(), e.spec().id());
                 int l = module.stats().losses(t.getUniqueId(), e.spec().id());
                 if (w + l > 0) {
@@ -59,7 +61,7 @@ final class DuelCommand extends SubCommands {
     @Override
     protected void root(CommandSender sender) {
         if (sender instanceof Player p) {
-            module.menus().openKits(p);
+            module.menus().openKits(p, module.kits());
         } else {
             plugin.messages().sendList(sender, "duels.help");
         }
@@ -67,7 +69,7 @@ final class DuelCommand extends SubCommands {
 
     @Override
     protected void unknown(CommandSender sender, String[] args) {
-        KitSpec spec = module.kits().spec(args[0]);
+        KitSpec spec = module.spec(args[0]);
         if (spec != null && sender instanceof Player p) {
             module.menus().openOpponent(p, spec);
             return;

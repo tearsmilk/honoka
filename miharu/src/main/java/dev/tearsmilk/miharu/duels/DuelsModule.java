@@ -27,7 +27,8 @@ import java.util.function.Consumer;
 /** Дуэли 1 на 1 по китам: очередь, раунды, статистика. Киты — modules/duels/kits/. */
 public final class DuelsModule extends MiharuModule implements Listener {
 
-    private final DuelKits kits = new DuelKits(this);
+    private final DuelKits kits = new DuelKits(this, "kits", "", dev.tearsmilk.miharu.pvp.CombatVersion.LEGACY, DuelKits.LEGACY_DEFAULTS);
+    private final DuelKits modernKits = new DuelKits(this, "kits-1.9", "m-", dev.tearsmilk.miharu.pvp.CombatVersion.MODERN, DuelKits.MODERN_DEFAULTS);
     private final List<Consumer<Player>> changeHooks = new ArrayList<>();
     private DuelQueue queue;
     private DuelStats stats;
@@ -46,6 +47,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
     @Override
     protected void onEnable() {
         kits.load(plugin.module(PvpModule.class).combat());
+        modernKits.load(plugin.module(PvpModule.class).combat());
         stats = new DuelStats(plugin.database());
         stats.createTables();
         queue = new DuelQueue(this);
@@ -66,7 +68,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         plugin.hooks().placeholder("queue_kit", (p, rest) -> {
             Player pl = p == null ? null : p.getPlayer();
             DuelQueue.Entry e = pl == null ? null : queue.entry(pl);
-            KitSpec s = e == null ? null : kits.spec(e.kit());
+            KitSpec s = e == null ? null : spec(e.kit());
             return s == null ? "" : s.display();
         });
         plugin.hooks().placeholder("queue_size", (p, rest) -> String.valueOf(rest.isEmpty() ? queue.total() : queue.size(rest)));
@@ -75,6 +77,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
     @Override
     protected void onReload() {
         kits.load(plugin.module(PvpModule.class).combat());
+        modernKits.load(plugin.module(PvpModule.class).combat());
     }
 
     @Override
@@ -85,8 +88,37 @@ public final class DuelsModule extends MiharuModule implements Listener {
         queue.clear();
     }
 
+    /** Киты 1.8 (быстрое PvP). */
     public DuelKits kits() {
         return kits;
+    }
+
+    /** Киты 1.9 (медленное PvP). */
+    public DuelKits modernKits() {
+        return modernKits;
+    }
+
+    /** Категория по версии: "1.8" / "1.9". */
+    public DuelKits category(String version) {
+        return dev.tearsmilk.miharu.pvp.CombatVersion.parse(version) == dev.tearsmilk.miharu.pvp.CombatVersion.MODERN ? modernKits : kits;
+    }
+
+    /** Кит по id из любой категории (только включённые). */
+    public KitSpec spec(String id) {
+        KitSpec s = kits.spec(id);
+        return s != null ? s : modernKits.spec(id);
+    }
+
+    public List<String> enabledIds() {
+        List<String> out = new ArrayList<>(kits.enabledIds());
+        out.addAll(modernKits.enabledIds());
+        return out;
+    }
+
+    public List<DuelKits.Entry> allEntries() {
+        List<DuelKits.Entry> out = new ArrayList<>(kits.all());
+        out.addAll(modernKits.all());
+        return out;
     }
 
     public DuelQueue queue() {

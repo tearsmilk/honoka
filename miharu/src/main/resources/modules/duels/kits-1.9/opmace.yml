@@ -1,0 +1,25 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<#8a8fa3><b>OP Mace</b>'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
+  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4}}
+  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
+  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4}}
+  offhand: {material: SHIELD}
+items:
+  0: {material: MACE, enchants: {density: 5, wind_burst: 3}}
+  1: {material: WIND_CHARGE, amount: 32}
+  2: {material: GOLDEN_APPLE, amount: 16}
+  3: {material: SPLASH_POTION, potion: strong_healing}
+  4: {material: SPLASH_POTION, potion: strong_healing}
+  5: {material: SPLASH_POTION, potion: strong_healing}
+  8: {material: COOKED_BEEF, amount: 32}
+bot:
+  enabled: true
+  heals: 6
+  heal-amount: 8
+  heal-below: 8

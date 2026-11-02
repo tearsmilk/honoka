@@ -26,12 +26,17 @@ public final class DuelMenus {
     }
 
     public void openKits(Player p) {
-        ConfigurationSection m = module.kits().menuConfig().getConfigurationSection("menu");
+        openKits(p, module.kits());
+    }
+
+    /** Меню китов категории (1.8 — каменный меч, 1.9 — золотой). */
+    public void openKits(Player p, DuelKits category) {
+        ConfigurationSection m = category.menuConfig().getConfigurationSection("menu");
         if (m == null) {
-            m = module.kits().menuConfig().createSection("menu");
+            m = category.menuConfig().createSection("menu");
         }
         Menu menu = new Menu(m.getInt("rows", 4), Text.mm(m.getString("title", "Киты")));
-        for (DuelKits.Entry e : module.kits().all()) {
+        for (DuelKits.Entry e : category.all()) {
             if (!e.enabled()) {
                 continue;
             }
@@ -87,7 +92,7 @@ public final class DuelMenus {
         if (s.isConfigurationSection("back")) {
             menu.set(s.getInt("back.slot", 22), Items.parse(s.getConfigurationSection("back"), ph), pl -> {
                 click(pl);
-                openKits(pl);
+                openKits(pl, module.category(spec.version().id()));
             });
         }
         filler(menu, s.getConfigurationSection("filler"));

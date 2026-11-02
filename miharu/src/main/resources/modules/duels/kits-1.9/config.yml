@@ -1,0 +1,252 @@
+# Меню китов медленного PvP (1.9) — золотой меч в лобби / команда /duel 1.9.
+# kits.<файл>: enabled, slot, icon. Сам кит — <файл>.yml рядом (id в очереди и статистике: m-<файл>).
+# Плейсхолдеры иконки: {kit} {version} {queue} {playing} {wins} {losses} {bot}
+menu:
+  title: '<dark_gray>Дуэли 1.9 <gray>· выбери кит'
+  rows: 5
+  filler: {enabled: true, material: YELLOW_STAINED_GLASS_PANE, name: ' '}
+  default-icon:
+    material: PAPER
+    name: '{kit}'
+    lore: ['<gray>В очереди: <white>{queue}', '<gray>Играют: <white>{playing}']
+kits:
+  swordshield:
+    enabled: true
+    slot: 10
+    icon:
+      material: SHIELD
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Железо, меч и щит'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  diamond:
+    enabled: true
+    slot: 11
+    icon:
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Алмазы без чар, щит'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  opdiamond:
+    enabled: true
+    slot: 12
+    icon:
+      material: DIAMOND_CHESTPLATE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Защита IV, Острота V, чар. яблоки'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  heavy:
+    enabled: true
+    slot: 13
+    icon:
+      material: NETHERITE_CHESTPLATE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Незерит, хилки, щит'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  axeshield:
+    enabled: true
+    slot: 14
+    icon:
+      material: DIAMOND_AXE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Топор выбивает щит'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  mace:
+    enabled: true
+    slot: 15
+    icon:
+      material: MACE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Удар с высоты, заряды ветра'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  opmace:
+    enabled: true
+    slot: 16
+    icon:
+      material: HEAVY_CORE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Плотность V, Порыв ветра III'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  trident:
+    enabled: true
+    slot: 19
+    icon:
+      material: TRIDENT
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Трезубец и меч'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  spear:
+    enabled: true
+    slot: 20
+    icon:
+      material: IRON_SPEAR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Копьё 1.21.11'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  netheritespear:
+    enabled: true
+    slot: 21
+    icon:
+      material: NETHERITE_SPEAR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Незеритовое копьё'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  lungespear:
+    enabled: true
+    slot: 22
+    icon:
+      material: DIAMOND_SPEAR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Выпад III — рывок к цели'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  crossbow:
+    enabled: true
+    slot: 23
+    icon:
+      material: CROSSBOW
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Меч и арбалет'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  archer:
+    enabled: true
+    slot: 24
+    icon:
+      material: BOW
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Лук и стрелы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  spearshield:
+    enabled: true
+    slot: 25
+    icon:
+      material: STONE_SPEAR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Копьё и щит, держи дистанцию'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  survival:
+    enabled: true
+    slot: 28
+    icon:
+      material: WATER_BUCKET
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Как в выживании'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  crystal:
+    enabled: true
+    slot: 29
+    icon:
+      material: END_CRYSTAL
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Кристаллы, обсидиан, тотемы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>С ботом: {bot}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

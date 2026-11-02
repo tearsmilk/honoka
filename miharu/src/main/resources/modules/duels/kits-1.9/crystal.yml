@@ -1,0 +1,29 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<light_purple>Crystal'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
+  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4}}
+  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
+  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4}}
+  offhand: {material: TOTEM_OF_UNDYING}
+items:
+  0: {material: NETHERITE_SWORD, enchants: {sharpness: 5}}
+  1: {material: NETHERITE_AXE, enchants: {sharpness: 5}}
+  2: {material: OBSIDIAN, amount: 32}
+  3: {material: END_CRYSTAL, amount: 64}
+  4: {material: GOLDEN_APPLE, amount: 16}
+  5: {material: POTION, potion: strong_strength}
+  6: {material: POTION, potion: strong_strength}
+  7: {material: TOTEM_OF_UNDYING}
+  17: {material: TOTEM_OF_UNDYING}
+  26: {material: TOTEM_OF_UNDYING}
+rules:
+  build: true             # обсидиан под кристаллы
+  break-placed-only: true
+  natural-regen: true
+bot:
+  enabled: false           # дальний бой / копья / кристаллы — только против игроков

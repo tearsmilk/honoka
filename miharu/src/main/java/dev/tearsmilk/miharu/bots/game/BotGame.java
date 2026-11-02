@@ -270,7 +270,14 @@ public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.
             Vector facing = player.getLocation().getDirection().setY(0);
             Vector fromBot = new Vector(body.x - player.getX(), 0, body.z - player.getZ());
             if (facing.lengthSquared() > 0 && fromBot.lengthSquared() > 0 && facing.angle(fromBot) < Math.PI / 2) {
-                player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1f, 1f);
+                if (kit != null && kit.weaponType().name().endsWith("_AXE")) {
+                    // топор выбивает щит на 5 секунд, как в ванили
+                    player.setCooldown(Material.SHIELD, 100);
+                    player.clearActiveItem();
+                    player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BREAK, 1f, 1f);
+                } else {
+                    player.getWorld().playSound(player.getLocation(), Sound.ITEM_SHIELD_BLOCK, 1f, 1f);
+                }
                 return;
             }
         }
@@ -351,6 +358,7 @@ public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.
 
         if (damageEnabled()) {
             double dmg = CombatMath.playerDamage(p, profile, cooldown, crit);
+            dmg += maceSmash(p, hand);
             dmg = CombatMath.applyArmor(dmg, kit == null ? 0 : kit.armorPoints(), kit == null ? 0 : kit.toughness());
             if (kit != null) {
                 dmg *= 1.0 - Math.min(20, kit.protectionLevels()) / 25.0;
@@ -370,6 +378,27 @@ public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.
             }
         }
         onPlayerHitBot();
+    }
+
+    /** Удар булавой с высоты: бонус как в ванили (+ Плотность), Порыв ветра подкидывает атакующего. */
+    private double maceSmash(Player p, ItemStack hand) {
+        if (hand.getType() != Material.MACE || p.getFallDistance() <= 1.5f) {
+            return 0;
+        }
+        double fall = p.getFallDistance();
+        double bonus = Math.min(3, fall) * 4 + Math.max(0, Math.min(5, fall - 3)) * 2 + Math.max(0, fall - 8);
+        int density = hand.getEnchantmentLevel(Enchantment.DENSITY);
+        bonus += density * 0.5 * fall;
+        int wind = hand.getEnchantmentLevel(Enchantment.WIND_BURST);
+        p.setFallDistance(0);
+        if (wind > 0) {
+            p.setVelocity(p.getVelocity().setY(0.6 + 0.35 * wind));
+        } else {
+            p.setVelocity(p.getVelocity().setY(0.1));
+        }
+        Location at = body.location();
+        at.getWorld().playSound(at, fall > 5 ? Sound.ITEM_MACE_SMASH_GROUND_HEAVY : Sound.ITEM_MACE_SMASH_GROUND, 1f, 1f);
+        return bonus;
     }
 
     private void attackSounds(Location at, boolean crit, boolean knockback, boolean charged) {

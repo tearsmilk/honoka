@@ -1,0 +1,24 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<dark_gray>Heavy Combat'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
+  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4}}
+  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
+  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4}}
+  offhand: {material: SHIELD}
+items:
+  0: {material: NETHERITE_SWORD, enchants: {sharpness: 5}}
+  1: {material: GOLDEN_APPLE, amount: 16}
+  2: {material: SPLASH_POTION, potion: strong_healing}
+  3: {material: SPLASH_POTION, potion: strong_healing}
+  4: {material: SPLASH_POTION, potion: strong_healing}
+  8: {material: COOKED_BEEF, amount: 32}
+bot:
+  enabled: true
+  heals: 8
+  heal-amount: 8
+  heal-below: 8

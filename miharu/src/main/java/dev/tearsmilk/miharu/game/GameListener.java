@@ -57,6 +57,11 @@ final class GameListener implements Listener {
             return;
         }
         if (e.getFinalDamage() >= p.getHealth() + p.getAbsorptionAmount()) {
+            // тотем бессмертия срабатывает как в ванили
+            if (p.getInventory().getItemInMainHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING
+                    || p.getInventory().getItemInOffHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING) {
+                return;
+            }
             e.setCancelled(true);
             game.onLethal(p, e);
         }

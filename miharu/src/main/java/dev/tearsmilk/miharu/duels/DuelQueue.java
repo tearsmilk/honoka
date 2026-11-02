@@ -114,7 +114,7 @@ public final class DuelQueue {
                 }
                 continue;
             }
-            KitSpec spec = module.kits().spec(e.kit());
+            KitSpec spec = module.spec(e.kit());
             module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
                     "time", Text.time((System.currentTimeMillis() - e.since()) / 1000), "size", size(e.kit()));
         }

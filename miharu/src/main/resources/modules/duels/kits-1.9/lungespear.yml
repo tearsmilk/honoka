@@ -1,0 +1,18 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<aqua>Lunge Spear'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet: {material: DIAMOND_HELMET, enchants: {protection: 3}}
+  chestplate: {material: DIAMOND_CHESTPLATE, enchants: {protection: 3}}
+  leggings: {material: DIAMOND_LEGGINGS, enchants: {protection: 3}}
+  boots: {material: DIAMOND_BOOTS, enchants: {protection: 3}}
+  offhand: {material: SHIELD}
+items:
+  0: {material: DIAMOND_SPEAR, enchants: {lunge: 3}}
+  1: {material: GOLDEN_APPLE, amount: 8}
+  8: {material: COOKED_BEEF, amount: 32}
+bot:
+  enabled: false           # дальний бой / копья / кристаллы — только против игроков

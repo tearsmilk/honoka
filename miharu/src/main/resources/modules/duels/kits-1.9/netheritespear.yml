@@ -1,0 +1,19 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<dark_gray>Netherite Spear'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet: {material: NETHERITE_HELMET, enchants: {protection: 4}}
+  chestplate: {material: NETHERITE_CHESTPLATE, enchants: {protection: 4}}
+  leggings: {material: NETHERITE_LEGGINGS, enchants: {protection: 4}}
+  boots: {material: NETHERITE_BOOTS, enchants: {protection: 4}}
+  offhand: {material: SHIELD}
+items:
+  0: {material: NETHERITE_SPEAR}
+  1: {material: NETHERITE_SWORD}
+  2: {material: GOLDEN_APPLE, amount: 12}
+  8: {material: COOKED_BEEF, amount: 32}
+bot:
+  enabled: false           # дальний бой / копья / кристаллы — только против игроков

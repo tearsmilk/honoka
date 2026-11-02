@@ -27,32 +27,48 @@ public final class DuelKits {
     public record Entry(KitSpec spec, boolean enabled, int slot, ConfigurationSection icon) {
     }
 
-    static final List<String> DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "sumo", "classic",
+    static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "sumo", "classic",
             "archer", "soup", "bridge", "mlgrush", "leather", "opdiamond", "diamond", "uhc");
+    static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
+            "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal");
 
     private final DuelsModule module;
+    /** Папка в modules/duels (kits — 1.8, kits-1.9 — медленное PvP). */
+    private final String folder;
+    /** Приставка к id, чтобы киты разных категорий не путались в статистике и очереди. */
+    private final String prefix;
+    private final CombatVersion defaultVersion;
+    private final List<String> defaults;
     private final Map<String, Entry> kits = new LinkedHashMap<>();
     private YamlConfiguration menuConfig;
 
-    DuelKits(DuelsModule module) {
+    DuelKits(DuelsModule module, String folder, String prefix, CombatVersion defaultVersion, List<String> defaults) {
         this.module = module;
+        this.folder = folder;
+        this.prefix = prefix;
+        this.defaultVersion = defaultVersion;
+        this.defaults = defaults;
+    }
+
+    public CombatVersion version() {
+        return defaultVersion;
     }
 
     File dir() {
-        File d = new File(module.folder(), "kits");
+        File d = new File(module.folder(), folder);
         d.mkdirs();
         return d;
     }
 
     void load(CombatService combat) {
-        File dir = new File(module.folder(), "kits");
+        File dir = new File(module.folder(), folder);
         if (!dir.exists()) {
             dir.mkdirs();
-            for (String id : DEFAULTS) {
-                module.plugin().saveResource("modules/duels/kits/" + id + ".yml", false);
+            for (String id : defaults) {
+                module.plugin().saveResource("modules/duels/" + folder + "/" + id + ".yml", false);
             }
         }
-        menuConfig = module.loadFile("kits/config.yml");
+        menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();
         File[] files = dir.listFiles((d, n) -> n.endsWith(".yml") && !n.equals("config.yml"));
         if (files == null) {
@@ -77,12 +93,13 @@ public final class DuelKits {
         });
         int autoSlot = 10;
         for (File f : sorted) {
-            String id = name(f);
+            String file = name(f);
+            String id = prefix + file;
             try {
                 YamlConfiguration y = YamlConfiguration.loadConfiguration(f);
-                CombatVersion version = CombatVersion.parse(y.getString("version", "1.8"));
+                CombatVersion version = CombatVersion.parse(y.getString("version", defaultVersion.id()));
                 if (version == null) {
-                    version = CombatVersion.LEGACY;
+                    version = defaultVersion;
                 }
                 KitRules rules = KitRules.load(y.getConfigurationSection("rules"), y.getInt("rounds", 1));
                 KitSpec.Bot bot = y.getBoolean("bot.enabled", true)
@@ -92,7 +109,7 @@ public final class DuelKits {
                 KitSpec spec = new KitSpec(id, y.getString("display", id), version,
                         combat.derive(version, y.getConfigurationSection("combat")), new Kit(id, y), rules,
                         y.getString("arena-mode", "duel").toLowerCase(Locale.ROOT), y.getStringList("arenas"), bot);
-                ConfigurationSection m = menuConfig.getConfigurationSection("kits." + id);
+                ConfigurationSection m = menuConfig.getConfigurationSection("kits." + file);
                 boolean enabled = m == null || m.getBoolean("enabled", true);
                 int slot = m != null && m.contains("slot") ? m.getInt("slot") : autoSlot;
                 ConfigurationSection icon = m != null && m.isConfigurationSection("icon") ? m.getConfigurationSection("icon")
@@ -106,7 +123,7 @@ public final class DuelKits {
                 module.plugin().getLogger().warning("Кит " + f.getName() + " не загрузился: " + e.getMessage());
             }
         }
-        module.plugin().getLogger().info("Китов дуэлей: " + kits.size());
+        module.plugin().getLogger().info("Китов дуэлей (" + folder + "): " + kits.size());
     }
 
     private static String name(File f) {
