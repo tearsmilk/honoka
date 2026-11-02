@@ -119,6 +119,12 @@ public final class DuelsModule extends MiharuModule implements Listener {
         queue.clear();
     }
 
+    /** Перечитать киты с диска. */
+    public void reloadKits() {
+        kits.load(plugin.module(PvpModule.class).combat());
+        modernKits.load(plugin.module(PvpModule.class).combat());
+    }
+
     /** Киты 1.8 (быстрое PvP). */
     public DuelKits kits() {
         return kits;

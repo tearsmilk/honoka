@@ -38,6 +38,23 @@ final class DuelCommand extends SubCommands {
                         "bot", e.spec().bot().enabled() ? plugin.messages().raw("duels.bot-yes") : plugin.messages().raw("duels.bot-no"));
             }
         });
+        sub("reset-kit", "miharu.admin", false, (s, a) -> {
+            if (a.length < 1) {
+                plugin.messages().send(s, "duels.reset-usage");
+                return;
+            }
+            String id = a[0].toLowerCase(java.util.Locale.ROOT);
+            boolean modern = id.startsWith("m-");
+            String file = modern ? id.substring(2) : id;
+            String path = "modules/duels/" + (modern ? "kits-1.9" : "kits") + "/" + file + ".yml";
+            if (plugin.getResource(path) == null) {
+                plugin.messages().send(s, "duels.reset-unknown", "kit", id);
+                return;
+            }
+            plugin.saveResource(path, true);
+            module.reloadKits();
+            plugin.messages().send(s, "duels.reset-done", "kit", id);
+        }, (s, a) -> module.allEntries().stream().map(e -> e.spec().id()).toList());
         sub("1.8", "miharu.duel", true, (s, a) -> module.menus().openKits((Player) s, module.kits()));
         sub("1.9", "miharu.duel", true, (s, a) -> module.menus().openKits((Player) s, module.modernKits()));
         sub("stats", "miharu.duel", false, (s, a) -> {

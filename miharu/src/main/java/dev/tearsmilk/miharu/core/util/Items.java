@@ -27,6 +27,7 @@ import java.util.Map;
  * unbreakable: true
  * glow: false
  * model: "namespace:key"      # item_model
+ * max-stack: 64              # размер стака (зелья, тотемы...)
  * </pre>
  */
 public final class Items {
@@ -95,6 +96,10 @@ public final class Items {
             if (!s.contains("name")) {
                 meta.displayName(Text.item("<gold>Золотая голова", placeholders));
             }
+        }
+        if (s.contains("max-stack")) {
+            // например стак зелий: max-stack: 64
+            meta.setMaxStackSize(Math.max(1, Math.min(99, s.getInt("max-stack"))));
         }
         if (s.getBoolean("hide-attributes", false)) {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
