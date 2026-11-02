@@ -12,7 +12,8 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 | `bots` | Пакетные фейк-игроки (без сущности на сервере), ИИ easy/medium/hard, дуэль с ботом (по киту) и клик-тест, меню, статистика | `modules/bots/config.yml`, `kits.yml`, `menu.yml` |
 | `duels` | Дуэли 1 на 1 по 16 китам 1.8 (NoDebuff, Debuff, Gapple, BuildUHC, Combo, Boxing, Sumo, Classic, Archer, Soup, Bridge, MLG Rush, Leather, OP Diamond, Diamond, UHC): очередь по киту, раунды, цели Bridge, кровати MLG, суп, золотые головы | `modules/duels/config.yml`, `kits/config.yml`, `kits/<id>.yml` |
 | `duels` (1.9) | Медленное PvP: 16 китов (Sword & Shield, Diamond, OP Diamond, Heavy, Axe & Shield, Mace, OP Mace, Trident, Spear, Netherite Spear, Lunge Spear, Sword & Crossbow, Archer, Spear & Shield, Survival, Crystal). Щиты, топор выбивает щит, удар булавой, тотемы | `modules/duels/kits-1.9/` |
-| `lobby` | Предметы лобби (каменный меч — дуэли 1.8, золотой — 1.9, глаз Эндера — наблюдение, краситель — выйти из очереди), своё табло и таб, защита, `/lobby`, `/setlobby` | `modules/lobby/config.yml` |
+| `duels` (рейтинг) | Рейтинговые дуэли: незеритовый меч в лобби, сверху выбор 1.8 / 1.9, только игроки, ELO по китам (старт 0, может уйти в минус), подбор соперника по ELO | `modules/duels/config.yml → ranked` |
+| `lobby` | Предметы лобби (каменный меч — дуэли 1.8, золотой — 1.9, незеритовый — рейтинг, глаз Эндера — наблюдение, краситель — выйти из очереди), своё табло и таб, защита, `/lobby`, `/setlobby` | `modules/lobby/config.yml` |
 
 Статистика пишется в `plugins/Miharu/data.db` (SQLite) или в MySQL (`config.yml → database`).
 
@@ -46,6 +47,7 @@ mvn package                         # → target/Miharu-0.2.0.jar
 | `/arena create\|pos1\|pos2\|spawn\|void\|mode\|display\|icon\|info\|save\|cancel\|edit\|delete\|list\|enable\|disable` | `miharu.arena` |
 | `/duel`, `/duel <кит>`, `/duel queue <кит>`, `/duel leave`, `/duel kits`, `/duel stats` | `miharu.duel` (всем) |
 | `/duel 1.8`, `/duel 1.9` — меню категории; киты 1.9 в очереди с id `m-<кит>` | `miharu.duel` |
+| `/ranked`, `/ranked 1.8\|1.9`, `/ranked queue <кит>`, `/ranked top [кит]`, `/elo [игрок]` | `miharu.duel` |
 | `/spectate [игрок]`, `/lobby` | `miharu.spectate` (всем) |
 | `/setlobby` | `miharu.admin` |
 | `/pvp [1.8\|1.9\|off] [игрок]` | показать — всем, менять — `miharu.pvp.admin` |
@@ -56,7 +58,7 @@ mvn package                         # → target/Miharu-0.2.0.jar
 `%miharu_pvp_version%`, `%miharu_ingame%`, `%miharu_game_mode%`, `%miharu_games_running%`,
 `%miharu_bot_wins%`, `%miharu_bot_wins_<сложность>%`, `%miharu_bot_losses[_<сложность>]%`,
 `%miharu_clicktest_best%`, `%miharu_clicktest_best_cps%`,
-`%miharu_duel_wins[_<кит>]%`, `%miharu_duel_losses[_<кит>]%`, `%miharu_queue_kit%`, `%miharu_queue_size[_<кит>]%`.
+`%miharu_duel_wins[_<кит>]%`, `%miharu_duel_losses[_<кит>]%`, `%miharu_queue_kit%`, `%miharu_queue_size[_<кит>]%`, `%miharu_elo[_<кит>]%`.
 
 ## Интеграции
 

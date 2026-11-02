@@ -64,3 +64,59 @@ menus:
       slot: 22
       material: ARROW
       name: '<gray>← Назад'
+
+# ═══ Рейтинговые дуэли (незеритовый меч в лобби, /ranked) ═══
+# Только игроки. ELO отдельно на каждый кит, старт start-elo, может уходить в минус.
+ranked:
+  start-elo: 0
+  k-factor: 32               # сколько максимум можно получить/потерять за матч
+  # подбор соперника: разница ELO не больше окна, окно растёт пока ждёшь
+  match-range:
+    start: 100
+    grow-per-10s: 50
+    max: 1000
+  # какие киты рейтинговые (id из kits/ и kits-1.9/; у китов 1.9 приставка m-)
+  kits-1.8: [diamond]
+  kits-1.9: [m-diamond]
+  menu:
+    title: '<dark_gray>Рейтинг <gray>· PvP {version}'
+    rows: 4
+    filler: {enabled: true, material: BLACK_STAINED_GLASS_PANE, name: ' '}
+    # переключатель сверху
+    tab-1.8:
+      slot: 3
+      normal: {material: STONE_SWORD, hide-attributes: true, name: '<gray>1.8 · быстрое', lore: ['<yellow>▶ Показать киты 1.8']}
+      selected: {material: STONE_SWORD, hide-attributes: true, glow: true, name: '<#ff9ecf><b>1.8 · быстрое</b>', lore: ['<green>✔ Выбрано']}
+    tab-1.9:
+      slot: 5
+      normal: {material: GOLDEN_SWORD, hide-attributes: true, name: '<gray>1.9 · медленное', lore: ['<yellow>▶ Показать киты 1.9']}
+      selected: {material: GOLDEN_SWORD, hide-attributes: true, glow: true, name: '<gold><b>1.9 · медленное</b>', lore: ['<green>✔ Выбрано']}
+    # слоты под киты выбранной версии (по порядку из kits-1.8 / kits-1.9)
+    kit-slots: [22, 21, 23, 20, 24, 19, 25]
+    kit-icon:
+      material: NETHERITE_SWORD
+      hide-attributes: true
+      name: '{kit} <gray>· рейтинг'
+      lore:
+        - '<gray>Твой ELO: <white>{elo}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Искать соперника'
+    # своя иконка кита: kit-icons.<id> (у китов 1.9 — m_<кит>, например m_diamond)
+    kit-icons:
+      diamond:
+        material: DIAMOND_SWORD
+        hide-attributes: true
+        name: '{kit} <gray>· 1.8 рейтинг'
+        lore: ['<gray>Твой ELO: <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}', '<gray>В очереди: <white>{queue}', '', '<yellow>▶ Искать соперника']
+      m_diamond:
+        material: DIAMOND_SWORD
+        hide-attributes: true
+        glow: true
+        name: '{kit} <gray>· 1.9 рейтинг'
+        lore: ['<gray>Твой ELO: <white>{elo}', '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}', '<gray>В очереди: <white>{queue}', '', '<yellow>▶ Искать соперника']
+    empty:
+      slot: 22
+      material: BARRIER
+      name: '<gray>Нет рейтинговых китов'

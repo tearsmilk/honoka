@@ -10,19 +10,25 @@ import org.bukkit.entity.Player;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Очередь на дуэль: двое в одном ките — сразу в игру. */
+/**
+ * Очередь на дуэль. Обычная: двое в одном ките — сразу в игру.
+ * Рейтинговая: отдельная очередь по киту, соперник подбирается по ELO (окно растёт со временем).
+ */
 public final class DuelQueue {
 
-    public record Entry(UUID id, String kit, long since) {
+    public record Entry(UUID id, String kit, boolean ranked, long since) {
+        String key() {
+            return (ranked ? "ranked:" : "") + kit;
+        }
     }
 
     private final DuelsModule module;
-    private final Map<String, Deque<UUID>> byKit = new LinkedHashMap<>();
+    private final Map<String, Deque<UUID>> byKey = new LinkedHashMap<>();
     private final Map<UUID, Entry> entries = new HashMap<>();
 
     DuelQueue(DuelsModule module) {
@@ -37,8 +43,15 @@ public final class DuelQueue {
         return entries.containsKey(p.getUniqueId());
     }
 
+    /** Сколько ждут в обычной очереди кита. */
     public int size(String kit) {
-        Deque<UUID> q = byKit.get(kit);
+        Deque<UUID> q = byKey.get(kit);
+        return q == null ? 0 : q.size();
+    }
+
+    /** Сколько ждут в рейтинговой очереди кита. */
+    public int rankedSize(String kit) {
+        Deque<UUID> q = byKey.get("ranked:" + kit);
         return q == null ? 0 : q.size();
     }
 
@@ -47,44 +60,31 @@ public final class DuelQueue {
     }
 
     public void join(Player p, KitSpec spec) {
+        join(p, spec, false);
+    }
+
+    public void join(Player p, KitSpec spec, boolean ranked) {
         GameModule games = module.plugin().module(GameModule.class);
         if (games.games().busy(p)) {
             module.plugin().messages().send(p, "game.already-in-game");
             return;
         }
         Entry cur = entries.get(p.getUniqueId());
-        if (cur != null && cur.kit().equals(spec.id())) {
+        if (cur != null && cur.kit().equals(spec.id()) && cur.ranked() == ranked) {
             module.plugin().messages().send(p, "duels.queue.already", "kit", spec.display());
             return;
         }
         leave(p, true);
-        Deque<UUID> q = byKit.computeIfAbsent(spec.id(), k -> new ArrayDeque<>());
-        // ищем соперника, который ещё онлайн и свободен
-        Iterator<UUID> it = q.iterator();
-        while (it.hasNext()) {
-            UUID otherId = it.next();
-            Player other = Bukkit.getPlayer(otherId);
-            if (other == null || games.games().busy(other)) {
-                it.remove();
-                entries.remove(otherId);
-                continue;
-            }
-            it.remove();
-            entries.remove(otherId);
-            module.plugin().messages().send(p, "duels.queue.found", "opponent", other.getName(), "kit", spec.display());
-            module.plugin().messages().send(other, "duels.queue.found", "opponent", p.getName(), "kit", spec.display());
-            other.playSound(other.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
-            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
-            module.changed(other);
-            if (!module.startDuel(other, p, spec)) {
-                module.changed(p);
-            }
-            return;
+        Entry e = new Entry(p.getUniqueId(), spec.id(), ranked, System.currentTimeMillis());
+        byKey.computeIfAbsent(e.key(), k -> new ArrayDeque<>()).addLast(p.getUniqueId());
+        entries.put(p.getUniqueId(), e);
+        if (ranked) {
+            module.plugin().messages().send(p, "ranked.joined", "kit", spec.display(), "elo", module.elo().elo(p.getUniqueId(), spec.id()));
+        } else {
+            module.plugin().messages().send(p, "duels.queue.joined", "kit", spec.display());
         }
-        q.addLast(p.getUniqueId());
-        entries.put(p.getUniqueId(), new Entry(p.getUniqueId(), spec.id(), System.currentTimeMillis()));
-        module.plugin().messages().send(p, "duels.queue.joined", "kit", spec.display());
         module.changed(p);
+        tryMatch(e.key());
     }
 
     public void leave(Player p, boolean silent) {
@@ -92,7 +92,7 @@ public final class DuelQueue {
         if (e == null) {
             return;
         }
-        Deque<UUID> q = byKit.get(e.kit());
+        Deque<UUID> q = byKey.get(e.key());
         if (q != null) {
             q.remove(p.getUniqueId());
         }
@@ -102,26 +102,88 @@ public final class DuelQueue {
         module.changed(p);
     }
 
+    /** Ищет пару в очереди key. В рейтинговой — только если разница ELO в допустимом окне. */
+    private void tryMatch(String key) {
+        Deque<UUID> q = byKey.get(key);
+        if (q == null || q.size() < 2) {
+            return;
+        }
+        List<UUID> list = List.copyOf(q);
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = i + 1; j < list.size(); j++) {
+                Entry a = entries.get(list.get(i));
+                Entry b = entries.get(list.get(j));
+                if (a == null || b == null) {
+                    continue;
+                }
+                if (a.ranked() && !module.ranked().canMatch(a, b)) {
+                    continue;
+                }
+                match(a, b);
+                return;
+            }
+        }
+    }
+
+    private void match(Entry ea, Entry eb) {
+        Player a = Bukkit.getPlayer(ea.id());
+        Player b = Bukkit.getPlayer(eb.id());
+        KitSpec spec = module.spec(ea.kit());
+        if (a == null || b == null || spec == null) {
+            return;
+        }
+        for (Entry e : List.of(ea, eb)) {
+            entries.remove(e.id());
+            Deque<UUID> q = byKey.get(e.key());
+            if (q != null) {
+                q.remove(e.id());
+            }
+        }
+        for (Player p : List.of(a, b)) {
+            Player op = p == a ? b : a;
+            if (ea.ranked()) {
+                module.plugin().messages().send(p, "ranked.found", "opponent", op.getName(), "kit", spec.display(),
+                        "elo", module.elo().elo(op.getUniqueId(), spec.id()));
+            } else {
+                module.plugin().messages().send(p, "duels.queue.found", "opponent", op.getName(), "kit", spec.display());
+            }
+            p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
+            module.changed(p);
+        }
+        module.startDuel(a, b, spec, ea.ranked());
+    }
+
     void tick() {
-        for (Entry e : java.util.List.copyOf(entries.values())) {
+        GameModule games = module.plugin().module(GameModule.class);
+        for (Entry e : List.copyOf(entries.values())) {
             Player p = Bukkit.getPlayer(e.id());
-            GameModule games = module.plugin().module(GameModule.class);
             if (p == null || games.games().busy(p)) {
                 entries.remove(e.id());
-                Deque<UUID> q = byKit.get(e.kit());
+                Deque<UUID> q = byKey.get(e.key());
                 if (q != null) {
                     q.remove(e.id());
                 }
                 continue;
             }
             KitSpec spec = module.spec(e.kit());
-            module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
-                    "time", Text.time((System.currentTimeMillis() - e.since()) / 1000), "size", size(e.kit()));
+            String time = Text.time((System.currentTimeMillis() - e.since()) / 1000);
+            if (e.ranked()) {
+                module.plugin().messages().actionBar(p, "ranked.actionbar", "kit", spec == null ? e.kit() : spec.display(), "time", time,
+                        "size", rankedSize(e.kit()), "range", module.ranked().range(e), "elo", module.elo().elo(p.getUniqueId(), e.kit()));
+            } else {
+                module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
+                        "time", time, "size", size(e.kit()));
+            }
+        }
+        for (String key : List.copyOf(byKey.keySet())) {
+            if (key.startsWith("ranked:")) {
+                tryMatch(key);
+            }
         }
     }
 
     void clear() {
         entries.clear();
-        byKit.clear();
+        byKey.clear();
     }
 }

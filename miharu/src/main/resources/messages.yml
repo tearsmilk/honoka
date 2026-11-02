@@ -216,3 +216,16 @@ duels:
 lobby:
   spawn-set: '{prefix}<green>Спавн лобби сохранён.'
   not-in-queue: '<gray>—'
+
+ranked:
+  label: '<#ff5c8a>[Рейтинг]'
+  joined: '{prefix}<gray>Рейтинговый поиск: {kit} <gray>· твой ELO <white>{elo}<gray>. Выйти — <white>/duel leave'
+  found: '{prefix}<green>Соперник: <white>{opponent}</white> <gray>({elo} ELO · {kit}<gray>)'
+  actionbar: '<#ff5c8a>Рейтинг</#ff5c8a> <gray>· {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> ELO {elo} ±{range}'
+  result: '{prefix}<gray>ELO: <white>{elo_before}</white> → <white>{elo}</white> (<yellow>{elo_change}</yellow>)'
+  unknown-kit: '{prefix}<red>Рейтинговые киты: <white>{kits}'
+  elo-header: '{prefix}<gray>Рейтинг <white>{player}</white>:'
+  elo-line: ' <dark_gray>•</dark_gray> {kit} <gray>({version}): <white>{elo}</white> ELO · <green>{wins}</green> / <red>{losses}'
+  top-header: '{prefix}<gray>Топ ELO · {kit}<gray>:'
+  top-empty: ' <gray>Пока пусто.'
+  top-line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{elo}</white> <gray>({wins}/{losses})'

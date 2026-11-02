@@ -56,9 +56,14 @@ public final class DuelGame extends Game implements KitGame {
     private int round = 1;
     private boolean finished;
     private Player winner;
+    private final boolean ranked;
+    private int eloDeltaA;
+    private int eloDeltaB;
+    private boolean eloApplied;
 
-    DuelGame(DuelsModule duels, GameModule games, Arena arena, KitSpec spec, CombatService combat, Player a, Player b) {
-        super(games, MODE, arena);
+    DuelGame(DuelsModule duels, GameModule games, Arena arena, KitSpec spec, CombatService combat, Player a, Player b, boolean ranked) {
+        super(games, ranked ? "ranked" : MODE, arena);
+        this.ranked = ranked;
         this.duels = duels;
         this.spec = spec;
         this.rules = spec.rules();
@@ -327,6 +332,12 @@ public final class DuelGame extends Game implements KitGame {
         }
         finished = true;
         winner = w;
+        if (ranked && !eloApplied) {
+            eloApplied = true;
+            int[] d = duels.elo().apply(a, b, spec.id(), w);
+            eloDeltaA = d[0];
+            eloDeltaB = d[1];
+        }
         if (w != null) {
             Player loser = opponent(w);
             duels.stats().record(w, loser, spec.id());
@@ -337,6 +348,9 @@ public final class DuelGame extends Game implements KitGame {
                 Object[] kv = kv(p);
                 plugin.messages().title(p, p == w ? "duels.win" : "duels.loss", kv);
                 plugin.messages().sendList(p, "duels.summary", kv);
+                if (ranked) {
+                    plugin.messages().send(p, "ranked.result", kv);
+                }
                 p.playSound(p.getLocation(), p == w ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             }
             if (loser.isOnline() && players.contains(loser) && duels.config().getBoolean("spectate-on-loss", true)) {
@@ -346,6 +360,9 @@ public final class DuelGame extends Game implements KitGame {
             for (Player p : List.of(a, b)) {
                 if (p.isOnline() && players.contains(p)) {
                     plugin.messages().title(p, "duels.draw", kv(p));
+                    if (ranked) {
+                        plugin.messages().send(p, "ranked.result", kv(p));
+                    }
                 }
             }
         }
@@ -399,6 +416,12 @@ public final class DuelGame extends Game implements KitGame {
         map.put("round", round);
         map.put("time_left", Text.time(Math.max(0, rules.maxDurationSeconds() - runningTicks / 20)));
         map.put("winner", winner == null ? "-" : winner.getName());
+        int myDelta = me == a ? eloDeltaA : eloDeltaB;
+        map.put("ranked", ranked ? plugin.messages().raw("ranked.label") : "");
+        map.put("elo", duels.elo().elo(me.getUniqueId(), spec.id()));
+        map.put("opponent_elo", duels.elo().elo(op.getUniqueId(), spec.id()));
+        map.put("elo_change", (myDelta >= 0 ? "+" : "") + myDelta);
+        map.put("elo_before", duels.elo().elo(me.getUniqueId(), spec.id()) - (eloApplied ? myDelta : 0));
         return map;
     }
 }

@@ -277,6 +277,11 @@ public final class LobbyModule extends MiharuModule {
                     duels.menus().openKits(p, duels.modernKits());
                 }
             }
+            case "ranked" -> {
+                if (duels != null) {
+                    duels.ranked().open(p);
+                }
+            }
             case "leave-queue" -> {
                 if (duels != null) {
                     duels.queue().leave(p, false);
@@ -367,6 +372,16 @@ public final class LobbyModule extends MiharuModule {
         KitSpec spec = e == null ? null : duels.spec(e.kit());
         ph.put("queue_kit", spec == null ? plugin.messages().raw("lobby.not-in-queue") : spec.display());
         ph.put("queue_time", e == null ? "-" : Text.time((System.currentTimeMillis() - e.since()) / 1000));
+        if (duels != null) {
+            java.util.List<KitSpec> fast = duels.ranked().kits(dev.tearsmilk.miharu.pvp.CombatVersion.LEGACY);
+            java.util.List<KitSpec> slow = duels.ranked().kits(dev.tearsmilk.miharu.pvp.CombatVersion.MODERN);
+            ph.put("elo_fast", fast.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), fast.getFirst().id()));
+            ph.put("elo_slow", slow.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), slow.getFirst().id()));
+        } else {
+            ph.put("elo_fast", 0);
+            ph.put("elo_slow", 0);
+        }
+        ph.put("queue_mode", e != null && e.ranked() ? plugin.messages().raw("ranked.label") : "");
         ph.put("duel_wins", duels == null ? 0 : duels.stats().wins(p.getUniqueId(), null));
         ph.put("duel_losses", duels == null ? 0 : duels.stats().losses(p.getUniqueId(), null));
         ph.put("bot_wins", bots == null ? 0 : bots.stats().summary(p.getUniqueId()).wins(null));
