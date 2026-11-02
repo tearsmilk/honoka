@@ -191,7 +191,13 @@ public final class BotsModule extends MiharuModule implements Listener {
         }
         Object perVersion = dev.tearsmilk.miharu.core.config.Configs.value(config().getConfigurationSection("modes." + mode + ".kits"), version.id());
         String kitId = perVersion != null ? String.valueOf(perVersion) : config().getString("modes." + mode + ".kit", "");
-        Kit kit = kits.get(kitId);
+        // сначала вариант под версию (clicktest-1.9), потом общий кит
+        Kit kit = kits.get(kitId + "-" + version.id());
+        if (kit != null) {
+            kitId = kitId + "-" + version.id();
+        } else {
+            kit = kits.get(kitId);
+        }
         KitRules base = KitRules.load(null, 1);
         KitRules rules = new KitRules(base.damage(), base.hunger(), base.naturalRegen(), base.fallDamage(), false, true, false,
                 liquidIsVoid(mode), true, 0, KitRules.Objective.NONE, 2.5, KitRules.DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true,

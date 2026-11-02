@@ -1,4 +1,5 @@
 # Киты для игр с ботом. Бот надевает ту же броню и берёт оружие из слота 0 (или bot-weapon).
+# Кит <id>-<версия> (например clicktest-1.9) берётся вместо <id> для этой версии PvP.
 # Предмет: material (или "nexo:id"), amount, name, lore, enchants {sharpness: 1}, unbreakable, glow, model
 kits:
   duel-1.8:
@@ -22,4 +23,9 @@ kits:
     effects: []
   clicktest:
     items: {}
+    effects: []
+  # 1.9: деревянный меч — удар раз в 12.5 тиков у игрока и бота
+  clicktest-1.9:
+    items:
+      0: {material: WOODEN_SWORD, unbreakable: true}
     effects: []

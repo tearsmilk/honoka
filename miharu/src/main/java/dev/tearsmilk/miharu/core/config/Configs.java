@@ -54,6 +54,10 @@ public final class Configs {
                 YamlConfiguration defaults = YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8));
                 boolean changed = false;
                 for (String key : defaults.getKeys(true)) {
+                    // копируем только значения: секции создадутся сами, иначе в память попадёт чужая секция
+                    if (defaults.isConfigurationSection(key) && !defaults.getConfigurationSection(key).getKeys(false).isEmpty()) {
+                        continue;
+                    }
                     if (!cfg.contains(key, true)) {
                         cfg.set(key, defaults.get(key));
                         changed = true;
