@@ -1,0 +1,58 @@
+# Мини-игра 1x1 (только против игрока, всегда PvP 1.8). Формат как у китов дуэлей (modules/duels/kits/).
+# Слоты: 0–8 хотбар, 9–35 инвентарь. team-color: кожа и WHITE_* блоки красятся в цвет команды.
+display: '<red>BedWars'
+version: "1.8"
+arena-mode: bedwars       # арена: p1, p2, bed1 (кровать первого), bed2 (кровать второго)
+rounds: 1
+team-color: true
+armor:
+  helmet:
+    material: LEATHER_HELMET
+    unbreakable: true
+  chestplate:
+    material: LEATHER_CHESTPLATE
+    unbreakable: true
+  leggings:
+    material: LEATHER_LEGGINGS
+    unbreakable: true
+  boots:
+    material: LEATHER_BOOTS
+    unbreakable: true
+items:
+  0:
+    material: STONE_SWORD
+    unbreakable: true
+  1:
+    material: WOODEN_PICKAXE
+    unbreakable: true
+    enchants:
+      efficiency: 1
+  2:
+    material: SHEARS
+    unbreakable: true
+  3:
+    material: WHITE_WOOL
+    amount: 64
+  4:
+    material: WHITE_WOOL
+    amount: 64
+  5:
+    material: OAK_PLANKS
+    amount: 32
+  6:
+    material: GOLDEN_APPLE
+    amount: 4
+  7:
+    material: ENDER_PEARL
+    amount: 1
+  8:
+    material: COOKED_BEEF
+    amount: 16
+rules:
+  build: true
+  break-placed-only: true      # ломаются только блоки игроков (и кровати)
+  objective: bedwars           # сломал кровать — соперник больше не возрождается
+  goal-radius: 1.5
+  respawn-seconds: 3           # возрождение, пока кровать цела
+  explosion-block-damage: placed
+  hunger: false

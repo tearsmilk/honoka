@@ -1,0 +1,55 @@
+# Мини-игра 1x1 (только против игрока, всегда PvP 1.8). Формат как у китов дуэлей (modules/duels/kits/).
+# Слоты: 0–8 хотбар, 9–35 инвентарь. team-color: кожа и WHITE_* блоки красятся в цвет команды.
+display: '<gold>Fireball Fight'
+version: "1.8"
+arena-mode: fireball      # арена: p1, p2, bed1, bed2. Кровати застрой заранее при /arena edit
+rounds: 1
+team-color: true
+armor:
+  helmet:
+    material: LEATHER_HELMET
+    unbreakable: true
+  chestplate:
+    material: LEATHER_CHESTPLATE
+    unbreakable: true
+  leggings:
+    material: LEATHER_LEGGINGS
+    unbreakable: true
+  boots:
+    material: LEATHER_BOOTS
+    unbreakable: true
+items:
+  0:
+    material: STONE_SWORD
+    unbreakable: true
+  1:
+    material: FIRE_CHARGE      # ПКМ — бросок фаербола, на взрыве можно прыгать
+    amount: 8
+  2:
+    material: TNT              # поджигается сразу после установки
+    amount: 4
+  3:
+    material: WHITE_WOOL
+    amount: 32
+  4:
+    material: WOODEN_PICKAXE
+    unbreakable: true
+    enchants:
+      efficiency: 1
+  5:
+    material: SHEARS
+    unbreakable: true
+  8:
+    material: GOLDEN_APPLE
+    amount: 3
+rules:
+  build: true
+  break-placed-only: true
+  objective: bedwars
+  goal-radius: 1.5
+  respawn-seconds: 3
+  fireball: true
+  auto-tnt: true
+  explosion-block-damage: placed   # взрывы ломают только поставленные блоки, карта цела
+  hunger: false
+  fall-damage: false

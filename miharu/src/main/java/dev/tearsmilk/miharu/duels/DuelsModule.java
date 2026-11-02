@@ -28,6 +28,8 @@ import java.util.function.Consumer;
 public final class DuelsModule extends MiharuModule implements Listener {
 
     private final DuelKits kits = new DuelKits(this, "kits", "", dev.tearsmilk.miharu.pvp.CombatVersion.LEGACY, DuelKits.LEGACY_DEFAULTS);
+    private final DuelKits minigameKits = new DuelKits(this, "minigames", "mg-", dev.tearsmilk.miharu.pvp.CombatVersion.LEGACY, DuelKits.MINIGAME_DEFAULTS).minigames();
+    private final Loot loot = new Loot(this);
     private final DuelKits modernKits = new DuelKits(this, "kits-1.9", "m-", dev.tearsmilk.miharu.pvp.CombatVersion.MODERN, DuelKits.MODERN_DEFAULTS);
     private final List<Consumer<Player>> changeHooks = new ArrayList<>();
     private DuelQueue queue;
@@ -52,6 +54,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
     protected void onEnable() {
         kits.load(plugin.module(PvpModule.class).combat());
         modernKits.load(plugin.module(PvpModule.class).combat());
+        minigameKits.load(plugin.module(PvpModule.class).combat());
         stats = new DuelStats(plugin.database());
         stats.createTables();
         elo = new EloStore(this, plugin.database());
@@ -68,6 +71,9 @@ public final class DuelsModule extends MiharuModule implements Listener {
         arenas.registerMode(new ArenaMode("sumo", "Сумо", List.of("p1", "p2")));
         arenas.registerMode(new ArenaMode("bridge", "Бридж", List.of("p1", "p2", "goal1", "goal2")));
         arenas.registerMode(new ArenaMode("mlg", "МЛГ-Раш", List.of("p1", "p2", "bed1", "bed2")));
+        arenas.registerMode(new ArenaMode("bedwars", "BedWars", List.of("p1", "p2", "bed1", "bed2")));
+        arenas.registerMode(new ArenaMode("fireball", "Fireball Fight", List.of("p1", "p2", "bed1", "bed2")));
+        arenas.registerMode(new ArenaMode("skywars", "SkyWars", List.of("p1", "p2")));
         listen(this);
         listen(new KitMechanics(this));
         task = Bukkit.getScheduler().runTaskTimer(plugin, queue::tick, 20L, 20L);
@@ -107,8 +113,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
 
     @Override
     protected void onReload() {
-        kits.load(plugin.module(PvpModule.class).combat());
-        modernKits.load(plugin.module(PvpModule.class).combat());
+        reloadKits();
     }
 
     @Override
@@ -123,6 +128,16 @@ public final class DuelsModule extends MiharuModule implements Listener {
     public void reloadKits() {
         kits.load(plugin.module(PvpModule.class).combat());
         modernKits.load(plugin.module(PvpModule.class).combat());
+        minigameKits.load(plugin.module(PvpModule.class).combat());
+    }
+
+    /** Мини-игры (фаербол в лобби). */
+    public DuelKits minigameKits() {
+        return minigameKits;
+    }
+
+    public Loot loot() {
+        return loot;
     }
 
     /** Киты 1.8 (быстрое PvP). */
@@ -143,18 +158,23 @@ public final class DuelsModule extends MiharuModule implements Listener {
     /** Кит по id из любой категории (только включённые). */
     public KitSpec spec(String id) {
         KitSpec s = kits.spec(id);
-        return s != null ? s : modernKits.spec(id);
+        if (s == null) {
+            s = modernKits.spec(id);
+        }
+        return s != null ? s : minigameKits.spec(id);
     }
 
     public List<String> enabledIds() {
         List<String> out = new ArrayList<>(kits.enabledIds());
         out.addAll(modernKits.enabledIds());
+        out.addAll(minigameKits.enabledIds());
         return out;
     }
 
     public List<DuelKits.Entry> allEntries() {
         List<DuelKits.Entry> out = new ArrayList<>(kits.all());
         out.addAll(modernKits.all());
+        out.addAll(minigameKits.all());
         return out;
     }
 
@@ -204,7 +224,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         GameModule games = plugin.module(GameModule.class);
         int n = 0;
         for (Game g : games.games().games()) {
-            if (g instanceof KitGame kg && kg.kitSpec().id().equals(kit)) {
+            if (g instanceof KitGame kg && (kg.kitSpec().id().equals(kit) || kg.kitSpec().id().startsWith(kit + "-"))) {
                 n += g.players().size();
             }
         }

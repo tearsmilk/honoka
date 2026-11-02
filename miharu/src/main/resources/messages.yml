@@ -254,3 +254,21 @@ tiers:
   usage: '{prefix}<red>/tier set <игрок> <кит> <HT1..LT5|auto>'
   set: '{prefix}<green>{player}: тир в {kit} — {tier}'
   reset: '{prefix}<green>{player}: тир в {kit} снова считается из ELO'
+
+minigames:
+  bed-yes: '<green>✔'
+  bed-no: '<red>✘'
+  goal-goal: 'голов'
+  goal-bed: 'кроватей'
+  goal-bedwars: 'побед'
+  goal-none: 'побед'
+  bed-destroyed: '{prefix}<red><b>КРОВАТЬ</b></red> <white>{victim}</white> <gray>сломал <white>{player}</white>!'
+  bed-lost:
+    title: '<red><b>Кровать сломана!</b>'
+    subtitle: '<gray>Больше не возродишься'
+    stay: 2000
+  final-kill: '{prefix}<red><b>ФИНАЛ</b></red> <white>{player}</white> <gray>выбыл — <white>{killer}</white>'
+  respawning:
+    title: '<red>Ты умер'
+    subtitle: '<gray>Возрождение через <white>{seconds}'
+    stay: 900

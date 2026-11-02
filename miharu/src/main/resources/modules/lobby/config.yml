@@ -28,7 +28,7 @@ protect:
   inventory: true
   void-y: -64
 
-# Предметы. action: duels (1.8) | duels-1.9 | ranked | stats | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# Предметы. action: duels (1.8) | minigames | duels-1.9 | ranked | stats | spectate | leave-queue | bots | clicktest | command:<команда> | none
 # show: always | in-queue | not-in-queue
 items:
   duels:
@@ -41,6 +41,15 @@ items:
     lore:
       - '<gray>Выбери кит и сыграй'
       - '<gray>с ботом или с игроком.'
+  minigames:
+    slot: 1
+    show: not-in-queue
+    action: minigames
+    material: FIRE_CHARGE
+    name: '<#ff8a3b><b>Мини-игры</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>BedWars, SkyWars, The Bridge,'
+      - '<gray>Fireball Fight, Sumo, MLG Rush — 1x1.'
   duels-modern:
     slot: 2
     show: not-in-queue

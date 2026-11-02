@@ -26,21 +26,45 @@ public record KitRules(
         int pearlCooldownTicks,
         boolean rodKnockback,
         int maxDurationSeconds,
-        boolean explosionBlocks
+        ExplosionMode explosions,
+        int respawnSeconds,
+        boolean fireball,
+        boolean autoTnt,
+        String chestLoot
 ) {
 
-    public enum Objective { NONE, GOAL, BED }
+    /**
+     * NONE — до смерти; GOAL — гол в ворота (Bridge); BED — сломал кровать = очко (MLG Rush);
+     * BEDWARS — сломал кровать = соперник больше не возрождается (BedWars, Fireball Fight).
+     */
+    public enum Objective { NONE, GOAL, BED, BEDWARS }
 
     /** lose-round — смерть отдаёт очко сопернику; respawn — просто возрождение (Bridge, MLG). */
     public enum DeathAction { LOSE_ROUND, RESPAWN }
 
-    public static final KitRules DEFAULT = new KitRules(true, true, true, true, false, true, false, false, true, 0,
-            Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7.0, 0, true, 600, true);
+    /** Что ломают взрывы: всё, ничего или только поставленные игроками блоки. */
+    public enum ExplosionMode { ALL, NONE, PLACED }
+
+    public static final KitRules DEFAULT = load(null, 1);
+
+    /** Правила для старых режимов бота (дуэль без кита дуэлей, клик-тест). */
+    public static KitRules botDefault(boolean liquidLose, int maxDurationSeconds) {
+        KitRules d = DEFAULT;
+        return new KitRules(d.damage, d.hunger, d.naturalRegen, d.fallDamage, false, true, false, liquidLose, true, 0,
+                Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true, maxDurationSeconds,
+                ExplosionMode.ALL, 0, false, false, "");
+    }
+
+    /** Та же игра, но до другого числа очков (варианты 3/5/7). */
+    public KitRules withRounds(int rounds) {
+        return new KitRules(damage, hunger, naturalRegen, fallDamage, build, breakPlacedOnly, infiniteBlocks, liquidLose, voidLose,
+                hitTarget, objective, goalRadius, onDeath, Math.max(1, rounds), roundCountdown, soup, soupHeal, pearlCooldownTicks,
+                rodKnockback, maxDurationSeconds, explosions, respawnSeconds, fireball, autoTnt, chestLoot);
+    }
 
     public static KitRules load(ConfigurationSection s, int rounds) {
         if (s == null) {
-            return new KitRules(true, true, true, true, false, true, false, false, true, 0, Objective.NONE, 2.5,
-                    DeathAction.LOSE_ROUND, Math.max(1, rounds), 3, false, 7.0, 0, true, 600, true);
+            s = new org.bukkit.configuration.MemoryConfiguration();
         }
         Objective obj;
         try {
@@ -49,6 +73,12 @@ public record KitRules(
             obj = Objective.NONE;
         }
         DeathAction death = "respawn".equalsIgnoreCase(s.getString("on-death", "lose-round")) ? DeathAction.RESPAWN : DeathAction.LOSE_ROUND;
+        String ex = String.valueOf(s.get("explosion-block-damage", "true")).toLowerCase(Locale.ROOT);
+        ExplosionMode explosions = switch (ex) {
+            case "false", "none", "off" -> ExplosionMode.NONE;
+            case "placed" -> ExplosionMode.PLACED;
+            default -> ExplosionMode.ALL;
+        };
         return new KitRules(
                 s.getBoolean("damage", true),
                 s.getBoolean("hunger", true),
@@ -70,7 +100,11 @@ public record KitRules(
                 s.getInt("pearl-cooldown-ticks", 0),
                 s.getBoolean("rod-knockback", true),
                 s.getInt("max-duration-seconds", 600),
-                s.getBoolean("explosion-block-damage", true)
+                explosions,
+                s.getInt("respawn-seconds", 0),
+                s.getBoolean("fireball", false),
+                s.getBoolean("auto-tnt", false),
+                s.getString("chest-loot", "")
         );
     }
 }

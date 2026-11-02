@@ -112,22 +112,6 @@ kits:
         - '<gray>С ботом: {bot}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
-  sumo:
-    enabled: true
-    slot: 16
-    icon:
-      material: SLIME_BALL
-      hide-attributes: true
-      glow: false
-      name: '{kit}'
-      lore:
-        - '<gray>Вытолкни соперника с платформы'
-        - ''
-        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-        - '<gray>С ботом: {bot}'
-        - ''
-        - '<yellow>▶ Нажми, чтобы играть'
   classic:
     enabled: true
     slot: 19
@@ -170,38 +154,6 @@ kits:
       name: '{kit}'
       lore:
         - '<gray>Лечение супом'
-        - ''
-        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-        - '<gray>С ботом: {bot}'
-        - ''
-        - '<yellow>▶ Нажми, чтобы играть'
-  bridge:
-    enabled: true
-    slot: 22
-    icon:
-      material: BLUE_TERRACOTTA
-      hide-attributes: true
-      glow: false
-      name: '{kit}'
-      lore:
-        - '<gray>Забей 5 голов в ворота'
-        - ''
-        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-        - '<gray>С ботом: {bot}'
-        - ''
-        - '<yellow>▶ Нажми, чтобы играть'
-  mlgrush:
-    enabled: true
-    slot: 23
-    icon:
-      material: WHITE_BED
-      hide-attributes: true
-      glow: false
-      name: '{kit}'
-      lore:
-        - '<gray>Сломай кровать соперника'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'

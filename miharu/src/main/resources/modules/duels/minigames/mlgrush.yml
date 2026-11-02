@@ -3,6 +3,12 @@
 # rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
 display: '<#e0b96a>MLG Rush'
 version: "1.8"
+# варианты матча: игрок выбирает, до скольких очков играть
+variants:
+  - 5
+  - 10
+  - 20
+variant-suffix: '<gray>· до {count}'
 arena-mode: mlg           # арена с точками p1, p2, bed1, bed2 (кровати команд)
 rounds: 5                 # сломанных кроватей до победы
 items:
@@ -28,5 +34,3 @@ rules:
   goal-radius: 1.5
   on-death: respawn
   hunger: false
-bot:
-  enabled: false

@@ -60,9 +60,11 @@ public final class DuelGame extends Game implements KitGame {
     private int eloDeltaA;
     private int eloDeltaB;
     private boolean eloApplied;
+    private boolean bedA = true;
+    private boolean bedB = true;
 
     DuelGame(DuelsModule duels, GameModule games, Arena arena, KitSpec spec, CombatService combat, Player a, Player b, boolean ranked) {
-        super(games, ranked ? "ranked" : MODE, arena);
+        super(games, ranked ? "ranked" : spec.id().startsWith("mg-") ? "minigame" : MODE, arena);
         this.ranked = ranked;
         this.duels = duels;
         this.spec = spec;
@@ -117,6 +119,12 @@ public final class DuelGame extends Game implements KitGame {
         instance.world().setGameRule(GameRules.FALL_DAMAGE, rules.fallDamage());
         giveKit(a);
         giveKit(b);
+        if (rules.chestLoot() != null && !rules.chestLoot().isEmpty()) {
+            int filled = duels.loot().fill(instance, rules.chestLoot());
+            if (plugin.debug()) {
+                plugin.getLogger().info("[debug] лут " + rules.chestLoot() + ": сундуков " + filled);
+            }
+        }
     }
 
     private void giveKit(Player p) {
@@ -155,14 +163,61 @@ public final class DuelGame extends Game implements KitGame {
 
     private void died(Player p) {
         Player killer = opponent(p);
+        if (rules.objective() == KitRules.Objective.BEDWARS) {
+            if (p == a ? bedA : bedB) {
+                broadcast("duels.killed", "player", p.getName(), "killer", killer.getName());
+                respawn(p);
+            } else {
+                broadcast("minigames.final-kill", "player", p.getName(), "killer", killer.getName());
+                roundWon(killer);
+            }
+            return;
+        }
         broadcast("duels.killed", "player", p.getName(), "killer", killer.getName());
         if (rules.onDeath() == KitRules.DeathAction.RESPAWN) {
+            respawn(p);
+            return;
+        }
+        roundWon(killer);
+    }
+
+    /** Возрождение: сразу или через respawn-seconds (наблюдателем над своей точкой). */
+    private void respawn(Player p) {
+        int sec = rules.respawnSeconds();
+        if (sec <= 0) {
             p.teleport(spawnFor(p));
             giveKit(p);
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT, 1f, 0.8f);
             return;
         }
-        roundWon(killer);
+        p.getInventory().clear();
+        p.setGameMode(GameMode.SPECTATOR);
+        p.teleport(spawnFor(p).add(0, 6, 0));
+        for (int i = 0; i < sec; i++) {
+            int left = sec - i;
+            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (players.contains(p) && state == State.RUNNING) {
+                    plugin.messages().title(p, "minigames.respawning", "seconds", left);
+                }
+            }, i * 20L);
+        }
+        org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (players.contains(p) && !finished && state == State.RUNNING && p.isOnline()) {
+                p.teleport(spawnFor(p));
+                giveKit(p);
+            }
+        }, sec * 20L);
+    }
+
+    /** Взрыв при explosion-block-damage: placed — ломаются только блоки игроков. */
+    void filterExplosion(List<Block> blocks) {
+        blocks.removeIf(bl -> !build.isPlaced(bl));
+        blocks.forEach(build::broke);
+    }
+
+    /** Взрыв, который ломает всё: запоминаем блоки для отката раунда. */
+    void trackExplosion(List<Block> blocks) {
+        blocks.forEach(build::broke);
     }
 
     @Override
@@ -252,6 +307,29 @@ public final class DuelGame extends Game implements KitGame {
 
     @Override
     protected boolean canBreak(Player p, Block block) {
+        if (rules.objective() == KitRules.Objective.BEDWARS && Tag.BEDS.isTagged(block.getType())) {
+            String own = p == a ? "bed1" : "bed2";
+            String enemy = p == a ? "bed2" : "bed1";
+            Location at = block.getLocation().add(0.5, 0, 0.5);
+            if (instance.has(own) && near(at, instance.spawn(own), rules.goalRadius() + 1)) {
+                plugin.messages().send(p, "duels.own-bed");
+                return false;
+            }
+            if (instance.has(enemy) && near(at, instance.spawn(enemy), rules.goalRadius() + 1)) {
+                Player victim = opponent(p);
+                if (victim == a) {
+                    bedA = false;
+                } else {
+                    bedB = false;
+                }
+                rememberBed(block);
+                broadcast("minigames.bed-destroyed", "player", p.getName(), "victim", victim.getName());
+                plugin.messages().title(victim, "minigames.bed-lost");
+                victim.playSound(victim.getLocation(), Sound.ENTITY_WITHER_DEATH, 0.6f, 1.2f);
+                p.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 0.6f, 1.4f);
+                return true;
+            }
+        }
         if (rules.objective() == KitRules.Objective.BED && Tag.BEDS.isTagged(block.getType())) {
             String own = p == a ? "bed1" : "bed2";
             String enemy = p == a ? "bed2" : "bed1";
@@ -431,6 +509,10 @@ public final class DuelGame extends Game implements KitGame {
         map.put("round", round);
         map.put("time_left", Text.time(Math.max(0, rules.maxDurationSeconds() - runningTicks / 20)));
         map.put("winner", winner == null ? "-" : winner.getName());
+        String yes = plugin.messages().raw("minigames.bed-yes");
+        String no = plugin.messages().raw("minigames.bed-no");
+        map.put("bed", (me == a ? bedA : bedB) ? yes : no);
+        map.put("opponent_bed", (me == a ? bedB : bedA) ? yes : no);
         int myDelta = me == a ? eloDeltaA : eloDeltaB;
         map.put("ranked", ranked ? plugin.messages().raw("ranked.label") : "");
         map.put("elo", duels.elo().elo(me.getUniqueId(), spec.id()));

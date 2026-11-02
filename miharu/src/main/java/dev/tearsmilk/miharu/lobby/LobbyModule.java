@@ -285,6 +285,11 @@ public final class LobbyModule extends MiharuModule {
                     duels.menus().openKits(p, duels.kits());
                 }
             }
+            case "minigames" -> {
+                if (duels != null) {
+                    duels.menus().openKits(p, duels.minigameKits());
+                }
+            }
             case "duels-1.9", "duels-modern" -> {
                 if (duels != null) {
                     duels.menus().openKits(p, duels.modernKits());

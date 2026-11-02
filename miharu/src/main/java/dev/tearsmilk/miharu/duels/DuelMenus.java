@@ -9,6 +9,7 @@ import dev.tearsmilk.miharu.core.util.Text;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +49,42 @@ public final class DuelMenus {
             }
             menu.set(e.slot(), Items.parse(icon, ph), pl -> {
                 click(pl);
-                chooseKit(pl, spec);
+                if (!e.variants().isEmpty()) {
+                    openVariants(pl, e, category);
+                } else {
+                    chooseKit(pl, spec);
+                }
             });
         }
         filler(menu, m.getConfigurationSection("filler"));
+        menu.open(p);
+    }
+
+    /** Выбор длины матча: Bridge до 3/5/7 голов, MLG Rush до 5/10/20 кроватей. */
+    public void openVariants(Player p, DuelKits.Entry entry, DuelKits category) {
+        ConfigurationSection s = module.config().getConfigurationSection("menus.variants");
+        Map<String, Object> ph = placeholders(p, entry.spec());
+        Menu menu = new Menu(s.getInt("rows", 3), Text.mm(s.getString("title", "Вариант"), ph));
+        java.util.List<Integer> slots = s.getIntegerList("slots");
+        for (int i = 0; i < entry.variants().size() && i < slots.size(); i++) {
+            KitSpec v = entry.variants().get(i);
+            Map<String, Object> vph = placeholders(p, v);
+            vph.put("count", v.rules().scoreToWin());
+            vph.put("goal", Text.plain(Text.mm(module.plugin().messages().raw("minigames.goal-" + v.rules().objective().name().toLowerCase()))));
+            ItemStack icon = Items.parse(s.getConfigurationSection("icon"), vph);
+            icon.setAmount(Math.max(1, Math.min(64, v.rules().scoreToWin())));
+            menu.set(slots.get(i), icon, pl -> {
+                click(pl);
+                chooseKit(pl, v);
+            });
+        }
+        if (s.isConfigurationSection("back")) {
+            menu.set(s.getInt("back.slot", 22), Items.parse(s.getConfigurationSection("back"), ph), pl -> {
+                click(pl);
+                openKits(pl, category);
+            });
+        }
+        filler(menu, s.getConfigurationSection("filler"));
         menu.open(p);
     }
 
@@ -92,7 +125,7 @@ public final class DuelMenus {
         if (s.isConfigurationSection("back")) {
             menu.set(s.getInt("back.slot", 22), Items.parse(s.getConfigurationSection("back"), ph), pl -> {
                 click(pl);
-                openKits(pl, module.category(spec.version().id()));
+                openKits(pl, spec.id().startsWith("mg-") ? module.minigameKits() : module.category(spec.version().id()));
             });
         }
         filler(menu, s.getConfigurationSection("filler"));

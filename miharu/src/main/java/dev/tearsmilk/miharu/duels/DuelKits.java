@@ -23,12 +23,15 @@ import java.util.Map;
  */
 public final class DuelKits {
 
-    /** Кит + как он выглядит в меню. */
-    public record Entry(KitSpec spec, boolean enabled, int slot, ConfigurationSection icon) {
+    /** Кит + как он выглядит в меню. variants — варианты матча (Bridge до 3/5/7 голов), пусто — без выбора. */
+    public record Entry(KitSpec spec, boolean enabled, int slot, ConfigurationSection icon, List<KitSpec> variants) {
     }
 
-    static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "sumo", "classic",
-            "archer", "soup", "bridge", "mlgrush", "leather", "opdiamond", "diamond", "uhc");
+    static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
+            "archer", "soup", "leather", "opdiamond", "diamond", "uhc");
+    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush");
+    /** Режимы, которые переехали из дуэлей 1.8 в мини-игры. */
+    static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
             "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal",
             "elytramace", "tntminecart", "anchor");
@@ -40,6 +43,9 @@ public final class DuelKits {
     private final String prefix;
     private final CombatVersion defaultVersion;
     private final List<String> defaults;
+    private final Map<String, KitSpec> variantSpecs = new LinkedHashMap<>();
+    /** Мини-игры: всегда 1.8 и без бота. */
+    private boolean minigames;
     private final Map<String, Entry> kits = new LinkedHashMap<>();
     private YamlConfiguration menuConfig;
 
@@ -53,6 +59,15 @@ public final class DuelKits {
 
     public CombatVersion version() {
         return defaultVersion;
+    }
+
+    DuelKits minigames() {
+        this.minigames = true;
+        return this;
+    }
+
+    public boolean isMinigames() {
+        return minigames;
     }
 
     File dir() {
@@ -80,7 +95,8 @@ public final class DuelKits {
                 }
                 if (folder.equals("kits")) {
                     known.addAll(LEGACY_DEFAULTS);
-                } else {
+                    known.addAll(MOVED_TO_MINIGAMES);
+                } else if (folder.equals("kits-1.9")) {
                     known.addAll(MODERN_DEFAULTS.subList(0, 16));
                 }
             }
@@ -95,6 +111,7 @@ public final class DuelKits {
         }
         menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();
+        variantSpecs.clear();
         File[] files = dir.listFiles((d, n) -> n.endsWith(".yml") && !n.equals("config.yml"));
         if (files == null) {
             return;
@@ -120,14 +137,17 @@ public final class DuelKits {
         for (File f : sorted) {
             String file = name(f);
             String id = prefix + file;
+            if (folder.equals("kits") && MOVED_TO_MINIGAMES.contains(file)) {
+                continue; // теперь в мини-играх (modules/duels/minigames)
+            }
             try {
                 YamlConfiguration y = YamlConfiguration.loadConfiguration(f);
                 CombatVersion version = CombatVersion.parse(y.getString("version", defaultVersion.id()));
-                if (version == null) {
+                if (version == null || minigames) {
                     version = defaultVersion;
                 }
                 KitRules rules = KitRules.load(y.getConfigurationSection("rules"), y.getInt("rounds", 1));
-                KitSpec.Bot bot = y.getBoolean("bot.enabled", true)
+                KitSpec.Bot bot = !minigames && y.getBoolean("bot.enabled", true)
                         ? new KitSpec.Bot(true, y.getInt("bot.heals", 0), y.getDouble("bot.heal-amount", 8), y.getDouble("bot.heal-below", 8),
                         y.getInt("bot.heal-cooldown-ticks", 30))
                         : KitSpec.Bot.DISABLED;
@@ -139,7 +159,14 @@ public final class DuelKits {
                 int slot = m != null && m.contains("slot") ? m.getInt("slot") : autoSlot;
                 ConfigurationSection icon = m != null && m.isConfigurationSection("icon") ? m.getConfigurationSection("icon")
                         : y.getConfigurationSection("icon");
-                kits.put(id, new Entry(spec, enabled, slot, icon));
+                List<KitSpec> variants = new ArrayList<>();
+                for (int n : y.getIntegerList("variants")) {
+                    KitSpec v = new KitSpec(id + "-" + n, spec.display() + " " + y.getString("variant-suffix", "<gray>· {count}").replace("{count}", String.valueOf(n)),
+                            spec.version(), spec.profile(), spec.kit(), rules.withRounds(n), spec.arenaMode(), spec.arenas(), spec.bot());
+                    variants.add(v);
+                    variantSpecs.put(v.id(), v);
+                }
+                kits.put(id, new Entry(spec, enabled, slot, icon, variants));
                 autoSlot++;
                 if (autoSlot % 9 == 8) {
                     autoSlot += 2;
@@ -165,7 +192,15 @@ public final class DuelKits {
 
     public KitSpec spec(String id) {
         Entry e = get(id);
-        return e == null || !e.enabled() ? null : e.spec();
+        if (e != null) {
+            return e.enabled() ? e.spec() : null;
+        }
+        KitSpec v = id == null ? null : variantSpecs.get(id.toLowerCase(Locale.ROOT));
+        if (v != null) {
+            Entry base = get(v.id().substring(0, v.id().lastIndexOf('-')));
+            return base != null && base.enabled() ? v : null;
+        }
+        return null;
     }
 
     public Collection<Entry> all() {
@@ -173,6 +208,17 @@ public final class DuelKits {
     }
 
     public List<String> enabledIds() {
-        return kits.values().stream().filter(Entry::enabled).map(e -> e.spec().id()).toList();
+        List<String> out = new ArrayList<>();
+        for (Entry e : kits.values()) {
+            if (!e.enabled()) {
+                continue;
+            }
+            if (e.variants().isEmpty()) {
+                out.add(e.spec().id());
+            } else {
+                e.variants().forEach(v -> out.add(v.id()));
+            }
+        }
+        return out;
     }
 }

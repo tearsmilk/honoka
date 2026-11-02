@@ -1,0 +1,100 @@
+# Меню мини-игр (огненный заряд во 2-м слоте лобби). Все 1x1, только против игрока, PvP 1.8.
+# kits.<файл>: enabled, slot, icon. Сама игра — <файл>.yml рядом (id в очереди: mg-<файл>, с вариантом — mg-bridge-5).
+# Плейсхолдеры иконки: {kit} {queue} {playing} {wins} {losses}
+menu:
+  title: '<dark_gray>Мини-игры <gray>· 1x1'
+  rows: 3
+  filler:
+    enabled: true
+    material: ORANGE_STAINED_GLASS_PANE
+    name: ' '
+  default-icon:
+    material: PAPER
+    name: '{kit}'
+    lore:
+      - '<gray>В очереди: <white>{queue}'
+kits:
+  bedwars:
+    enabled: true
+    slot: 10
+    icon:
+      material: RED_BED
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Сломай кровать соперника и добей его'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  skywars:
+    enabled: true
+    slot: 11
+    icon:
+      material: CHEST
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Острова, сундуки с лутом, последний живой побеждает'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  bridge:
+    enabled: true
+    slot: 12
+    icon:
+      material: BLUE_TERRACOTTA
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Прыгни в портал соперника 3, 5 или 7 раз'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  fireball:
+    enabled: true
+    slot: 13
+    icon:
+      material: FIRE_CHARGE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>BedWars с фаерболами и TNT'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  sumo:
+    enabled: true
+    slot: 14
+    icon:
+      material: SLIME_BALL
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Вытолкни соперника с платформы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  mlgrush:
+    enabled: true
+    slot: 15
+    icon:
+      material: STICK
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Палка, блоки и кровать: 5, 10 или 20 раз'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

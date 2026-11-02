@@ -3,6 +3,12 @@
 # rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
 display: '<blue>The Bridge'
 version: "1.8"
+# варианты матча: игрок выбирает, до скольких очков играть
+variants:
+  - 3
+  - 5
+  - 7
+variant-suffix: '<gray>· до {count}'
 arena-mode: bridge        # арена с точками p1, p2, goal1 (ворота первого), goal2 (ворота второго)
 rounds: 5                 # голов до победы
 team-color: true          # кожа и WHITE_* блоки красятся в цвет команды
@@ -51,5 +57,3 @@ rules:
   on-death: respawn        # смерть просто возвращает на базу
   hunger: false
   fall-damage: false
-bot:
-  enabled: false

@@ -137,32 +137,123 @@ final class KitMechanics implements Listener {
         victim.setNoDamageTicks(victim.getMaximumNoDamageTicks());
     }
 
-    /** Правило explosion-block-damage: false — взрывы (TNT, якоря, кристаллы) не ломают арену. */
-    private boolean protectBlocks(org.bukkit.World world) {
+    private Game gameIn(org.bukkit.World world) {
         GameModule games = module.plugin().module(GameModule.class);
         if (games == null) {
-            return false;
+            return null;
         }
         for (Game g : games.games().games()) {
-            if (g instanceof KitGame kg && g.instance() != null && g.instance().world().equals(world)) {
-                return !kg.kitSpec().rules().explosionBlocks();
+            if (g instanceof KitGame && g.instance() != null && g.instance().world().equals(world)) {
+                return g;
             }
         }
-        return false;
+        return null;
+    }
+
+    /** explosion-block-damage: true — всё, false — ничего, placed — только блоки игроков. */
+    private void filterExplosion(org.bukkit.World world, java.util.List<org.bukkit.block.Block> blocks) {
+        Game g = gameIn(world);
+        if (!(g instanceof KitGame kg)) {
+            return;
+        }
+        switch (kg.kitSpec().rules().explosions()) {
+            case NONE -> blocks.clear();
+            case PLACED -> {
+                if (g instanceof DuelGame dg) {
+                    dg.filterExplosion(blocks);
+                } else {
+                    blocks.clear();
+                }
+            }
+            default -> {
+                if (g instanceof DuelGame dg) {
+                    dg.trackExplosion(blocks);
+                }
+            }
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(org.bukkit.event.entity.EntityExplodeEvent e) {
-        if (protectBlocks(e.getLocation().getWorld())) {
-            e.blockList().clear();
-        }
+        filterExplosion(e.getLocation().getWorld(), e.blockList());
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBlockExplode(org.bukkit.event.block.BlockExplodeEvent e) {
-        if (protectBlocks(e.getBlock().getWorld())) {
-            e.blockList().clear();
+        filterExplosion(e.getBlock().getWorld(), e.blockList());
+    }
+
+    /** Урон от фаерболов и TNT по игрокам — множитель из modules/duels/config.yml. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onExplosionDamage(org.bukkit.event.entity.EntityDamageByEntityEvent e) {
+        if (!(e.getEntity() instanceof Player p) || rules(p) == null) {
+            return;
         }
+        if (e.getDamager() instanceof org.bukkit.entity.Fireball) {
+            e.setDamage(e.getDamage() * module.config().getDouble("fireball.damage-multiplier", 0.35));
+        } else if (e.getDamager() instanceof org.bukkit.entity.TNTPrimed) {
+            e.setDamage(e.getDamage() * module.config().getDouble("tnt.damage-multiplier", 0.5));
+        }
+    }
+
+    private final java.util.Map<java.util.UUID, Long> fireballCooldown = new java.util.HashMap<>();
+
+    /** ПКМ огненным зарядом — бросок фаербола (Fireball Fight). */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onFireball(PlayerInteractEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK)) {
+            return;
+        }
+        ItemStack item = e.getItem();
+        if (item == null || item.getType() != Material.FIRE_CHARGE) {
+            return;
+        }
+        Player p = e.getPlayer();
+        KitRules r = rules(p);
+        if (module.plugin().debug()) {
+            module.plugin().getLogger().info("[debug] огненный заряд: " + p.getName() + " action=" + e.getAction() + " rules=" + (r == null ? "нет" : "fireball=" + r.fireball()));
+        }
+        if (r == null || !r.fireball()) {
+            return;
+        }
+        e.setCancelled(true);
+        long now = System.currentTimeMillis();
+        Long last = fireballCooldown.get(p.getUniqueId());
+        if (last != null && now - last < module.config().getLong("fireball.cooldown-ticks", 10) * 50L) {
+            return;
+        }
+        fireballCooldown.put(p.getUniqueId(), now);
+        org.bukkit.entity.Fireball fb = p.launchProjectile(org.bukkit.entity.Fireball.class,
+                p.getLocation().getDirection().multiply(module.config().getDouble("fireball.speed", 1.2)));
+        fb.setYield((float) module.config().getDouble("fireball.yield", 2.0));
+        fb.setIsIncendiary(false);
+        if (p.getGameMode() != org.bukkit.GameMode.CREATIVE) {
+            item.setAmount(item.getAmount() - 1);
+        }
+        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 0.8f, 1.2f);
+    }
+
+    /** Поставленный TNT сразу поджигается (Fireball Fight). */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onTnt(BlockPlaceEvent e) {
+        if (e.getBlockPlaced().getType() != Material.TNT) {
+            return;
+        }
+        KitRules r = rules(e.getPlayer());
+        if (r == null || !r.autoTnt()) {
+            return;
+        }
+        org.bukkit.block.Block b = e.getBlockPlaced();
+        Bukkit.getScheduler().runTask(module.plugin(), () -> {
+            if (b.getType() != Material.TNT) {
+                return;
+            }
+            b.setType(Material.AIR);
+            org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
+            tnt.setFuseTicks(module.config().getInt("tnt.fuse-ticks", 40));
+            tnt.setYield((float) module.config().getDouble("tnt.yield", 3.0));
+            tnt.setSource(e.getPlayer());
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
