@@ -38,6 +38,8 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private EloStore elo;
     private Ranked ranked;
     private Tiers tiers;
+    private KitLayouts layouts;
+    private KitEditor editor;
     private StatsMenu statsMenu;
     private BukkitTask task;
 
@@ -60,6 +62,24 @@ public final class DuelsModule extends MiharuModule implements Listener {
         elo = new EloStore(this, plugin.database());
         elo.createTables();
         ranked = new Ranked(this);
+        layouts = new KitLayouts(plugin.database());
+        layouts.createTables();
+        editor = new KitEditor(this);
+        listen(editor);
+        dev.tearsmilk.miharu.core.kit.Kit.layouts = (uuid, kit) -> layouts.get(uuid, kit);
+        plugin.registerCommand("kit", "Раскладка китов: /kit edit", List.of("kiteditor", "layout"), new io.papermc.paper.command.brigadier.BasicCommand() {
+            @Override
+            public void execute(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
+                if (source.getSender() instanceof Player p) {
+                    editor.openKits(p, kits);
+                }
+            }
+
+            @Override
+            public java.util.Collection<String> suggest(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
+                return List.of("edit");
+            }
+        });
         tiers = new Tiers(this);
         statsMenu = new StatsMenu(this);
         plugin.registerCommand("tier", "PvP-тиры по режимам", List.of("tiers"), new TierCommand(plugin, this));
@@ -83,6 +103,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         Bukkit.getOnlinePlayers().forEach(p -> {
             stats.load(p.getUniqueId());
             elo.load(p.getUniqueId());
+            layouts.load(p.getUniqueId());
         });
         plugin.hooks().placeholder("tier", (p, rest) -> {
             if (p == null) {
@@ -122,6 +143,15 @@ public final class DuelsModule extends MiharuModule implements Listener {
             task.cancel();
         }
         queue.clear();
+        dev.tearsmilk.miharu.core.kit.Kit.layouts = (u, k) -> null;
+    }
+
+    public KitLayouts layouts() {
+        return layouts;
+    }
+
+    public KitEditor editor() {
+        return editor;
     }
 
     /** Перечитать киты с диска. */
@@ -260,6 +290,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         stats.load(e.getPlayer().getUniqueId());
         elo.load(e.getPlayer().getUniqueId());
+        layouts.load(e.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -267,5 +298,6 @@ public final class DuelsModule extends MiharuModule implements Listener {
         queue.leave(e.getPlayer(), true);
         stats.unload(e.getPlayer().getUniqueId());
         elo.unload(e.getPlayer().getUniqueId());
+        layouts.unload(e.getPlayer().getUniqueId());
     }
 }

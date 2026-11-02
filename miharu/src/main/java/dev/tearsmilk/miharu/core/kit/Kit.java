@@ -102,17 +102,67 @@ public final class Kit {
         apply(p, combat, profile, null);
     }
 
+    /**
+     * Раскладки игроков (/kit edit): (uuid, id кита) → массив 36 слотов, где [слот] = слот по умолчанию (-1 — пусто).
+     * Ставит модуль дуэлей.
+     */
+    public static java.util.function.BiFunction<java.util.UUID, String, int[]> layouts = (u, k) -> null;
+
+    /** Инвентарь по умолчанию (36 слотов: 0–8 хотбар, 9–35 основное). */
+    public ItemStack[] defaults(CombatService combat, CombatProfile profile, @Nullable Team team) {
+        ItemStack[] def = new ItemStack[36];
+        items.forEach((slot, item) -> {
+            if (slot >= 0 && slot < 36) {
+                def[slot] = combat.prepare(paint(item.clone(), team), profile);
+            }
+        });
+        if (fill != null) {
+            for (int i = 0; i < 36; i++) {
+                if (def[i] == null) {
+                    def[i] = fill.clone();
+                }
+            }
+        }
+        return def;
+    }
+
+    /** Раскладывает предметы по сохранённой раскладке; то, чего в ней нет (кит изменился), — в свободные слоты. */
+    public static ItemStack[] arrange(ItemStack[] def, int @Nullable [] layout) {
+        if (layout == null || layout.length != 36) {
+            return def;
+        }
+        ItemStack[] res = new ItemStack[36];
+        boolean[] used = new boolean[36];
+        for (int t = 0; t < 36; t++) {
+            int d = layout[t];
+            if (d >= 0 && d < 36 && def[d] != null && !used[d]) {
+                res[t] = def[d];
+                used[d] = true;
+            }
+        }
+        int free = 0;
+        for (int d = 0; d < 36; d++) {
+            if (def[d] == null || used[d]) {
+                continue;
+            }
+            while (free < 36 && res[free] != null) {
+                free++;
+            }
+            if (free < 36) {
+                res[free] = def[d];
+            }
+        }
+        return res;
+    }
+
     public void apply(Player p, CombatService combat, CombatProfile profile, @Nullable Team team) {
         PlayerInventory inv = p.getInventory();
         inv.clear();
         armor.forEach((slot, item) -> inv.setItem(slot, paint(item.clone(), team)));
-        items.forEach((slot, item) -> inv.setItem(slot, combat.prepare(paint(item.clone(), team), profile)));
-        if (fill != null) {
-            for (int i = 0; i < 36; i++) {
-                ItemStack cur = inv.getItem(i);
-                if (cur == null || cur.getType().isAir()) {
-                    inv.setItem(i, fill.clone());
-                }
+        ItemStack[] content = arrange(defaults(combat, profile, team), layouts.apply(p.getUniqueId(), id));
+        for (int i = 0; i < 36; i++) {
+            if (content[i] != null) {
+                inv.setItem(i, content[i]);
             }
         }
         inv.setHeldItemSlot(0);

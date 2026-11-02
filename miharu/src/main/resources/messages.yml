@@ -178,6 +178,7 @@ duels:
     - '<white>/duel queue <кит></white>, <white>/duel leave</white> <gray>— очередь'
     - '<white>/duel kits</white>, <white>/duel stats [игрок]</white>, <white>/spectate</white>'
     - '<white>/duel reset-kit <кит></white> <gray>— вернуть встроенный кит (админ)'
+    - '<white>/kit edit</white> <gray>— своя раскладка предметов в китах'
   reset-usage: '{prefix}<red>/duel reset-kit <кит> <gray>(киты 1.9 — с приставкой m-)'
   reset-unknown: '{prefix}<red>Встроенного кита <white>{kit}</white> нет.'
   reset-done: '{prefix}<green>Кит <white>{kit}</white> возвращён к встроенному виду и перечитан.'
@@ -272,3 +273,12 @@ minigames:
     title: '<red>Ты умер'
     subtitle: '<gray>Возрождение через <white>{seconds}'
     stay: 900
+
+kit-editor:
+  in-game: '{prefix}<red>Раскладку можно менять только в лобби.'
+  saved: '{prefix}<green>Раскладка {kit}<green> сохранена.'
+  cancelled: '{prefix}<gray>Изменения не сохранены.'
+  closed: '{prefix}<gray>Окно закрыто без сохранения. Нажми «Сохранить и выйти», чтобы сохранить.'
+  lore-default: '<gray>Раскладка: <white>по умолчанию'
+  lore-custom: '<gray>Раскладка: <green>своя'
+  lore-click: '<yellow>▶ Нажми, чтобы настроить'

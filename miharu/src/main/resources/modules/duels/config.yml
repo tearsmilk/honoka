@@ -406,3 +406,95 @@ stats-menu:
       lore:
         - '<gray>Рекорд: <white>{clicktest_best}'
         - '<gray>Макс CPS: <white>{clicktest_cps}'
+
+# ═══ Раскладка китов (/kit edit) ═══
+# Игрок двигает предметы кита как хочет; раскладка сохраняется (data.db) и применяется во всех играх с этим китом.
+kit-editor:
+  menu:
+    title: '<dark_gray>Раскладка китов'
+    filler:
+      enabled: true
+      material: GRAY_STAINED_GLASS_PANE
+      name: ' '
+    tab-legacy:
+      slot: 2
+      normal:
+        material: STONE_SWORD
+        hide-attributes: true
+        name: '<gray>Дуэли 1.8'
+      selected:
+        material: STONE_SWORD
+        hide-attributes: true
+        glow: true
+        name: '<#ff9ecf><b>Дуэли 1.8</b>'
+    tab-modern:
+      slot: 4
+      normal:
+        material: GOLDEN_SWORD
+        hide-attributes: true
+        name: '<gray>Дуэли 1.9'
+      selected:
+        material: GOLDEN_SWORD
+        hide-attributes: true
+        glow: true
+        name: '<gold><b>Дуэли 1.9</b>'
+    tab-minigames:
+      slot: 6
+      normal:
+        material: FIRE_CHARGE
+        name: '<gray>Мини-игры'
+      selected:
+        material: FIRE_CHARGE
+        glow: true
+        name: '<#ff8a3b><b>Мини-игры</b>'
+    kit-slots:
+      - 19
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 28
+      - 29
+      - 30
+      - 31
+      - 32
+      - 33
+      - 34
+      - 37
+      - 38
+      - 39
+      - 40
+      - 41
+      - 42
+      - 43
+    default-icon:
+      material: PAPER
+      name: '{kit}'
+  editor:
+    title: '<dark_gray>Раскладка · {kit}'
+    separator:
+      material: BLACK_STAINED_GLASS_PANE
+      name: '<gray>↑ инвентарь · хотбар ↑'
+    bottom-filler:
+      material: GRAY_STAINED_GLASS_PANE
+      name: ' '
+    reset:
+      slot: 45
+      material: BARRIER
+      name: '<red><b>Сбросить</b>'
+      lore:
+        - '<gray>Вернуть раскладку по умолчанию'
+    save:
+      slot: 49
+      material: LIME_CONCRETE
+      name: '<green><b>Сохранить и выйти</b>'
+      lore:
+        - '<gray>Предметы будут лежать так в каждой игре'
+    cancel:
+      slot: 53
+      material: RED_CONCRETE
+      name: '<gray>Отмена'
+      lore:
+        - '<gray>Закрыть без сохранения'
