@@ -43,6 +43,11 @@ public final class LobbyModule extends MiharuModule {
     private final Map<UUID, GameBoard> boards = new HashMap<>();
     private final Map<UUID, String> itemState = new HashMap<>();
     private BukkitTask task;
+    private final AdminMode adminMode = new AdminMode(this);
+
+    public AdminMode adminMode() {
+        return adminMode;
+    }
 
     public LobbyModule(Miharu plugin) {
         super(plugin, "lobby");
@@ -57,6 +62,7 @@ public final class LobbyModule extends MiharuModule {
     protected void onEnable() {
         listen(new LobbyListener(this));
         GameModule games = plugin.module(GameModule.class);
+        games.games().onJoin(p -> adminMode.exit(p, false));
         games.games().onReturn(p -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (p.isOnline() && isLobby(p)) {
                 apply(p, config().getBoolean("teleport-on-return", false));
@@ -118,6 +124,7 @@ public final class LobbyModule extends MiharuModule {
 
     @Override
     protected void onDisable() {
+        adminMode.exitAll();
         if (task != null) {
             task.cancel();
         }
@@ -181,6 +188,9 @@ public final class LobbyModule extends MiharuModule {
 
     /** Готовит игрока к лобби: режим, здоровье, предметы, табло. */
     public void apply(Player p, boolean teleport) {
+        if (adminMode.active(p)) {
+            return;
+        }
         if (teleport) {
             Location spawn = spawn();
             if (spawn != null) {
@@ -229,6 +239,9 @@ public final class LobbyModule extends MiharuModule {
     }
 
     public void giveItems(Player p) {
+        if (adminMode.active(p)) {
+            return;
+        }
         String state = state(p);
         itemState.put(p.getUniqueId(), state);
         ConfigurationSection items = config().getConfigurationSection("items");
@@ -340,6 +353,10 @@ public final class LobbyModule extends MiharuModule {
                 update(p, board);
             } else if (board == null) {
                 showBoard(p);
+            }
+            if (adminMode.active(p)) {
+                plugin.messages().actionBar(p, "lobby.adm-actionbar");
+                continue;
             }
             if (!state(p).equals(itemState.get(p.getUniqueId()))) {
                 giveItems(p);

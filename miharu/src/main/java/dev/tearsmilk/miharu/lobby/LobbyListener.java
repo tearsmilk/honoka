@@ -31,7 +31,8 @@ final class LobbyListener implements Listener {
     }
 
     private boolean protect(Player p, String key) {
-        return module.isLobby(p) && module.config().getBoolean("protect." + key, true) && !p.hasPermission("miharu.lobby.bypass");
+        return module.isLobby(p) && module.config().getBoolean("protect." + key, true) && !p.hasPermission("miharu.lobby.bypass")
+                && !module.adminMode().active(p);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -46,6 +47,7 @@ final class LobbyListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        module.adminMode().exit(e.getPlayer(), false);
         module.forget(e.getPlayer());
     }
 
@@ -65,7 +67,7 @@ final class LobbyListener implements Listener {
             return;
         }
         String action = Keys.get(e.getItem(), Keys.LOBBY_ITEM);
-        if (action == null || !module.isLobby(e.getPlayer())) {
+        if (action == null || !module.isLobby(e.getPlayer()) || module.adminMode().active(e.getPlayer())) {
             return;
         }
         e.setCancelled(true);
@@ -98,7 +100,8 @@ final class LobbyListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
-        if (e.getEntity() instanceof Player p && module.isLobby(p) && module.config().getBoolean("protect.damage", true)) {
+        if (e.getEntity() instanceof Player p && module.isLobby(p) && module.config().getBoolean("protect.damage", true)
+                && !module.adminMode().active(p)) {
             e.setCancelled(true);
             if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 Location spawn = module.spawn();

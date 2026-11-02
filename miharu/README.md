@@ -53,6 +53,7 @@ mvn package                         # → target/Miharu-0.2.0.jar
 | `/tier set <игрок> <кит> <HT1..LT5\|auto>` | `miharu.admin` |
 | `/spectate [игрок]`, `/lobby` | `miharu.spectate` (всем) |
 | `/setlobby` | `miharu.admin` |
+| `/miharu adm-mode` — режим строителя: свой сохраняемый инвентарь, креатив, полёт, защиты лобби выключены | только OP |
 | `/pvp [1.8\|1.9\|off] [игрок]` | показать — всем, менять — `miharu.pvp.admin` |
 | `/miharu reload\|modules\|games\|start\|stop` | `miharu.admin` |
 

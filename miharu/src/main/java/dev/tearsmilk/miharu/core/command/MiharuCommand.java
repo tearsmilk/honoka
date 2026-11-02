@@ -32,6 +32,19 @@ public final class MiharuCommand extends SubCommands {
             }
         });
         sub("games", perm, false, this::games);
+        sub("adm-mode", null, true, (s, a) -> {
+            Player p = (Player) s;
+            if (!p.isOp()) {
+                plugin.messages().send(s, "no-permission");
+                return;
+            }
+            dev.tearsmilk.miharu.lobby.LobbyModule lobby = plugin.module(dev.tearsmilk.miharu.lobby.LobbyModule.class);
+            if (lobby == null) {
+                plugin.messages().send(s, "lobby.adm-no-lobby");
+                return;
+            }
+            lobby.adminMode().toggle(p);
+        });
         sub("start", perm, false, this::start, this::completeStart);
         sub("stop", perm, false, this::stop, (s, a) -> {
             List<String> out = new ArrayList<>(List.of("all"));

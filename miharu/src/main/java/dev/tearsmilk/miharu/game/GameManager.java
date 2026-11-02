@@ -183,6 +183,9 @@ public final class GameManager {
     }
 
     private void join(Game game, Player p) {
+        for (java.util.function.Consumer<Player> hook : joinHooks) {
+            safe(() -> hook.accept(p));
+        }
         PlayerSnapshot snap = PlayerSnapshot.capture(p);
         snapshots.put(p.getUniqueId(), snap);
         try {
@@ -292,6 +295,12 @@ public final class GameManager {
     }
 
     private final List<java.util.function.Consumer<Player>> returnHooks = new ArrayList<>();
+    private final List<java.util.function.Consumer<Player>> joinHooks = new ArrayList<>();
+
+    /** Вызывается перед входом игрока в игру (до снимка инвентаря). */
+    public void onJoin(java.util.function.Consumer<Player> hook) {
+        joinHooks.add(hook);
+    }
 
     /** Вызывается, когда игрок вернулся из игры (лобби выдаёт предметы и табло). */
     public void onReturn(java.util.function.Consumer<Player> hook) {

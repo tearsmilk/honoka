@@ -13,6 +13,7 @@ admin:
     - '<white>/miharu reload</white> <gray>— перечитать все конфиги'
     - '<white>/miharu modules</white> <gray>— состояние модулей'
     - '<white>/miharu games</white> <gray>— идущие игры'
+    - '<white>/miharu adm-mode</white> <gray>— режим строителя (только OP): свой инвентарь, креатив, без защит лобби'
     - '<white>/miharu start <игрок> <duel|clicktest> <1.8|1.9> <сложность> [арена]</white> <gray>— запустить игру'
     - '<white>/miharu stop <id|игрок|all></white> <gray>— остановить игру'
     - '<white>/arena</white> <gray>— настройка арен · <white>/bot</white> <gray>— игры с ботами · <white>/pvp</white> <gray>— версия боя'
@@ -215,6 +216,11 @@ duels:
 
 lobby:
   spawn-set: '{prefix}<green>Спавн лобби сохранён.'
+  adm-on: '{prefix}<gold>Режим строителя включён.</gold> <gray>Свой инвентарь, креатив, защиты лобби выключены. Выйти — <white>/miharu adm-mode'
+  adm-off: '{prefix}<gray>Режим строителя выключен, инвентарь строителя сохранён.'
+  adm-in-game: '{prefix}<red>Сначала выйди из игры: /leave'
+  adm-no-lobby: '{prefix}<red>Модуль лобби выключен.'
+  adm-actionbar: '<gold>⚒ Режим строителя</gold> <dark_gray>·</dark_gray> <gray>/miharu adm-mode — выйти'
   not-in-queue: '<gray>—'
 
 ranked:
