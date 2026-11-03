@@ -195,6 +195,16 @@ public final class Kit {
         return armor;
     }
 
+    /** Предметы кита (слот → предмет), без брони. */
+    public Map<Integer, ItemStack> items() {
+        return items;
+    }
+
+    /** Заполнитель пустых слотов (хилки, суп) или null. */
+    public @Nullable ItemStack fill() {
+        return fill;
+    }
+
     public ItemStack weapon() {
         return botWeapon;
     }

@@ -34,6 +34,10 @@ public final class KitManager {
         }
     }
 
+    public java.util.Collection<Kit> all() {
+        return kits.values();
+    }
+
     public Kit get(String id) {
         return kits.get(id);
     }

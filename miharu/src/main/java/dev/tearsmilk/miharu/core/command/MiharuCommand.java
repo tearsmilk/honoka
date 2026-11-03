@@ -32,6 +32,13 @@ public final class MiharuCommand extends SubCommands {
             }
         });
         sub("games", perm, false, this::games);
+        sub("adm-items", null, true, (s, a) -> {
+            if (!((Player) s).isOp()) {
+                plugin.messages().send(s, "no-permission");
+                return;
+            }
+            new AdminItemsMenu(plugin).open((Player) s, 0);
+        });
         sub("adm-mode", null, true, (s, a) -> {
             Player p = (Player) s;
             if (!p.isOp()) {

@@ -122,6 +122,10 @@ public final class BotsModule extends MiharuModule implements Listener {
 
     // --- API ---
 
+    public KitManager kits() {
+        return kits;
+    }
+
     public YamlConfiguration menuConfig() {
         return menuConfig;
     }

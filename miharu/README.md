@@ -23,7 +23,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.7.jar
+mvn package                         # → target/Miharu-0.2.8.jar
 ```
 
 ## Как это работает
@@ -55,6 +55,7 @@ mvn package                         # → target/Miharu-0.2.7.jar
 | `/tier set <игрок> <кит> <HT1..LT5\|auto>` | `miharu.admin` |
 | `/spectate [игрок]`, `/lobby` | `miharu.spectate` (всем) |
 | `/setlobby` | `miharu.admin` |
+| `/miharu adm-items` — все предметы из всех китов, только просмотр | только OP |
 | `/miharu adm-mode` — режим строителя: свой сохраняемый инвентарь, креатив, полёт, защиты лобби выключены | только OP |
 | `/pvp [1.8\|1.9\|off] [игрок]` | показать — всем, менять — `miharu.pvp.admin` |
 | `/miharu reload\|modules\|games\|start\|stop` | `miharu.admin` |
