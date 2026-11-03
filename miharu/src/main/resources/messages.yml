@@ -16,6 +16,7 @@ admin:
     - '<white>/miharu reload</white> <gray>— перечитать все конфиги'
     - '<white>/miharu modules</white> <gray>— состояние модулей'
     - '<white>/miharu games</white> <gray>— идущие игры'
+    - '<white>/force-start [режим]</white> <gray>— митап: запустить с теми, кто в очереди, или пропустить подготовку (OP)'
     - '<white>/miharu adm-items</white> <gray>— все предметы из всех китов, просмотр (только OP)'
     - '<white>/miharu adm-mode</white> <gray>— режим строителя (только OP): свой инвентарь, креатив, без защит лобби'
     - '<white>/miharu start <игрок> <duel|clicktest> <1.8|1.9> <сложность> [арена]</white> <gray>— запустить игру'
@@ -324,6 +325,11 @@ custom-kits:
   wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
 
 meetups:
+  force-prep: '{prefix}<green>Подготовка пропущена — все на арену!'
+  force-not-prep: '{prefix}<red>Митап уже идёт: подготовка закончилась.'
+  force-no-queue: '{prefix}<red>Нет очереди митапа. Укажи режим: <white>{modes}'
+  force-not-enough: '{prefix}<red>{mode}<red>: в очереди {count}, нужно хотя бы 2.'
+  force-started: '{prefix}<green>{mode}<green> запущен принудительно: игроков {count}.'
   your-vote: '<green>(твой голос)'
   voted: '{prefix}<gray>Твой голос: <white>PvP {version}'
   phase-prep: '<yellow>подготовка'

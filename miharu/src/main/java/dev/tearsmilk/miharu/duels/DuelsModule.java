@@ -79,6 +79,22 @@ public final class DuelsModule extends MiharuModule implements Listener {
         meetups = new Meetups(this);
         meetups.load();
         listen(meetups);
+        plugin.registerCommand("force-start", "Принудительный старт митапа (OP)", List.of("forcestart"), new io.papermc.paper.command.brigadier.BasicCommand() {
+            @Override
+            public void execute(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
+                forceStart(source.getSender(), args.length > 0 ? args[0] : null);
+            }
+
+            @Override
+            public java.util.Collection<String> suggest(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
+                return meetups.ids();
+            }
+
+            @Override
+            public boolean canUse(org.bukkit.command.CommandSender sender) {
+                return sender.isOp();
+            }
+        });
         buildCustomSpecs();
         dev.tearsmilk.miharu.core.kit.Kit.layouts = (uuid, kit) -> layouts.get(uuid, kit);
         plugin.registerCommand("kit", "Раскладка китов: /kit edit", List.of("kiteditor", "layout"), new io.papermc.paper.command.brigadier.BasicCommand() {
@@ -161,6 +177,50 @@ public final class DuelsModule extends MiharuModule implements Listener {
 
     public Meetups meetups() {
         return meetups;
+    }
+
+    /** /force-start [режим]: на подготовке — сразу бой; иначе запустить очередь митапа с теми, кто ждёт. */
+    void forceStart(org.bukkit.command.CommandSender sender, String modeArg) {
+        if (!sender.isOp()) {
+            plugin.messages().send(sender, "no-permission");
+            return;
+        }
+        if (sender instanceof Player p && modeArg == null) {
+            GameModule games = plugin.module(GameModule.class);
+            Game g = games.games().contextOf(p);
+            if (g instanceof MeetupGame mg) {
+                plugin.messages().send(sender, mg.skipPrep() ? "meetups.force-prep" : "meetups.force-not-prep");
+                return;
+            }
+        }
+        String mode = modeArg;
+        if (mode == null && sender instanceof Player p) {
+            DuelQueue.Entry e = queue.entry(p);
+            if (e != null && meetups.mode(e.kit()) != null) {
+                mode = e.kit();
+            }
+        }
+        if (mode == null) {
+            int best = 0;
+            for (String id : meetups.ids()) {
+                int n = queue.waiting(id);
+                if (n > best) {
+                    best = n;
+                    mode = id;
+                }
+            }
+        }
+        KitSpec spec = mode == null ? null : meetups.spec(mode);
+        if (spec == null) {
+            plugin.messages().send(sender, "meetups.force-no-queue", "modes", String.join(", ", meetups.ids()));
+            return;
+        }
+        int started = queue.forceStart(mode, spec);
+        if (started == 0) {
+            plugin.messages().send(sender, "meetups.force-not-enough", "mode", spec.display(), "count", queue.waiting(mode));
+        } else {
+            plugin.messages().send(sender, "meetups.force-started", "mode", spec.display(), "count", started);
+        }
     }
 
     /** Спец-киты очереди «Свой кит» для 1.8 и 1.9 (у каждого игрока в игре — свой кит). */

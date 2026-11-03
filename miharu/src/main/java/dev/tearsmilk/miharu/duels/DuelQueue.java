@@ -170,6 +170,36 @@ public final class DuelQueue {
         module.startDuel(a, b, spec, ea.ranked());
     }
 
+    /** Сколько ждут в очереди key (без рейтинговых). */
+    int waiting(String key) {
+        Deque<UUID> q = byKey.get(key);
+        return q == null ? 0 : q.size();
+    }
+
+    /**
+     * Принудительный старт (/force-start): все, кто сейчас в очереди key, сразу в игру (минимум двое).
+     *
+     * @return сколько игроков запущено (0 — не хватило)
+     */
+    int forceStart(String key, KitSpec spec) {
+        Deque<UUID> q = byKey.get(key);
+        if (q == null) {
+            return 0;
+        }
+        List<Entry> group = new java.util.ArrayList<>();
+        for (UUID id : List.copyOf(q)) {
+            Entry e = entries.get(id);
+            if (e != null && Bukkit.getPlayer(id) != null && group.size() < spec.rules().players()) {
+                group.add(e);
+            }
+        }
+        if (group.size() < 2) {
+            return 0;
+        }
+        matchGroup(group, spec);
+        return group.size();
+    }
+
     private void matchGroup(List<Entry> group, KitSpec spec) {
         List<Player> players = new java.util.ArrayList<>();
         for (Entry e : group) {

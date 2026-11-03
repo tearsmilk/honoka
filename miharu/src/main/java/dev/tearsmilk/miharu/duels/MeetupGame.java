@@ -207,6 +207,15 @@ public final class MeetupGame extends Game implements KitGame, BuildGame {
         }
     }
 
+    /** /force-start на подготовке — сразу в бой. */
+    public boolean skipPrep() {
+        if (!prep || state != State.RUNNING) {
+            return false;
+        }
+        startFight();
+        return true;
+    }
+
     private void startFight() {
         prep = false;
         int v18 = votes(CombatVersion.LEGACY);
