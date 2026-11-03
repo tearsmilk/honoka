@@ -28,7 +28,7 @@ protect:
   inventory: true
   void-y: -64
 
-# Предметы. action: duels (1.8) | minigames | duels-1.9 | ranked | stats | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# Предметы. action: duels (1.8) | minigames | duels-1.9 | ranked | stats | meetups | spectate | leave-queue | bots | clicktest | command:<команда> | none
 # show: always | in-queue | not-in-queue
 items:
   duels:
@@ -87,6 +87,14 @@ items:
     lore:
       - '<gray>Тиры по режимам, ELO, победы.'
       - '<gray>1.8: {tier_fast} <gray>· 1.9: {tier_slow}'
+  meetups:
+    slot: 7
+    show: not-in-queue
+    action: meetups
+    material: PURPLE_SHULKER_BOX
+    name: '<#b48cff><b>Митапы</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>1x4, 1x8, 1x16, 2x2, 2x4, 2x8'
   spectate:
     slot: 8
     show: always
@@ -96,6 +104,77 @@ items:
     lore:
       - '<gray>Смотреть активные игры.'
       - '<gray>Выйти — <white>/leave'
+
+# Меню митапов (шалкер в 8-м слоте). Пока только витрина — клик пишет «скоро».
+# Ключи режимов без точек; display — как показать в сообщении.
+meetups-menu:
+  title: '<dark_gray>Митапы'
+  rows: 3
+  filler:
+    enabled: true
+    material: PURPLE_STAINED_GLASS_PANE
+    name: ' '
+  modes:
+    solo4:
+      slot: 10
+      display: '1x4'
+      material: IRON_SWORD
+      hide-attributes: true
+      name: '<#b48cff><b>1x4</b>'
+      lore:
+        - '<gray>Каждый сам за себя · 4 игрока'
+        - ''
+        - '<dark_gray>Скоро'
+    solo8:
+      slot: 11
+      display: '1x8'
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      name: '<#b48cff><b>1x8</b>'
+      lore:
+        - '<gray>Каждый сам за себя · 8 игроков'
+        - ''
+        - '<dark_gray>Скоро'
+    solo16:
+      slot: 12
+      display: '1x16'
+      material: NETHERITE_SWORD
+      hide-attributes: true
+      name: '<#b48cff><b>1x16</b>'
+      lore:
+        - '<gray>Каждый сам за себя · 16 игроков'
+        - ''
+        - '<dark_gray>Скоро'
+    duo2:
+      slot: 14
+      display: '2x2'
+      material: LEATHER_CHESTPLATE
+      hide-attributes: true
+      name: '<#b48cff><b>2x2</b>'
+      lore:
+        - '<gray>Команды по 2 · 2 команды'
+        - ''
+        - '<dark_gray>Скоро'
+    duo4:
+      slot: 15
+      display: '2x4'
+      material: IRON_CHESTPLATE
+      hide-attributes: true
+      name: '<#b48cff><b>2x4</b>'
+      lore:
+        - '<gray>Команды по 2 · 4 команды'
+        - ''
+        - '<dark_gray>Скоро'
+    duo8:
+      slot: 16
+      display: '2x8'
+      material: DIAMOND_CHESTPLATE
+      hide-attributes: true
+      name: '<#b48cff><b>2x8</b>'
+      lore:
+        - '<gray>Команды по 2 · 8 команд'
+        - ''
+        - '<dark_gray>Скоро'
 
 scoreboard:
   enabled: true

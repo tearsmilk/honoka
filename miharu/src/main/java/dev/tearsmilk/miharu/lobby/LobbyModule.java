@@ -312,6 +312,7 @@ public final class LobbyModule extends MiharuModule {
                 }
             }
             case "spectate" -> games.spectateMenu().open(p);
+            case "meetups" -> openMeetups(p);
             case "bots" -> {
                 if (bots != null) {
                     bots.menu().openModes(p);
@@ -328,6 +329,34 @@ public final class LobbyModule extends MiharuModule {
                 }
             }
         }
+    }
+
+    /** Меню митапов (1x4 … 2x8). Пока только витрина — режимы появятся позже. */
+    private void openMeetups(Player p) {
+        ConfigurationSection m = config().getConfigurationSection("meetups-menu");
+        if (m == null) {
+            return;
+        }
+        dev.tearsmilk.miharu.core.menu.Menu menu = new dev.tearsmilk.miharu.core.menu.Menu(m.getInt("rows", 3), Text.mm(m.getString("title", "Митапы")));
+        ConfigurationSection modes = m.getConfigurationSection("modes");
+        if (modes != null) {
+            for (String id : modes.getKeys(false)) {
+                ConfigurationSection it = modes.getConfigurationSection(id);
+                if (it == null || !it.getBoolean("enabled", true)) {
+                    continue;
+                }
+                String name = it.getString("display", id);
+                menu.set(it.getInt("slot"), Items.parse(it, Map.of("mode", name)), pl -> {
+                    pl.playSound(pl.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
+                    plugin.messages().send(pl, "lobby.meetups-soon", "mode", name);
+                });
+            }
+        }
+        ConfigurationSection f = m.getConfigurationSection("filler");
+        if (f != null && f.getBoolean("enabled", true)) {
+            menu.fill(Items.parse(f, Map.of()));
+        }
+        menu.open(p);
     }
 
     // --- табло и таб ---

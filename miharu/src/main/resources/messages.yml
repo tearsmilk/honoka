@@ -237,6 +237,7 @@ lobby:
   adm-no-lobby: '{prefix}<red>Модуль лобби выключен.'
   adm-actionbar: '<gold>⚒ Режим строителя</gold> <dark_gray>·</dark_gray> <gray>/miharu adm-mode — выйти'
   not-in-queue: '<gray>—'
+  meetups-soon: '{prefix}<#b48cff>Митапы {mode}</#b48cff> <gray>скоро появятся.'
 
 ranked:
   label: '<#ff5c8a>[Рейтинг]'
