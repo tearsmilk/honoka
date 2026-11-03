@@ -2,7 +2,13 @@
 # Слоты: 0–8 хотбар, 9–35 инвентарь. team-color: кожа и WHITE_* блоки красятся в цвет команды.
 display: '<red>BedWars'
 version: "1.8"
-arena-mode: bedwars       # арена: p1, p2, bed1 (кровать первого), bed2 (кровать второго)
+arena-mode: bedwars       # арена: p1, p2, bed1, bed2 (кровати). Для 1x3/1x4 — ещё p3/p4 и bed3/bed4
+# 1x1, 1x3, 1x4 — каждый сам за себя на 2, 3 или 4 игрока
+players:
+  - 2
+  - 3
+  - 4
+players-suffix: '<gray>· {format}'
 rounds: 1
 team-color: true
 armor:

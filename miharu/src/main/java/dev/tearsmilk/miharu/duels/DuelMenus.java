@@ -60,34 +60,67 @@ public final class DuelMenus {
         menu.open(p);
     }
 
-    /** Выбор длины матча: Bridge до 3/5/7 голов, MLG Rush до 5/10/20 кроватей. */
+    /**
+     * Выбор варианта: сначала число игроков (1x1 / 1x3 / 1x4), потом длина матча (3/5/7).
+     * Если остаётся один вариант — сразу в очередь.
+     */
     public void openVariants(Player p, DuelKits.Entry entry, DuelKits category) {
+        openVariants(p, entry, category, null);
+    }
+
+    private void openVariants(Player p, DuelKits.Entry entry, DuelKits category, Integer players) {
+        java.util.List<Integer> playerOpts = entry.variants().stream().map(v -> v.rules().players()).distinct().toList();
+        if (players == null && playerOpts.size() > 1) {
+            // шаг 1: сколько игроков — по одному представителю на каждое число
+            java.util.List<KitSpec> reps = new java.util.ArrayList<>();
+            for (int n : playerOpts) {
+                entry.variants().stream().filter(v -> v.rules().players() == n).findFirst().ifPresent(reps::add);
+            }
+            showOptions(p, entry, category, reps, true, v -> openVariants(p, entry, category, v.rules().players()));
+            return;
+        }
+        int n = players != null ? players : playerOpts.isEmpty() ? 2 : playerOpts.getFirst();
+        java.util.List<KitSpec> list = entry.variants().stream().filter(v -> v.rules().players() == n).toList();
+        if (list.size() == 1) {
+            chooseKit(p, list.getFirst());
+            return;
+        }
+        showOptions(p, entry, category, list, false, v -> chooseKit(p, v));
+    }
+
+    private void showOptions(Player p, DuelKits.Entry entry, DuelKits category, java.util.List<KitSpec> options, boolean byPlayers,
+                             java.util.function.Consumer<KitSpec> action) {
         ConfigurationSection s = module.config().getConfigurationSection("menus.variants");
         Map<String, Object> ph = placeholders(p, entry.spec());
         Menu menu = new Menu(s.getInt("rows", 3), Text.mm(s.getString("title", "Вариант"), ph));
         java.util.List<Integer> slots = s.getIntegerList("slots");
-        for (int i = 0; i < entry.variants().size() && i < slots.size(); i++) {
-            KitSpec v = entry.variants().get(i);
+        for (int i = 0; i < options.size() && i < slots.size(); i++) {
+            KitSpec v = options.get(i);
+            int pl = v.rules().players();
+            int count = byPlayers ? pl : v.rules().scoreToWin();
             Map<String, Object> vph = placeholders(p, v);
-            boolean byPlayers = v.rules().players() > 2 || entry.variants().stream().anyMatch(x -> x.rules().players() > 2);
-            int count = byPlayers ? v.rules().players() : v.rules().scoreToWin();
             vph.put("count", count);
-            vph.put("opponents", Math.max(1, v.rules().players() - 1));
+            vph.put("format", pl <= 2 ? "1x1" : "1x" + pl);
+            vph.put("opponents", Math.max(1, pl - 1));
             vph.put("goal", Text.plain(Text.mm(module.plugin().messages().raw(byPlayers ? "minigames.goal-players"
                     : "minigames.goal-" + v.rules().objective().name().toLowerCase()))));
             vph.put("variant_info", Text.apply(module.plugin().messages().raw(byPlayers ? "minigames.variant-players" : "minigames.variant-rounds"), vph));
-            vph.put("queue", module.queue().size(v.id()) + (byPlayers ? "/" + v.rules().players() : ""));
+            int waiting = byPlayers
+                    ? entry.variants().stream().filter(x -> x.rules().players() == pl).mapToInt(x -> module.queue().size(x.id())).sum()
+                    : module.queue().size(v.id());
+            vph.put("queue", waiting + (pl > 2 ? "/" + pl : ""));
+            vph.put("kit", byPlayers ? entry.spec().display() + " <gray>· " + vph.get("format") : v.display());
             ItemStack icon = Items.parse(s.getConfigurationSection("icon"), vph);
-            icon.setAmount(Math.max(1, Math.min(64, byPlayers ? (v.rules().players() <= 2 ? 1 : v.rules().players()) : count)));
-            menu.set(slots.get(i), icon, pl -> {
-                click(pl);
-                chooseKit(pl, v);
+            icon.setAmount(Math.max(1, Math.min(64, byPlayers ? (pl <= 2 ? 1 : pl) : count)));
+            menu.set(slots.get(i), icon, who -> {
+                click(who);
+                action.accept(v);
             });
         }
         if (s.isConfigurationSection("back")) {
-            menu.set(s.getInt("back.slot", 22), Items.parse(s.getConfigurationSection("back"), ph), pl -> {
-                click(pl);
-                openKits(pl, category);
+            menu.set(s.getInt("back.slot", 22), Items.parse(s.getConfigurationSection("back"), ph), who -> {
+                click(who);
+                openKits(who, category);
             });
         }
         filler(menu, s.getConfigurationSection("filler"));

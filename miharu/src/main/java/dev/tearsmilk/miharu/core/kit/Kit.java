@@ -30,7 +30,9 @@ public final class Kit {
     /** Команда для окраски: красные и синие. */
     public enum Team {
         RED(Color.fromRGB(0xD43B3B), "RED_"),
-        BLUE(Color.fromRGB(0x3B6FD4), "BLUE_");
+        BLUE(Color.fromRGB(0x3B6FD4), "BLUE_"),
+        GREEN(Color.fromRGB(0x4CB04C), "LIME_"),
+        YELLOW(Color.fromRGB(0xE3C83B), "YELLOW_");
 
         final Color color;
         final String prefix;

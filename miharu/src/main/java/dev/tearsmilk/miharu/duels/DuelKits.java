@@ -159,18 +159,44 @@ public final class DuelKits {
                 int slot = m != null && m.contains("slot") ? m.getInt("slot") : autoSlot;
                 ConfigurationSection icon = m != null && m.isConfigurationSection("icon") ? m.getConfigurationSection("icon")
                         : y.getConfigurationSection("icon");
+                // варианты: число игроков (players: [2, 3, 4]) и/или длина матча (variants: [3, 5, 7])
                 List<KitSpec> variants = new ArrayList<>();
-                boolean byPlayers = "players".equalsIgnoreCase(y.getString("variants-type", "rounds"));
-                for (int n : y.getIntegerList("variants")) {
-                    String format = n <= 2 ? "1x1" : "1x" + n;
-                    String suffix = y.getString("variant-suffix", byPlayers ? "<gray>· {format}" : "<gray>· {count}")
-                            .replace("{count}", String.valueOf(n)).replace("{format}", format)
-                            .replace("{opponents}", String.valueOf(Math.max(1, n - 1)));
-                    KitSpec v = new KitSpec(id + "-" + n, spec.display() + " " + suffix,
-                            spec.version(), spec.profile(), spec.kit(), byPlayers ? rules.withPlayers(n) : rules.withRounds(n),
-                            spec.arenaMode(), spec.arenas(), spec.bot());
-                    variants.add(v);
-                    variantSpecs.put(v.id(), v);
+                boolean legacyPlayers = "players".equalsIgnoreCase(y.getString("variants-type", "rounds"));
+                List<Integer> playerOpts = legacyPlayers ? y.getIntegerList("variants") : y.getIntegerList("players");
+                List<Integer> roundOpts = legacyPlayers ? List.of() : y.getIntegerList("variants");
+                String playersSuffix = y.getString(legacyPlayers ? "variant-suffix" : "players-suffix", "<gray>· {format}");
+                String roundsSuffix = legacyPlayers ? "" : y.getString("variant-suffix", "<gray>· {count}");
+                if (!playerOpts.isEmpty() || !roundOpts.isEmpty()) {
+                    List<Integer> pList = playerOpts.isEmpty() ? List.of(2) : playerOpts;
+                    List<Integer> rList = roundOpts.isEmpty() ? java.util.Collections.singletonList(null) : roundOpts;
+                    for (int n : pList) {
+                        for (Integer r : rList) {
+                            String vid;
+                            if (playerOpts.isEmpty()) {
+                                vid = id + "-" + r;
+                            } else if (roundOpts.isEmpty()) {
+                                vid = id + "-" + n;
+                            } else {
+                                vid = n <= 2 ? id + "-" + r : id + "-p" + n + "-" + r;
+                            }
+                            StringBuilder name = new StringBuilder(spec.display());
+                            if (!playerOpts.isEmpty()) {
+                                name.append(' ').append(playersSuffix.replace("{format}", n <= 2 ? "1x1" : "1x" + n)
+                                        .replace("{count}", String.valueOf(n)).replace("{opponents}", String.valueOf(Math.max(1, n - 1))));
+                            }
+                            if (r != null) {
+                                name.append(' ').append(roundsSuffix.replace("{count}", String.valueOf(r)));
+                            }
+                            KitRules vr = rules.withPlayers(n);
+                            if (r != null) {
+                                vr = vr.withRounds(r);
+                            }
+                            KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
+                                    spec.arenaMode(), spec.arenas(), spec.bot());
+                            variants.add(v);
+                            variantSpecs.put(v.id(), v);
+                        }
+                    }
                 }
                 kits.put(id, new Entry(spec, enabled, slot, icon, variants));
                 autoSlot++;
@@ -203,8 +229,11 @@ public final class DuelKits {
         }
         KitSpec v = id == null ? null : variantSpecs.get(id.toLowerCase(Locale.ROOT));
         if (v != null) {
-            Entry base = get(v.id().substring(0, v.id().lastIndexOf('-')));
-            return base != null && base.enabled() ? v : null;
+            for (Entry base : kits.values()) {
+                if (base.variants().contains(v)) {
+                    return base.enabled() ? v : null;
+                }
+            }
         }
         return null;
     }

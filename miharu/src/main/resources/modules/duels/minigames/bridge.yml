@@ -9,7 +9,13 @@ variants:
   - 5
   - 7
 variant-suffix: '<gray>· до {count}'
-arena-mode: bridge        # арена с точками p1, p2, goal1 (ворота первого), goal2 (ворота второго)
+arena-mode: bridge        # арена: p1, p2, goal1, goal2 (ворота). Для 1x3/1x4 — ещё p3/p4 и goal3/goal4
+# 1x1, 1x3, 1x4 — каждый сам за себя на 2, 3 или 4 игрока
+players:
+  - 2
+  - 3
+  - 4
+players-suffix: '<gray>· {format}'
 rounds: 5                 # голов до победы
 team-color: true          # кожа и WHITE_* блоки красятся в цвет команды
 armor:

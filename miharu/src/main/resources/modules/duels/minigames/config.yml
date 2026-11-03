@@ -22,7 +22,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>Сломай кровать соперника и добей его'
+        - '<gray>1x1, 1x3, 1x4 · сломай кровати и добей соперников'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
@@ -50,7 +50,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>Прыгни в портал соперника 3, 5 или 7 раз'
+        - '<gray>1x1, 1x3, 1x4 · прыгни в чужие ворота 3, 5 или 7 раз'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
@@ -64,7 +64,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>BedWars с фаерболами и TNT'
+        - '<gray>1x1, 1x3, 1x4 · BedWars с фаерболами и TNT'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
@@ -78,7 +78,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>Вытолкни соперника с платформы'
+        - '<gray>1x1, 1x3, 1x4 · последний на платформе побеждает'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'

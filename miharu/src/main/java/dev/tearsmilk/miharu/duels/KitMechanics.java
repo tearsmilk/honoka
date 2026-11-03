@@ -159,15 +159,15 @@ final class KitMechanics implements Listener {
         switch (kg.kitSpec().rules().explosions()) {
             case NONE -> blocks.clear();
             case PLACED -> {
-                if (g instanceof DuelGame dg) {
-                    dg.filterExplosion(blocks);
+                if (g instanceof BuildGame bg) {
+                    bg.filterExplosion(blocks);
                 } else {
                     blocks.clear();
                 }
             }
             default -> {
-                if (g instanceof DuelGame dg) {
-                    dg.trackExplosion(blocks);
+                if (g instanceof BuildGame bg) {
+                    bg.trackExplosion(blocks);
                 }
             }
         }

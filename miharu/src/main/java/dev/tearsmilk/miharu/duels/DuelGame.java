@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  * Дуэль 1 на 1 по киту. Раунды до rounds побед, правила кита:
  * без урона (сумо/бокс), бокс до N ударов, цели Bridge, кровати MLG, стройка с откатом между раундами.
  */
-public final class DuelGame extends Game implements KitGame {
+public final class DuelGame extends Game implements KitGame, BuildGame {
 
     public static final String MODE = "duel";
 
@@ -210,13 +210,15 @@ public final class DuelGame extends Game implements KitGame {
     }
 
     /** Взрыв при explosion-block-damage: placed — ломаются только блоки игроков. */
-    void filterExplosion(List<Block> blocks) {
+    @Override
+    public void filterExplosion(List<Block> blocks) {
         blocks.removeIf(bl -> !build.isPlaced(bl));
         blocks.forEach(build::broke);
     }
 
     /** Взрыв, который ломает всё: запоминаем блоки для отката раунда. */
-    void trackExplosion(List<Block> blocks) {
+    @Override
+    public void trackExplosion(List<Block> blocks) {
         blocks.forEach(build::broke);
     }
 
@@ -268,6 +270,10 @@ public final class DuelGame extends Game implements KitGame {
 
     @Override
     protected void onMove(Player p, Location to) {
+        if (rules.liquidLose() && to.getBlock().isLiquid()) {
+            onVoid(p);
+            return;
+        }
         if (rules.objective() != KitRules.Objective.GOAL) {
             return;
         }

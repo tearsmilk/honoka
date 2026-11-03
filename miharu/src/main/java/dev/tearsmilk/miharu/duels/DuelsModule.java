@@ -268,8 +268,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
         List<Arena> list = arenas.arenas().forMode(spec.arenaMode()).stream()
                 .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
                 .filter(a -> {
+                    // нужны точки p1…pN, а для кроватей/ворот ещё bed1…bedN / goal1…goalN
+                    String extra = switch (spec.rules().objective()) {
+                        case BED, BEDWARS -> "bed";
+                        case GOAL -> "goal";
+                        default -> null;
+                    };
                     for (int i = 1; i <= need; i++) {
-                        if (a.spawn("p" + i) == null) {
+                        if (a.spawn("p" + i) == null || (extra != null && a.spawn(extra + i) == null)) {
                             return false;
                         }
                     }
