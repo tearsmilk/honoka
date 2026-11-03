@@ -346,9 +346,17 @@ public final class LobbyModule extends MiharuModule {
                     continue;
                 }
                 String name = it.getString("display", id);
+                String queueKit = it.getString("queue", "");
                 menu.set(it.getInt("slot"), Items.parse(it, Map.of("mode", name)), pl -> {
                     pl.playSound(pl.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
-                    plugin.messages().send(pl, "lobby.meetups-soon", "mode", name);
+                    DuelsModule duels = plugin.module(DuelsModule.class);
+                    KitSpec spec = queueKit.isEmpty() || duels == null ? null : duels.spec(queueKit);
+                    if (spec != null) {
+                        pl.closeInventory();
+                        duels.queue().join(pl, spec);
+                    } else {
+                        plugin.messages().send(pl, "lobby.meetups-soon", "mode", name);
+                    }
                 });
             }
         }

@@ -94,7 +94,7 @@ items:
     material: PURPLE_SHULKER_BOX
     name: '<#b48cff><b>Митапы</b> <gray>(ПКМ)'
     lore:
-      - '<gray>1x4, 1x8, 1x16, 2x2, 2x4, 2x8'
+      - '<gray>1x2 (тест), 1x4, 1x8, 1x16, 2x2, 2x4, 2x8'
   spectate:
     slot: 8
     show: always
@@ -115,6 +115,17 @@ meetups-menu:
     material: PURPLE_STAINED_GLASS_PANE
     name: ' '
   modes:
+    # queue: <кит> — карточка ставит в очередь этого кита (остальные пока «скоро»)
+    solo2:
+      slot: 4
+      display: '1x2'
+      queue: mg-meetup
+      material: PURPLE_SHULKER_BOX
+      name: '<#b48cff><b>1x2</b> <gray>· тест'
+      lore:
+        - '<gray>Тестовый митап на двоих'
+        - ''
+        - '<yellow>▶ Играть'
     solo4:
       slot: 10
       display: '1x4'

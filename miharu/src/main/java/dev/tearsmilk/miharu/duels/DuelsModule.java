@@ -108,6 +108,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         arenas.registerMode(new ArenaMode("bedwars", "BedWars", List.of("p1", "p2", "bed1", "bed2")));
         arenas.registerMode(new ArenaMode("fireball", "Fireball Fight", List.of("p1", "p2", "bed1", "bed2")));
         arenas.registerMode(new ArenaMode("skywars", "SkyWars", List.of("p1", "p2")));
+        arenas.registerMode(new ArenaMode("meetup", "Митап", List.of("p1", "p2")));
         listen(this);
         listen(new KitMechanics(this));
         task = Bukkit.getScheduler().runTaskTimer(plugin, queue::tick, 20L, 20L);

@@ -98,3 +98,18 @@ kits:
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  meetup:
+    enabled: true
+    slot: 16
+    icon:
+      material: PURPLE_SHULKER_BOX
+      hide-attributes: true
+      name: '{kit} <gray>· 1x2'
+      lore:
+        - '<gray>Тестовый митап: UHC-кит, без регенерации'
+        - '<gray>Последний живой побеждает'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

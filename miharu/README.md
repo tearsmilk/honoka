@@ -11,7 +11,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 | `game` | Запуск/остановка игр, снимок инвентаря (переживает краш), своё табло и таб, изоляция игроков, возврат (в т.ч. на лобби через Velocity) | `modules/game/config.yml` |
 | `bots` | Пакетные фейк-игроки (без сущности на сервере), ИИ easy/medium/hard, дуэль с ботом (по киту) и клик-тест, меню, статистика | `modules/bots/config.yml`, `kits.yml`, `menu.yml` |
 | `duels` | Дуэли 1 на 1 по 16 китам 1.8 (NoDebuff, Debuff, Gapple, BuildUHC, Combo, Boxing, Sumo, Classic, Archer, Soup, Bridge, MLG Rush, Leather, OP Diamond, Diamond, UHC): очередь по киту, раунды, цели Bridge, кровати MLG, суп, золотые головы | `modules/duels/config.yml`, `kits/config.yml`, `kits/<id>.yml` |
-| `duels` (мини-игры) | Огненный заряд во 2-м слоте: BedWars, SkyWars, The Bridge (3/5/7), Fireball Fight, Sumo — 1x1 / 1x3 / 1x4 (каждый сам за себя); MLG Rush (5/10/20) — 1x1, только игроки, PvP 1.8 | `modules/duels/minigames/` |
+| `duels` (мини-игры) | Огненный заряд во 2-м слоте: BedWars, SkyWars, The Bridge (3/5/7), Fireball Fight, Sumo — 1x1 / 1x3 / 1x4 (каждый сам за себя); MLG Rush (5/10/20); Meetup 1x2 (тест) — 1x1, только игроки, PvP 1.8 | `modules/duels/minigames/` |
 | `duels` (1.9) | Медленное PvP: 16 китов (Sword & Shield, Diamond, OP Diamond, Heavy, Axe & Shield, Mace, OP Mace, Trident, Spear, Netherite Spear, Lunge Spear, Sword & Crossbow, Archer, Spear & Shield, Survival, Crystal). Щиты, топор выбивает щит, удар булавой, тотемы | `modules/duels/kits-1.9/` |
 | `duels` (рейтинг) | Рейтинговые дуэли: незеритовый меч в лобби, сверху выбор 1.8 / 1.9, только игроки, ELO по китам (старт 0, может уйти в минус), подбор соперника по ELO | `modules/duels/config.yml → ranked` |
 | `duels` (тиры) | PvP-тиры HT1…LT5 отдельно на каждый режим (кит): из ELO по порогам или вручную `/tier set`; статистика `/stats` | `modules/duels/config.yml → ranked.tiers, stats-menu` |
@@ -23,7 +23,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.10.jar
+mvn package                         # → target/Miharu-0.2.11.jar
 ```
 
 ## Как это работает
@@ -39,7 +39,7 @@ mvn package                         # → target/Miharu-0.2.10.jar
 
 Кит = файл `modules/duels/kits/<id>.yml`: `armor`, `items`, `fill`, `effects`, `rules` (урон, бокс до N ударов, сумо, вода = поражение, стройка, бесконечные блоки, цели/кровати, смерть = респавн, суп, кулдаун жемчуга), `combat` (свои хит-делей и отдача поверх `modules/pvp`), `bot` (можно ли с ботом, сколько раз бот лечится). В `kits/config.yml` кит включается и меняется его предмет в меню. Новый кит — новый yml.
 
-Режимы арен: `duel` (p1, p2), `sumo` (p1, p2), `bridge` (p1, p2, goal1, goal2), `mlg` / `bedwars` / `fireball` (p1, p2, bed1, bed2), `skywars` (p1, p2, для 1x3/1x4 ещё p3, p4 + сундуки).
+Режимы арен: `duel` (p1, p2), `sumo` (p1, p2), `bridge` (p1, p2, goal1, goal2), `mlg` / `bedwars` / `fireball` (p1, p2, bed1, bed2), `skywars` (p1, p2, для 1x3/1x4 ещё p3, p4 + сундуки), `meetup` (p1, p2).
 
 ## Команды
 
