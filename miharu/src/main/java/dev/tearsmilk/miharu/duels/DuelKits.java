@@ -1,6 +1,7 @@
 package dev.tearsmilk.miharu.duels;
 
 import dev.tearsmilk.miharu.core.kit.Kit;
+import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.core.kit.KitRules;
 import dev.tearsmilk.miharu.core.kit.KitSpec;
 import dev.tearsmilk.miharu.pvp.CombatService;
@@ -191,8 +192,15 @@ public final class DuelKits {
                             if (r != null) {
                                 vr = vr.withRounds(r);
                             }
+                            // свой режим арены на каждое число игроков: sw-duo, sw-trio, sw-quatro…
+                            String arenaMode = spec.arenaMode();
+                            if (!playerOpts.isEmpty()) {
+                                String shortName = y.getString("arena-short", module.arenaShort(spec.arenaMode()));
+                                arenaMode = shortName + "-" + module.sizeName(n);
+                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n, rules.objective(), Text.plain(Text.mm(spec.display())));
+                            }
                             KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
-                                    spec.arenaMode(), spec.arenas(), spec.bot());
+                                    arenaMode, spec.arenas(), spec.bot());
                             variants.add(v);
                             variantSpecs.put(v.id(), v);
                         }

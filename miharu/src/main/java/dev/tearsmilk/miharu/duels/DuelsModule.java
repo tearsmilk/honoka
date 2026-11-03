@@ -390,10 +390,72 @@ public final class DuelsModule extends MiharuModule implements Listener {
     }
 
     /** Свободная (случайная подходящая) арена под кит. */
+    /** Режим арены варианта (sw-trio) → общий режим игры (skywars): старые арены тоже подходят, если в них есть точки. */
+    private final java.util.Map<String, String> variantBase = new java.util.HashMap<>();
+
+    /** Короткое имя для режимов арен по числу игроков: skywars → sw. */
+    String arenaShort(String mode) {
+        String v = config().getString("arena-short." + mode);
+        if (v != null) {
+            return v;
+        }
+        return switch (mode) {
+            case "skywars" -> "sw";
+            case "bedwars" -> "bw";
+            case "bridge" -> "br";
+            case "fireball" -> "fb";
+            default -> mode;
+        };
+    }
+
+    /** 2 → duo, 3 → trio, 4 → quatro (arena-size-names в config.yml). */
+    String sizeName(int players) {
+        String v = config().getString("arena-size-names." + players);
+        if (v != null) {
+            return v;
+        }
+        return switch (players) {
+            case 2 -> "duo";
+            case 3 -> "trio";
+            case 4 -> "quatro";
+            default -> String.valueOf(players);
+        };
+    }
+
+    void registerVariantArenaMode(String id, String base, int players, dev.tearsmilk.miharu.core.kit.KitRules.Objective objective, String display) {
+        variantBase.put(id, base);
+        ArenaModule arenas = plugin.module(ArenaModule.class);
+        if (arenas == null || arenas.mode(id) != null) {
+            return;
+        }
+        String extra = switch (objective) {
+            case BED, BEDWARS -> "bed";
+            case GOAL -> "goal";
+            default -> null;
+        };
+        List<String> spawns = new ArrayList<>();
+        for (int i = 1; i <= players; i++) {
+            spawns.add("p" + i);
+            if (extra != null) {
+                spawns.add(extra + i);
+            }
+        }
+        arenas.registerMode(new ArenaMode(id, display + " · " + (players <= 2 ? "1x1" : "1x" + players), spawns));
+    }
+
     public Arena arenaFor(KitSpec spec) {
         ArenaModule arenas = plugin.module(ArenaModule.class);
         int need = spec.rules().players();
-        List<Arena> list = arenas.arenas().forMode(spec.arenaMode()).stream()
+        List<Arena> candidates = new ArrayList<>(arenas.arenas().forMode(spec.arenaMode()));
+        String base = variantBase.get(spec.arenaMode());
+        if (base != null) {
+            for (Arena a : arenas.arenas().forMode(base)) {
+                if (!candidates.contains(a)) {
+                    candidates.add(a);
+                }
+            }
+        }
+        List<Arena> list = candidates.stream()
                 .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
                 .filter(a -> {
                     // нужны точки p1…pN, а для кроватей/ворот ещё bed1…bedN / goal1…goalN

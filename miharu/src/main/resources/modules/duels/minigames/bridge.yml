@@ -11,6 +11,7 @@ variants:
 variant-suffix: '<gray>· до {count}'
 arena-mode: bridge        # арена: p1, p2, goal1, goal2 (ворота). Для 1x3/1x4 — ещё p3/p4 и goal3/goal4
 # 1x1, 1x3, 1x4 — каждый сам за себя на 2, 3 или 4 игрока
+# режимы арены по числу игроков: <имя>-duo / -trio / -quatro (см. arena-short в modules/duels/config.yml)
 players:
   - 2
   - 3

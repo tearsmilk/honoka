@@ -325,6 +325,8 @@ custom-kits:
   wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
 
 meetups:
+  start-vote: '{prefix}<white>{player}</white> <gray>голосует за старт <green>({votes}/{need})'
+  start-vote-already: '{prefix}<gray>Ты уже проголосовал за старт.'
   force-prep: '{prefix}<green>Подготовка пропущена — все на арену!'
   force-not-prep: '{prefix}<red>Митап уже идёт: подготовка закончилась.'
   force-no-queue: '{prefix}<red>Нет очереди митапа. Укажи режим: <white>{modes}'

@@ -42,6 +42,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class Meetups implements Listener {
 
     static final NamespacedKey VOTE = new NamespacedKey("miharu", "meetup_vote");
+    static final NamespacedKey START_VOTE = new NamespacedKey("miharu", "meetup_start_vote");
+
+    /** Голоса за досрочный старт в очереди: режим → кто проголосовал. */
+    private final Map<String, java.util.Set<java.util.UUID>> startVotes = new java.util.HashMap<>();
 
     /** Режим митапа: id (mup-14), подпись (1x4), размер команды, всего игроков. */
     public record Mode(String id, String display, int teamSize, int players) {
@@ -150,6 +154,83 @@ public final class Meetups implements Listener {
     Material shulker() {
         Material m = Material.matchMaterial(cfg().getString("loot.shulker", "PURPLE_SHULKER_BOX"));
         return m == null ? Material.PURPLE_SHULKER_BOX : m;
+    }
+
+    // --- голосование за досрочный старт (в очереди) ---
+
+    /** Очередь почти полная (не хватает meetups.start-vote.missing и меньше) — можно голосовать за старт. */
+    boolean startVoteReady(String mode, int waiting) {
+        Mode m = modes.get(mode);
+        if (m == null || !cfg().getBoolean("start-vote.enabled", true)) {
+            return false;
+        }
+        int missing = Math.max(0, cfg().getInt("start-vote.missing", 1));
+        return waiting >= Math.max(2, cfg().getInt("start-vote.min-votes", 2)) && waiting >= m.players() - missing && waiting < m.players();
+    }
+
+    ItemStack startVoteItem(String mode, int waiting) {
+        Mode m = modes.get(mode);
+        ItemStack it = Items.parse(cfg().getConfigurationSection("start-vote.item"), Map.of("waiting", waiting, "players", m == null ? 0 : m.players(),
+                "votes", startVotes.getOrDefault(mode, java.util.Set.of()).size(), "need", cfg().getInt("start-vote.min-votes", 2)));
+        ItemMeta meta = it.getItemMeta();
+        meta.getPersistentDataContainer().set(START_VOTE, PersistentDataType.STRING, mode);
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    static boolean isStartVoteItem(ItemStack it) {
+        return it != null && it.hasItemMeta() && it.getItemMeta().getPersistentDataContainer().has(START_VOTE);
+    }
+
+    /** Убрать голос (игрок вышел из очереди или очередь перестала быть «почти полной»). */
+    void unvote(java.util.UUID id) {
+        startVotes.values().forEach(set -> set.remove(id));
+    }
+
+    void clearVotes(String mode) {
+        startVotes.remove(mode);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onStartVote(PlayerInteractEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND || e.getAction() == Action.PHYSICAL) {
+            return;
+        }
+        ItemStack it = e.getItem();
+        if (!isStartVoteItem(it)) {
+            return;
+        }
+        e.setCancelled(true);
+        Player p = e.getPlayer();
+        DuelQueue.Entry entry = module.queue().entry(p);
+        if (entry == null || modes.get(entry.kit()) == null) {
+            return;
+        }
+        String mode = entry.kit();
+        int waiting = module.queue().waiting(mode);
+        if (!startVoteReady(mode, waiting)) {
+            return;
+        }
+        java.util.Set<java.util.UUID> set = startVotes.computeIfAbsent(mode, k -> new java.util.HashSet<>());
+        if (!set.add(p.getUniqueId())) {
+            module.plugin().messages().send(p, "meetups.start-vote-already");
+            return;
+        }
+        int need = Math.max(2, cfg().getInt("start-vote.min-votes", 2));
+        for (java.util.UUID id : module.queue().players(mode)) {
+            Player q = org.bukkit.Bukkit.getPlayer(id);
+            if (q != null) {
+                module.plugin().messages().send(q, "meetups.start-vote", "player", p.getName(), "votes", set.size(), "need", need);
+            }
+        }
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.4f);
+        if (set.size() >= need) {
+            startVotes.remove(mode);
+            KitSpec spec = specs.get(mode);
+            if (spec != null) {
+                module.queue().forceStart(mode, spec);
+            }
+        }
     }
 
     // --- голосование за версию PvP ---

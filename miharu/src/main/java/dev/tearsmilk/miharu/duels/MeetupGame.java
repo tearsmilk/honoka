@@ -136,6 +136,7 @@ public final class MeetupGame extends Game implements KitGame, BuildGame {
         Material box = duels.meetups().shulker();
         for (int i = 0; i < order.size(); i++) {
             Player p = order.get(i);
+            duels.meetups().unvote(p.getUniqueId());
             p.getInventory().clear();
             for (PotionEffect e : p.getActivePotionEffects()) {
                 p.removePotionEffect(e.getType());

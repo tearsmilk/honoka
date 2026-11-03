@@ -24,7 +24,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.13.jar
+mvn package                         # → target/Miharu-0.2.14.jar
 ```
 
 ## Как это работает
@@ -40,7 +40,7 @@ mvn package                         # → target/Miharu-0.2.13.jar
 
 Кит = файл `modules/duels/kits/<id>.yml`: `armor`, `items`, `fill`, `effects`, `rules` (урон, бокс до N ударов, сумо, вода = поражение, стройка, бесконечные блоки, цели/кровати, смерть = респавн, суп, кулдаун жемчуга), `combat` (свои хит-делей и отдача поверх `modules/pvp`), `bot` (можно ли с ботом, сколько раз бот лечится). В `kits/config.yml` кит включается и меняется его предмет в меню. Новый кит — новый yml.
 
-Режимы арен: `duel` (p1, p2), `sumo` (p1, p2), `bridge` (p1, p2, goal1, goal2), `mlg` / `bedwars` / `fireball` (p1, p2, bed1, bed2), `skywars` (p1, p2, для 1x3/1x4 ещё p3, p4 + сундуки), `meetup` (p1, p2); митапы `mup-12…mup-28` — на каждого игрока p<N>, pre<N>, loot<N>a, loot<N>b.
+Режимы арен: `duel` (p1, p2), `sumo` (p1, p2), `bridge` (p1, p2, goal1, goal2), `mlg` / `bedwars` / `fireball` (p1, p2, bed1, bed2), `skywars` (p1, p2, для 1x3/1x4 ещё p3, p4 + сундуки), `meetup` (p1, p2); по числу игроков — `sw-duo/trio/quatro`, `bw-*`, `br-*`, `fb-*`, `sumo-*`; митапы `mup-12…mup-28` — на каждого игрока p<N>, pre<N>, loot<N>a, loot<N>b.
 
 ## Команды
 

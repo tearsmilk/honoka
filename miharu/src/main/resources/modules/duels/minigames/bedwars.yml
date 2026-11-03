@@ -4,6 +4,7 @@ display: '<red>BedWars'
 version: "1.8"
 arena-mode: bedwars       # арена: p1, p2, bed1, bed2 (кровати). Для 1x3/1x4 — ещё p3/p4 и bed3/bed4
 # 1x1, 1x3, 1x4 — каждый сам за себя на 2, 3 или 4 игрока
+# режимы арены по числу игроков: <имя>-duo / -trio / -quatro (см. arena-short в modules/duels/config.yml)
 players:
   - 2
   - 3

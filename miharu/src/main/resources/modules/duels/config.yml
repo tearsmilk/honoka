@@ -13,6 +13,20 @@ golden-head:
     - regeneration:1:180
     - absorption:0:2400
 
+# Режимы арен по числу игроков для мини-игр с вариантами 1x1/1x3/1x4:
+# <короткое имя>-<размер>, например sw-duo (2 игрока), sw-trio (3), sw-quatro (4); bw-*, br-*, fb-*, sumo-*.
+# /arena mode sw-trio — плагин скажет, какие точки нужны. Старые арены с общим режимом (skywars) тоже подходят.
+arena-short:
+  skywars: sw
+  bedwars: bw
+  bridge: br
+  fireball: fb
+  sumo: sumo
+arena-size-names:
+  '2': duo
+  '3': trio
+  '4': quatro
+
 # Снежки и яйца толкают игроков (SkyWars и другие игры с китами)
 snowball:
   enabled: true
@@ -670,6 +684,19 @@ meetups:
       display: '2x8'
       team-size: 2
       players: 16
+  # голосование за досрочный старт в очереди: когда не хватает missing игроков (например 3 из 4),
+  # ожидающим выдаётся предмет; набралось min-votes голосов — митап стартует с теми, кто есть
+  start-vote:
+    enabled: true
+    missing: 1
+    min-votes: 2
+    slot: -1                    # -1 — первый свободный слот
+    item:
+      material: LIME_DYE
+      name: '<green><b>Голосовать за старт</b> <gray>(ПКМ)'
+      lore:
+        - '<gray>В очереди: <white>{waiting}/{players}'
+        - '<gray>Голосов: <white>{votes}/{need}'
   # лут шалкеров: у каждого полный сет брони и оружие (из предметов всех дуэльных китов), остальное случайно
   loot:
     shulker: PURPLE_SHULKER_BOX

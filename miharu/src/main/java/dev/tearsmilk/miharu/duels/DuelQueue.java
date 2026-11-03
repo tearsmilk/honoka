@@ -6,6 +6,7 @@ import dev.tearsmilk.miharu.game.GameModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -99,7 +100,50 @@ public final class DuelQueue {
         if (!silent) {
             module.plugin().messages().send(p, "duels.queue.left");
         }
+        module.meetups().unvote(p.getUniqueId());
+        removeStartVoteItem(p);
         module.changed(p);
+    }
+
+    private static void removeStartVoteItem(Player p) {
+        for (int i = 0; i < p.getInventory().getSize(); i++) {
+            if (Meetups.isStartVoteItem(p.getInventory().getItem(i))) {
+                p.getInventory().setItem(i, null);
+            }
+        }
+    }
+
+    /** Предмет «Голосовать за старт» у ожидающих митапа, когда очередь почти полная. */
+    private void updateStartVoteItems() {
+        for (String key : List.copyOf(byKey.keySet())) {
+            if (module.meetups().mode(key) == null) {
+                continue;
+            }
+            int n = waiting(key);
+            boolean ready = module.meetups().startVoteReady(key, n);
+            if (!ready) {
+                module.meetups().clearVotes(key);
+            }
+            for (UUID id : players(key)) {
+                Player p = Bukkit.getPlayer(id);
+                if (p == null) {
+                    continue;
+                }
+                removeStartVoteItem(p);
+                if (ready) {
+                    int slot = module.meetups().cfg().getInt("start-vote.slot", -1);
+                    ItemStack item = module.meetups().startVoteItem(key, n);
+                    if (slot >= 0 && slot < 36 && p.getInventory().getItem(slot) == null) {
+                        p.getInventory().setItem(slot, item);
+                    } else {
+                        int free = p.getInventory().firstEmpty();
+                        if (free >= 0 && free < 36) {
+                            p.getInventory().setItem(free, item);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /** Ищет пару в очереди key. В рейтинговой — только если разница ELO в допустимом окне. */
@@ -168,6 +212,12 @@ public final class DuelQueue {
             module.changed(p);
         }
         module.startDuel(a, b, spec, ea.ranked());
+    }
+
+    /** Кто ждёт в очереди key. */
+    List<UUID> players(String key) {
+        Deque<UUID> q = byKey.get(key);
+        return q == null ? List.of() : List.copyOf(q);
     }
 
     /** Сколько ждут в очереди key (без рейтинговых). */
@@ -251,6 +301,7 @@ public final class DuelQueue {
         for (String key : List.copyOf(byKey.keySet())) {
             tryMatch(key);
         }
+        updateStartVoteItems();
     }
 
     void clear() {
