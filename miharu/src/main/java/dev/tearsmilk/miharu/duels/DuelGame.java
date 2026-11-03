@@ -60,6 +60,7 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
     private int eloDeltaA;
     private int eloDeltaB;
     private boolean eloApplied;
+    private final java.util.Map<java.util.UUID, Kit> kitOverrides = new java.util.HashMap<>();
     private boolean bedA = true;
     private boolean bedB = true;
 
@@ -109,6 +110,13 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
         return rules.hunger();
     }
 
+    /** Свой кит игрока (очередь «Свой кит»): у каждого в игре — его собственный кит. */
+    void overrideKit(Player p, Kit kit) {
+        if (kit != null) {
+            kitOverrides.put(p.getUniqueId(), kit);
+        }
+    }
+
     private Player opponent(Player p) {
         return p == a ? b : a;
     }
@@ -138,7 +146,7 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
         p.setFireTicks(0);
         p.setFallDistance(0);
         p.setGameMode(rules.build() ? GameMode.SURVIVAL : GameMode.valueOf(module.config().getString("gamemode", "ADVENTURE").toUpperCase(java.util.Locale.ROOT)));
-        spec.kit().apply(p, combat, spec.profile(), p == a ? Kit.Team.RED : Kit.Team.BLUE);
+        kitOverrides.getOrDefault(p.getUniqueId(), spec.kit()).apply(p, combat, spec.profile(), p == a ? Kit.Team.RED : Kit.Team.BLUE);
     }
 
     // --- смерть, пустота, урон ---

@@ -56,8 +56,43 @@ public final class DuelMenus {
                 }
             });
         }
+        if (!category.isMinigames()) {
+            addCustomRow(p, menu, category.version());
+        }
         filler(menu, m.getConfigurationSection("filler"));
         menu.open(p);
+    }
+
+    /** Нижний ряд меню 1.8/1.9: свои киты игрока (кнопка — в очередь «Свой кит»). */
+    private void addCustomRow(Player p, Menu menu, dev.tearsmilk.miharu.pvp.CombatVersion version) {
+        ConfigurationSection c = module.config().getConfigurationSection("custom-kits.duels-menu");
+        if (c == null || !c.getBoolean("enabled", true)) {
+            return;
+        }
+        java.util.List<Integer> slots = c.getIntegerList("slots");
+        for (int i = 1; i <= CustomKits.SLOTS && i - 1 < slots.size(); i++) {
+            int n = i;
+            CustomKits.CustomKit kit = module.customKits().get(p.getUniqueId(), n);
+            Map<String, Object> ph = new HashMap<>();
+            ph.put("slot", n);
+            ph.put("version", kit == null ? version.id() : kit.version().id());
+            ph.put("name", kit == null ? "" : kit.name());
+            ph.put("items", kit == null ? 0 : kit.size());
+            ph.put("queue", module.queue().size("custom-" + version.id().replace(".", "")));
+            String key = kit == null ? "empty" : kit.version() == version ? "ready" : "other-version";
+            menu.set(slots.get(i - 1), Items.parse(c.getConfigurationSection(key), ph), pl -> {
+                click(pl);
+                if (kit == null) {
+                    pl.closeInventory();
+                    module.builder().openSlots(pl);
+                } else if (kit.version() == version) {
+                    pl.closeInventory();
+                    module.queueCustom(pl, n);
+                } else {
+                    module.plugin().messages().send(pl, "custom-kits.wrong-version", "version", kit.version().id());
+                }
+            });
+        }
     }
 
     /**

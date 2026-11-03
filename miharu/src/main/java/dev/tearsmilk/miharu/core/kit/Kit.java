@@ -89,6 +89,25 @@ public final class Kit {
         }
     }
 
+    /** Кит из готовых предметов (свои киты игроков). */
+    public Kit(String id, Map<EquipmentSlot, ItemStack> armor, Map<Integer, ItemStack> items) {
+        this.id = id;
+        this.armor.putAll(armor);
+        this.items.putAll(items);
+        this.fill = null;
+        this.effects = List.of();
+        this.teamColor = false;
+        ItemStack found = null;
+        for (ItemStack i : items.values()) {
+            String n = i.getType().name();
+            if (n.endsWith("_SWORD") || n.endsWith("_AXE") || n.equals("MACE")) {
+                found = i;
+                break;
+            }
+        }
+        this.botWeapon = found;
+    }
+
     private void put(ConfigurationSection a, String key, EquipmentSlot slot) {
         ConfigurationSection s = a.getConfigurationSection(key);
         if (s != null) {

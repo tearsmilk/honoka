@@ -40,6 +40,11 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private Tiers tiers;
     private KitLayouts layouts;
     private KitEditor editor;
+    private CustomKits customKits;
+    private KitBuilder builder;
+    /** Какой свой кит игрок выбрал для очереди «Свой кит». */
+    private final java.util.Map<java.util.UUID, dev.tearsmilk.miharu.core.kit.Kit> customSelection = new java.util.HashMap<>();
+    private final java.util.Map<dev.tearsmilk.miharu.pvp.CombatVersion, KitSpec> customSpecs = new java.util.EnumMap<>(dev.tearsmilk.miharu.pvp.CombatVersion.class);
     private StatsMenu statsMenu;
     private BukkitTask task;
 
@@ -66,18 +71,27 @@ public final class DuelsModule extends MiharuModule implements Listener {
         layouts.createTables();
         editor = new KitEditor(this);
         listen(editor);
+        customKits = new CustomKits(plugin.database());
+        customKits.createTables();
+        builder = new KitBuilder(this);
+        listen(builder);
+        buildCustomSpecs();
         dev.tearsmilk.miharu.core.kit.Kit.layouts = (uuid, kit) -> layouts.get(uuid, kit);
         plugin.registerCommand("kit", "Раскладка китов: /kit edit", List.of("kiteditor", "layout"), new io.papermc.paper.command.brigadier.BasicCommand() {
             @Override
             public void execute(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
                 if (source.getSender() instanceof Player p) {
-                    editor.openKits(p, kits);
+                    if (args.length > 0 && args[0].equalsIgnoreCase("create")) {
+                        builder.openSlots(p);
+                    } else {
+                        editor.openKits(p, kits);
+                    }
                 }
             }
 
             @Override
             public java.util.Collection<String> suggest(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
-                return List.of("edit");
+                return List.of("edit", "create");
             }
         });
         tiers = new Tiers(this);
@@ -104,6 +118,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
             stats.load(p.getUniqueId());
             elo.load(p.getUniqueId());
             layouts.load(p.getUniqueId());
+            customKits.load(p.getUniqueId());
         });
         plugin.hooks().placeholder("tier", (p, rest) -> {
             if (p == null) {
@@ -135,6 +150,38 @@ public final class DuelsModule extends MiharuModule implements Listener {
     @Override
     protected void onReload() {
         reloadKits();
+        buildCustomSpecs();
+    }
+
+    /** Спец-киты очереди «Свой кит» для 1.8 и 1.9 (у каждого игрока в игре — свой кит). */
+    private void buildCustomSpecs() {
+        customSpecs.clear();
+        PvpModule pvp = plugin.module(PvpModule.class);
+        for (dev.tearsmilk.miharu.pvp.CombatVersion v : dev.tearsmilk.miharu.pvp.CombatVersion.values()) {
+            dev.tearsmilk.miharu.core.kit.KitRules rules = dev.tearsmilk.miharu.core.kit.KitRules.load(config().getConfigurationSection("custom-kits.rules"), 1);
+            String display = config().getString("custom-kits.display", "<#c9a7ff>Свой кит <gray>{version}").replace("{version}", v.id());
+            customSpecs.put(v, new KitSpec("custom-" + v.id().replace(".", ""), display, v, pvp.combat().profile(v),
+                    new dev.tearsmilk.miharu.core.kit.Kit("custom-" + v.id(), java.util.Map.of(), java.util.Map.of()),
+                    rules, "duel", List.of(), KitSpec.Bot.DISABLED));
+        }
+    }
+
+    public CustomKits customKits() {
+        return customKits;
+    }
+
+    public KitBuilder builder() {
+        return builder;
+    }
+
+    /** Встать в очередь «Свой кит» со своим китом из слота. */
+    public void queueCustom(Player p, int slot) {
+        CustomKits.CustomKit kit = customKits.get(p.getUniqueId(), slot);
+        if (kit == null) {
+            return;
+        }
+        customSelection.put(p.getUniqueId(), kit.toKit(p.getUniqueId()));
+        queue.join(p, customSpecs.get(kit.version()), false);
     }
 
     @Override
@@ -143,6 +190,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
             task.cancel();
         }
         queue.clear();
+        builder.endAll();
         dev.tearsmilk.miharu.core.kit.Kit.layouts = (u, k) -> null;
     }
 
@@ -190,6 +238,13 @@ public final class DuelsModule extends MiharuModule implements Listener {
         KitSpec s = kits.spec(id);
         if (s == null) {
             s = modernKits.spec(id);
+        }
+        if (s == null && id != null) {
+            for (KitSpec c : customSpecs.values()) {
+                if (c.id().equals(id)) {
+                    return c;
+                }
+            }
         }
         return s != null ? s : minigameKits.spec(id);
     }
@@ -298,6 +353,10 @@ public final class DuelsModule extends MiharuModule implements Listener {
         }
         GameModule games = plugin.module(GameModule.class);
         DuelGame game = new DuelGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), a, b, rankedMatch);
+        if (spec.id().startsWith("custom-")) {
+            game.overrideKit(a, customSelection.get(a.getUniqueId()));
+            game.overrideKit(b, customSelection.get(b.getUniqueId()));
+        }
         return games.games().start(game, List.of(a, b));
     }
 
@@ -318,6 +377,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         stats.load(e.getPlayer().getUniqueId());
         elo.load(e.getPlayer().getUniqueId());
         layouts.load(e.getPlayer().getUniqueId());
+        customKits.load(e.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -326,5 +386,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         stats.unload(e.getPlayer().getUniqueId());
         elo.unload(e.getPlayer().getUniqueId());
         layouts.unload(e.getPlayer().getUniqueId());
+        customKits.unload(e.getPlayer().getUniqueId());
+        customSelection.remove(e.getPlayer().getUniqueId());
     }
 }

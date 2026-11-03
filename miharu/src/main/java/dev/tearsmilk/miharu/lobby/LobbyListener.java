@@ -30,9 +30,15 @@ final class LobbyListener implements Listener {
         this.module = module;
     }
 
+    /** Игрок собирает свой кит (/kit create) — свой инвентарь двигать можно. */
+    private boolean building(Player p) {
+        var duels = module.plugin().module(dev.tearsmilk.miharu.duels.DuelsModule.class);
+        return duels != null && duels.builder().active(p);
+    }
+
     private boolean protect(Player p, String key) {
         return module.isLobby(p) && module.config().getBoolean("protect." + key, true) && !p.hasPermission("miharu.lobby.bypass")
-                && !module.adminMode().active(p);
+                && !module.adminMode().active(p) && !building(p);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

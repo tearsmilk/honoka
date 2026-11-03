@@ -8,6 +8,7 @@ import dev.tearsmilk.miharu.core.util.Items;
 import dev.tearsmilk.miharu.core.util.Text;
 import dev.tearsmilk.miharu.duels.DuelKits;
 import dev.tearsmilk.miharu.duels.DuelsModule;
+import dev.tearsmilk.miharu.duels.ItemCatalog;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,65 +22,20 @@ import java.util.Set;
 /** /miharu adm-items — все предметы из всех китов, только просмотр (OP). */
 final class AdminItemsMenu {
 
-    private record Found(ItemStack item, Set<String> kits) {
-    }
-
     private final Miharu plugin;
 
     AdminItemsMenu(Miharu plugin) {
         this.plugin = plugin;
     }
 
-    private List<Found> collect() {
-        List<Found> out = new ArrayList<>();
-        DuelsModule duels = plugin.module(DuelsModule.class);
-        if (duels != null) {
-            for (DuelKits.Entry e : duels.allEntries()) {
-                add(out, e.spec().kit(), e.spec().id());
-            }
-        }
-        BotsModule bots = plugin.module(BotsModule.class);
-        if (bots != null) {
-            for (Kit k : bots.kits().all()) {
-                add(out, k, "bot:" + k.id());
-            }
-        }
-        return out;
-    }
-
-    private void add(List<Found> out, Kit kit, String name) {
-        List<ItemStack> items = new ArrayList<>(kit.armor().values());
-        items.addAll(kit.items().values());
-        if (kit.fill() != null) {
-            items.add(kit.fill());
-        }
-        for (ItemStack it : items) {
-            if (it == null || it.getType().isAir()) {
-                continue;
-            }
-            Found same = null;
-            for (Found f : out) {
-                if (f.item().isSimilar(it)) {
-                    same = f;
-                    break;
-                }
-            }
-            if (same == null) {
-                same = new Found(it.clone(), new LinkedHashSet<>());
-                out.add(same);
-            }
-            same.kits().add(name);
-        }
-    }
-
     void open(Player p, int page) {
-        List<Found> all = collect();
+        List<ItemCatalog.Found> all = ItemCatalog.collect(plugin);
         int pages = Math.max(1, (all.size() + 44) / 45);
         int pg = Math.max(0, Math.min(page, pages - 1));
         Menu menu = new Menu(6, Text.mm(plugin.messages().raw("admin.items-title"),
                 Map.of("page", pg + 1, "pages", pages, "count", all.size())));
         for (int i = 0; i < 45 && pg * 45 + i < all.size(); i++) {
-            Found f = all.get(pg * 45 + i);
+            ItemCatalog.Found f = all.get(pg * 45 + i);
             ItemStack shown = f.item().clone();
             ItemMeta meta = shown.getItemMeta();
             List<net.kyori.adventure.text.Component> lore = meta.hasLore() && meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();

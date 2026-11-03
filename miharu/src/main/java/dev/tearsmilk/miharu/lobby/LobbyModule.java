@@ -239,7 +239,8 @@ public final class LobbyModule extends MiharuModule {
     }
 
     public void giveItems(Player p) {
-        if (adminMode.active(p)) {
+        DuelsModule dm = plugin.module(DuelsModule.class);
+        if (adminMode.active(p) || (dm != null && dm.builder().active(p))) {
             return;
         }
         String state = state(p);

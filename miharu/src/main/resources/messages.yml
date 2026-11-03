@@ -185,6 +185,7 @@ duels:
     - '<white>/duel kits</white>, <white>/duel stats [игрок]</white>, <white>/spectate</white>'
     - '<white>/duel reset-kit <кит></white> <gray>— вернуть встроенный кит (админ)'
     - '<white>/kit edit</white> <gray>— своя раскладка предметов в китах'
+    - '<white>/kit create</white> <gray>— собрать свой кит (до 3), играть — нижний ряд меню дуэлей'
   reset-usage: '{prefix}<red>/duel reset-kit <кит> <gray>(киты 1.9 — с приставкой m-)'
   reset-unknown: '{prefix}<red>Встроенного кита <white>{kit}</white> нет.'
   reset-done: '{prefix}<green>Кит <white>{kit}</white> возвращён к встроенному виду и перечитан.'
@@ -310,3 +311,13 @@ kit-editor:
   lore-default: '<gray>Раскладка: <white>по умолчанию'
   lore-custom: '<gray>Раскладка: <green>своя'
   lore-click: '<yellow>▶ Нажми, чтобы настроить'
+
+custom-kits:
+  in-game: '{prefix}<red>Свои киты собираются только в лобби.'
+  started: '{prefix}<gray>Сборка кита {slot} <gray>(PvP {version}). Бери предметы в <white>«Каталоге»</white>, раскладывай и жми <green>«Сохранить»</green>.'
+  saved: '{prefix}<green>Кит {slot} сохранён (PvP {version}). Играть: меню дуэлей → нижний ряд.'
+  exited: '{prefix}<gray>Сборка кита закрыта без сохранения.'
+  empty: '{prefix}<red>Кит пустой — положи хоть один предмет.'
+  deleted: '{prefix}<gray>Кит {slot} удалён.'
+  inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
+  wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
