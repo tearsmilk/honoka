@@ -110,7 +110,7 @@ public final class DuelQueue {
         }
         Entry first = entries.get(q.peekFirst());
         KitSpec fs = first == null ? null : module.spec(first.kit());
-        if (fs != null && fs.rules().players() > 2 && !first.ranked()) {
+        if (fs != null && (fs.rules().players() > 2 || module.meetups().mode(fs.id()) != null) && !first.ranked()) {
             if (q.size() >= fs.rules().players()) {
                 List<Entry> group = new java.util.ArrayList<>();
                 for (UUID id : List.copyOf(q)) {
@@ -212,7 +212,8 @@ public final class DuelQueue {
                 module.plugin().messages().actionBar(p, "ranked.actionbar", "kit", spec == null ? e.kit() : spec.display(), "time", time,
                         "size", rankedSize(e.kit()), "range", module.ranked().range(e), "elo", module.elo().elo(p.getUniqueId(), e.kit()));
             } else {
-                String size = spec != null && spec.rules().players() > 2 ? size(e.kit()) + "/" + spec.rules().players() : String.valueOf(size(e.kit()));
+                boolean group = spec != null && (spec.rules().players() > 2 || module.meetups().mode(spec.id()) != null);
+                String size = group ? size(e.kit()) + "/" + spec.rules().players() : String.valueOf(size(e.kit()));
                 module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
                         "time", time, "size", size);
             }

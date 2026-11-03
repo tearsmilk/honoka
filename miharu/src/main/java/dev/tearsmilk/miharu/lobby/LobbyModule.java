@@ -347,10 +347,14 @@ public final class LobbyModule extends MiharuModule {
                 }
                 String name = it.getString("display", id);
                 String queueKit = it.getString("queue", "");
+                if (queueKit.equals("mg-meetup")) {
+                    queueKit = "mup-12";   // карточка 1x2 из 0.2.11 → настоящий митап
+                }
+                String finalQueue = queueKit;
                 menu.set(it.getInt("slot"), Items.parse(it, Map.of("mode", name)), pl -> {
                     pl.playSound(pl.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
                     DuelsModule duels = plugin.module(DuelsModule.class);
-                    KitSpec spec = queueKit.isEmpty() || duels == null ? null : duels.spec(queueKit);
+                    KitSpec spec = finalQueue.isEmpty() || duels == null ? null : duels.spec(finalQueue);
                     if (spec != null) {
                         pl.closeInventory();
                         duels.queue().join(pl, spec);

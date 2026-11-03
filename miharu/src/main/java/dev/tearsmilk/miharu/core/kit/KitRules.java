@@ -52,7 +52,7 @@ public record KitRules(
     public static KitRules botDefault(boolean liquidLose, int maxDurationSeconds) {
         KitRules d = DEFAULT;
         return new KitRules(d.damage, d.hunger, d.naturalRegen, d.fallDamage, false, true, false, liquidLose, true, 0,
-                Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7, 0, true, maxDurationSeconds,
+                Objective.NONE, 2.5, DeathAction.LOSE_ROUND, 1, 3, false, 7, -1, true, maxDurationSeconds,
                 ExplosionMode.ALL, 0, false, false, "", 2);
     }
 
@@ -105,7 +105,7 @@ public record KitRules(
                 s.getInt("round-countdown", 3),
                 s.getBoolean("soup.enabled", false),
                 s.getDouble("soup.heal", 7.0),
-                s.getInt("pearl-cooldown-ticks", 0),
+                s.getInt("pearl-cooldown-ticks", -1),
                 s.getBoolean("rod-knockback", true),
                 s.getInt("max-duration-seconds", 600),
                 explosions,

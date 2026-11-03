@@ -109,8 +109,55 @@ final class KitMechanics implements Listener {
         if (r == null) {
             return;
         }
-        int cd = Math.max(0, r.pearlCooldownTicks());
-        Bukkit.getScheduler().runTask(module.plugin(), () -> p.setCooldown(Material.ENDER_PEARL, cd));
+        // кит может задать свой кулдаун (pearl-cooldown-ticks >= 0), иначе — общий из cooldowns.ender-pearl-ticks
+        int cd = r.pearlCooldownTicks() >= 0 ? r.pearlCooldownTicks() : module.config().getInt("cooldowns.ender-pearl-ticks", 20);
+        Bukkit.getScheduler().runTask(module.plugin(), () -> p.setCooldown(Material.ENDER_PEARL, Math.max(0, cd)));
+    }
+
+    /** Кулдаун золотых и чарованных яблок (cooldowns.* в modules/duels/config.yml). */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onAppleCooldown(PlayerItemConsumeEvent e) {
+        Material type = e.getItem().getType();
+        if (type != Material.ENCHANTED_GOLDEN_APPLE && type != Material.GOLDEN_APPLE) {
+            return;
+        }
+        Player p = e.getPlayer();
+        if (rules(p) == null) {
+            return;
+        }
+        String key = type == Material.ENCHANTED_GOLDEN_APPLE ? "cooldowns.enchanted-golden-apple-ticks" : "cooldowns.golden-apple-ticks";
+        int cd = module.config().getInt(key, type == Material.ENCHANTED_GOLDEN_APPLE ? 600 : 0);
+        if (cd > 0) {
+            Bukkit.getScheduler().runTask(module.plugin(), () -> p.setCooldown(type, cd));
+        }
+    }
+
+    /** Снежки и яйца толкают игроков (SkyWars и др.) — snowball.* в modules/duels/config.yml. */
+    @EventHandler(ignoreCancelled = true)
+    public void onSnowball(ProjectileHitEvent e) {
+        if (!(e.getEntity() instanceof org.bukkit.entity.Snowball || e.getEntity() instanceof org.bukkit.entity.Egg)
+                || !(e.getEntity().getShooter() instanceof Player shooter) || !(e.getHitEntity() instanceof Player victim) || victim == shooter) {
+            return;
+        }
+        if (!module.config().getBoolean("snowball.enabled", true) || rules(shooter) == null || rules(victim) == null) {
+            return;
+        }
+        if (victim.getNoDamageTicks() > victim.getMaximumNoDamageTicks() / 2 || victim.getGameMode() == org.bukkit.GameMode.SPECTATOR) {
+            return;
+        }
+        Vector dir = e.getEntity().getVelocity().setY(0);
+        if (dir.lengthSquared() < 1.0E-4) {
+            dir = victim.getLocation().toVector().subtract(shooter.getLocation().toVector()).setY(0);
+        }
+        if (dir.lengthSquared() < 1.0E-4) {
+            return;
+        }
+        dir.normalize().multiply(module.config().getDouble("snowball.horizontal", 0.4));
+        dir.setY(module.config().getDouble("snowball.vertical", 0.32));
+        victim.playHurtAnimation((float) Math.toDegrees(Math.atan2(-dir.getZ(), -dir.getX())) - victim.getYaw());
+        victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_PLAYER_HURT, 0.8f, 1.2f);
+        victim.setVelocity(victim.getVelocity().multiply(0.5).add(dir));
+        victim.setNoDamageTicks(victim.getMaximumNoDamageTicks());
     }
 
     @EventHandler(ignoreCancelled = true)

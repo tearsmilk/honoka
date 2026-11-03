@@ -322,3 +322,19 @@ custom-kits:
   deleted: '{prefix}<gray>Кит {slot} удалён.'
   inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
   wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
+
+meetups:
+  your-vote: '<green>(твой голос)'
+  voted: '{prefix}<gray>Твой голос: <white>PvP {version}'
+  phase-prep: '<yellow>подготовка'
+  phase-fight: '<red>бой'
+  prep-started: '{prefix}<gray>Собирай вещи из шалкеров! Через <white>{seconds} с</white> — на арену. Бумага в 9-м слоте — голосование за версию PvP.'
+  prep-actionbar: '<#b48cff>Подготовка</#b48cff> <gray>· <white>{seconds} с</white> <dark_gray>·</dark_gray> 1.8: <white>{votes_18}</white> · 1.9: <white>{votes_19}'
+  prep-countdown:
+    title: '<#b48cff><b>{seconds}</b>'
+    subtitle: '<gray>до начала боя'
+    stay: 900
+  fight:
+    title: '<red><b>БОЙ!</b>'
+    subtitle: '<gray>PvP {version} <dark_gray>(1.8: {votes_18} · 1.9: {votes_19})'
+    stay: 2000

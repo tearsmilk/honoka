@@ -13,6 +13,12 @@ golden-head:
     - regeneration:1:180
     - absorption:0:2400
 
+# Снежки и яйца толкают игроков (SkyWars и другие игры с китами)
+snowball:
+  enabled: true
+  horizontal: 0.4
+  vertical: 0.32
+
 # Отдача от удочки, как в 1.8
 rod:
   horizontal: 0.4
@@ -619,3 +625,89 @@ custom-kits:
       name: '<dark_gray>{name}'
       lore:
         - '<gray>Этот кит для PvP {version}'
+
+# ═══ Кулдауны в играх ═══
+# Кит может задать свой кулдаун жемчуга: rules.pearl-cooldown-ticks (0 — без кулдауна).
+cooldowns:
+  ender-pearl-ticks: 20             # 20 тиков = 1 секунда (как в ванили)
+  enchanted-golden-apple-ticks: 600 # 30 секунд на чарованное яблоко
+  golden-apple-ticks: 0             # обычные яблоки без кулдауна
+
+# ═══ Митапы (шалкер в 8-м слоте лобби) ═══
+# Арена: /arena mode <режим>. На каждого игрока N точки: p<N> (бой), pre<N> (коробка подготовки),
+# loot<N>a и loot<N>b (шалкеры с лутом). Например для mup-14 — p1…p4, pre1…pre4, loot1a…loot4b.
+meetups:
+  display: '<#b48cff>Митап {mode}'
+  prep-seconds: 60              # сколько стоят в коробках и собирают шалкеры
+  default-version: "1.8"        # при равных голосах
+  # team-size — игроков в команде (1 — каждый сам за себя), players — всего игроков
+  modes:
+    mup-12:
+      display: '1x2'
+      team-size: 1
+      players: 2
+    mup-14:
+      display: '1x4'
+      team-size: 1
+      players: 4
+    mup-18:
+      display: '1x8'
+      team-size: 1
+      players: 8
+    mup-116:
+      display: '1x16'
+      team-size: 1
+      players: 16
+    mup-22:
+      display: '2x2'
+      team-size: 2
+      players: 4
+    mup-24:
+      display: '2x4'
+      team-size: 2
+      players: 8
+    mup-28:
+      display: '2x8'
+      team-size: 2
+      players: 16
+  # лут шалкеров: у каждого полный сет брони и оружие (из предметов всех дуэльных китов), остальное случайно
+  loot:
+    shulker: PURPLE_SHULKER_BOX
+    extra-items:
+      min: 8
+      max: 14
+    exclude:                    # какие предметы не класть случайными
+      - TOTEM_OF_UNDYING
+      - END_CRYSTAL
+      - RESPAWN_ANCHOR
+  rules:
+    build: true
+    break-placed-only: false
+    natural-regen: false
+    max-duration-seconds: 900
+  vote:
+    slot: 8
+    item:
+      material: PAPER
+      name: '<#b48cff><b>Голосование</b> <gray>(ПКМ)'
+      lore:
+        - '<gray>Выбери версию PvP: 1.8 или 1.9'
+        - '<gray>Где больше голосов — то и будет'
+    title: '<dark_gray>Версия PvP митапа'
+    filler:
+      material: GRAY_STAINED_GLASS_PANE
+      name: ' '
+    legacy:
+      slot: 11
+      material: STONE_SWORD
+      hide-attributes: true
+      name: '<#ff9ecf><b>1.8</b> <gray>— быстрое {mine}'
+      lore:
+        - '<gray>Голосов: <white>{votes}'
+    modern:
+      slot: 15
+      material: GOLDEN_SWORD
+      hide-attributes: true
+      name: '<gold><b>1.9</b> <gray>— медленное {mine}'
+      lore:
+        - '<gray>Голосов: <white>{votes}'

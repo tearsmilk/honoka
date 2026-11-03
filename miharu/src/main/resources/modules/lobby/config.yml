@@ -105,7 +105,7 @@ items:
       - '<gray>Смотреть активные игры.'
       - '<gray>Выйти — <white>/leave'
 
-# Меню митапов (шалкер в 8-м слоте). Пока только витрина — клик пишет «скоро».
+# Меню митапов (шалкер в 8-м слоте). queue — режим митапа (modules/duels/config.yml → meetups.modes).
 # Ключи режимов без точек; display — как показать в сообщении.
 meetups-menu:
   title: '<dark_gray>Митапы'
@@ -115,11 +115,10 @@ meetups-menu:
     material: PURPLE_STAINED_GLASS_PANE
     name: ' '
   modes:
-    # queue: <кит> — карточка ставит в очередь этого кита (остальные пока «скоро»)
     solo2:
       slot: 4
       display: '1x2'
-      queue: mg-meetup
+      queue: mup-12
       material: PURPLE_SHULKER_BOX
       name: '<#b48cff><b>1x2</b> <gray>· тест'
       lore:
@@ -129,63 +128,69 @@ meetups-menu:
     solo4:
       slot: 10
       display: '1x4'
+      queue: mup-14
       material: IRON_SWORD
       hide-attributes: true
       name: '<#b48cff><b>1x4</b>'
       lore:
         - '<gray>Каждый сам за себя · 4 игрока'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
     solo8:
       slot: 11
       display: '1x8'
+      queue: mup-18
       material: DIAMOND_SWORD
       hide-attributes: true
       name: '<#b48cff><b>1x8</b>'
       lore:
         - '<gray>Каждый сам за себя · 8 игроков'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
     solo16:
       slot: 12
       display: '1x16'
+      queue: mup-116
       material: NETHERITE_SWORD
       hide-attributes: true
       name: '<#b48cff><b>1x16</b>'
       lore:
         - '<gray>Каждый сам за себя · 16 игроков'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
     duo2:
       slot: 14
       display: '2x2'
+      queue: mup-22
       material: LEATHER_CHESTPLATE
       hide-attributes: true
       name: '<#b48cff><b>2x2</b>'
       lore:
         - '<gray>Команды по 2 · 2 команды'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
     duo4:
       slot: 15
       display: '2x4'
+      queue: mup-24
       material: IRON_CHESTPLATE
       hide-attributes: true
       name: '<#b48cff><b>2x4</b>'
       lore:
         - '<gray>Команды по 2 · 4 команды'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
     duo8:
       slot: 16
       display: '2x8'
+      queue: mup-28
       material: DIAMOND_CHESTPLATE
       hide-attributes: true
       name: '<#b48cff><b>2x8</b>'
       lore:
         - '<gray>Команды по 2 · 8 команд'
         - ''
-        - '<dark_gray>Скоро'
+        - '<yellow>▶ Играть'
 
 scoreboard:
   enabled: true

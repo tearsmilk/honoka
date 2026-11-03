@@ -137,6 +137,10 @@ final class PvpListener implements Listener {
                 && e.getCause() != EntityKnockbackEvent.Cause.SWEEP_ATTACK) {
             return;
         }
+        // снаряды (снежки, яйца, стрелы) — оставляем ванильную отдачу: своя считается только для ударов
+        if (e instanceof com.destroystokyo.paper.event.entity.EntityKnockbackByEntityEvent kb && kb.getHitBy() instanceof org.bukkit.entity.Projectile) {
+            return;
+        }
         CombatProfile profile = e.getEntity() instanceof Player p ? combat.profile(p) : null;
         if (profile != null && profile.knockback.custom()) {
             e.setCancelled(true);

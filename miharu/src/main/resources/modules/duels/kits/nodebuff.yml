@@ -63,7 +63,6 @@ rules:
   damage: true
   hunger: true
   natural-regen: true
-  pearl-cooldown-ticks: 0
 bot:
   enabled: true
   heals: 10          # бот «пьёт» хилки

@@ -42,6 +42,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private KitEditor editor;
     private CustomKits customKits;
     private KitBuilder builder;
+    private Meetups meetups;
     /** Какой свой кит игрок выбрал для очереди «Свой кит». */
     private final java.util.Map<java.util.UUID, dev.tearsmilk.miharu.core.kit.Kit> customSelection = new java.util.HashMap<>();
     private final java.util.Map<dev.tearsmilk.miharu.pvp.CombatVersion, KitSpec> customSpecs = new java.util.EnumMap<>(dev.tearsmilk.miharu.pvp.CombatVersion.class);
@@ -75,6 +76,9 @@ public final class DuelsModule extends MiharuModule implements Listener {
         customKits.createTables();
         builder = new KitBuilder(this);
         listen(builder);
+        meetups = new Meetups(this);
+        meetups.load();
+        listen(meetups);
         buildCustomSpecs();
         dev.tearsmilk.miharu.core.kit.Kit.layouts = (uuid, kit) -> layouts.get(uuid, kit);
         plugin.registerCommand("kit", "Раскладка китов: /kit edit", List.of("kiteditor", "layout"), new io.papermc.paper.command.brigadier.BasicCommand() {
@@ -152,6 +156,11 @@ public final class DuelsModule extends MiharuModule implements Listener {
     protected void onReload() {
         reloadKits();
         buildCustomSpecs();
+        meetups.load();
+    }
+
+    public Meetups meetups() {
+        return meetups;
     }
 
     /** Спец-киты очереди «Свой кит» для 1.8 и 1.9 (у каждого игрока в игре — свой кит). */
@@ -239,6 +248,9 @@ public final class DuelsModule extends MiharuModule implements Listener {
         KitSpec s = kits.spec(id);
         if (s == null) {
             s = modernKits.spec(id);
+        }
+        if (s == null && meetups != null && meetups.spec(id) != null) {
+            return meetups.spec(id);
         }
         if (s == null && id != null) {
             for (KitSpec c : customSpecs.values()) {
@@ -369,7 +381,9 @@ public final class DuelsModule extends MiharuModule implements Listener {
             return false;
         }
         GameModule games = plugin.module(GameModule.class);
-        FfaGame game = new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        Game game = meetups.mode(spec.id()) != null
+                ? new MeetupGame(this, games, arena, spec, meetups.mode(spec.id()), players)
+                : new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
         return games.games().start(game, players);
     }
 
