@@ -1,5 +1,5 @@
 # BoxPvP 1x4 / 2x4 / 3x4 / 4x4: мини-лобби → выбор класса (PvP только 1.9) → бой за квадрат 3x3.
-# Поставь все 9 блоков шерсти своего цвета и удержи их (boxpvp.hold-time в modules/duels/config.yml, по умолчанию 10 с).
+# Поставь все 9 блоков шерсти своего цвета и удержи их (boxpvp.hold-time в modules/duels/config.yml, по умолчанию 3 с).
 # Классы — ниже в classes (формат как у китов дуэлей: armor, items, effects, icon). Каждому дополнительно: 64 шерсти и ножницы.
 # effects: 'эффект:уровень(0 = I):длительность в тиках' — выдаются при каждом появлении.
 display: '<#5fd6c4>BoxPvP'
@@ -102,34 +102,31 @@ classes:
       - 'speed:0:1000000'
   tank:
     display: '<#8a9bff>Танк'
+    revision: 2
     icon:
-      material: SHIELD
+      material: DIAMOND_CHESTPLATE
       hide-attributes: true
       name: '<#8a9bff><b>Танк</b>'
       lore:
         - '<gray>Много защиты, но медленный'
-        - '<gray>Алмазная броня (Защита III), +4 сердца, Медлительность I'
+        - '<gray>Алмазная броня (Защита II), +4 сердца, Медлительность I'
     armor:
       helmet:
         material: DIAMOND_HELMET
         enchants:
-          protection: 3
+          protection: 2
       chestplate:
         material: DIAMOND_CHESTPLATE
         enchants:
-          protection: 3
+          protection: 2
       leggings:
         material: DIAMOND_LEGGINGS
         enchants:
-          protection: 3
+          protection: 2
       boots:
         material: DIAMOND_BOOTS
         enchants:
-          protection: 3
-      offhand:
-        material: SHIELD
-        enchants:
-          unbreaking: 3
+          protection: 2
     items:
       0:
         material: IRON_AXE

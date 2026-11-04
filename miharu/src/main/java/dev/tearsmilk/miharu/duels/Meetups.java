@@ -181,6 +181,10 @@ public final class Meetups implements Listener {
     /** Минимум для быстрого старта: половина (quick-start.fraction) от нужного, но не меньше двух. */
     int quickMin(String key) {
         int need = groupSize(key);
+        int own = module.quickMin(key);
+        if (own > 0) {
+            return Math.max(2, own);
+        }
         return Math.max(2, (int) Math.ceil(need * quick().getDouble("fraction", 0.5)));
     }
 

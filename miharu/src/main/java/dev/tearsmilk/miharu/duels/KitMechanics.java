@@ -220,6 +220,45 @@ final class KitMechanics implements Listener {
         }
     }
 
+    // --- BowSpleef: огненная стрела поджигает TNT, он падает вниз и исчезает без взрыва ---
+
+    private boolean spleef(org.bukkit.World world) {
+        Game g = gameIn(world);
+        return g instanceof KitGame kg && kg.kitSpec().id().toLowerCase(java.util.Locale.ROOT).startsWith("mg-bowspleef");
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSpleefArrow(org.bukkit.event.entity.ProjectileHitEvent e) {
+        org.bukkit.block.Block b = e.getHitBlock();
+        if (b == null || b.getType() != org.bukkit.Material.TNT || !spleef(b.getWorld())) {
+            return;
+        }
+        Game g = gameIn(b.getWorld());
+        if (g == null || g.state() != Game.State.RUNNING) {
+            return;
+        }
+        b.setType(org.bukkit.Material.AIR, false);
+        org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
+        tnt.setFuseTicks(Math.max(5, module.config().getInt("bowspleef.fuse-ticks", 30)));
+        tnt.setYield(0);
+        e.getEntity().remove();
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSpleefPrime(org.bukkit.event.block.TNTPrimeEvent e) {
+        if (spleef(e.getBlock().getWorld())) {
+            e.setCancelled(true); // поджигаем сами (стрелой), без цепной реакции
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSpleefExplode(org.bukkit.event.entity.ExplosionPrimeEvent e) {
+        if (e.getEntity() instanceof org.bukkit.entity.TNTPrimed && spleef(e.getEntity().getWorld())) {
+            e.setCancelled(true);
+            e.getEntity().remove();
+        }
+    }
+
     @EventHandler(ignoreCancelled = true)
     public void onEntityExplode(org.bukkit.event.entity.EntityExplodeEvent e) {
         filterExplosion(e.getLocation().getWorld(), e.blockList());

@@ -1,0 +1,44 @@
+# GunGame — ШАБЛОН, геймплея пока нет (игра идёт как обычный FFA с пустым китом).
+# Задумка: за убийства растёт уровень; каждые levels-per-kit уровней меняется набор вещей (kits ниже).
+# Версия PvP (1.8 / 1.9) выбирается голосованием в начале игры. Кто первым прошёл все уровни — победил.
+display: '<#ffb347>GunGame'
+version: "1.8"
+arena-mode: gungame       # режим арены gg-8: точки p1..p8
+rounds: 1
+players:
+  - 8
+players-suffix: '<gray>· {format}'
+armor: {}
+items: {}
+rules:
+  damage: true
+  hunger: false
+  void-lose: false
+  max-duration-seconds: 900
+
+# --- настройки будущего геймплея (пока не используются) ---
+gungame:
+  kills-per-level: 1        # убийств для следующего уровня
+  levels-per-kit: 2         # каждые N уровней — новый набор вещей
+  max-level: 10             # прошёл последний уровень — победа
+  version-vote:
+    enabled: true           # голосование 1.8 / 1.9 в начале игры
+    seconds: 15
+  respawn-seconds: 3
+  # наборы по порядку: 1-й — уровни 1–2, 2-й — 3–4 и т.д. Формат как у китов дуэлей (armor, items)
+  kits:
+    k1:
+      armor: {}
+      items: {}
+    k2:
+      armor: {}
+      items: {}
+    k3:
+      armor: {}
+      items: {}
+    k4:
+      armor: {}
+      items: {}
+    k5:
+      armor: {}
+      items: {}

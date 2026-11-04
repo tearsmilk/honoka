@@ -23,6 +23,8 @@ arena-short:
   fireball: fb
   sumo: sumo
   boxpvp: box
+  bowspleef: bs
+  gungame: gg
 arena-size-names:
   '2': duo
   '3': trio
@@ -731,7 +733,7 @@ meetups:
 boxpvp:
   select-seconds: 30            # время выбора кита в мини-лобби
   kit-choices: 6                # если в boxpvp.yml нет classes — сколько случайных китов 1.9 предлагать
-  hold-time: 10                 # сколько секунд удерживать все 9 блоков для победы
+  hold-time: 3                  # сколько секунд удерживать все 9 блоков для победы
   respawn-seconds: 5            # кд возрождения (в это время — мини-лобби, можно сменить кит)
   wool: 64                      # шерсти своего цвета при каждом появлении
   selector:
@@ -788,3 +790,7 @@ quick-start:
       - '<gray>В очереди: <white>{waiting}/{players}'
       - '<gray>Голосов: <white>{votes}/{need}'
       - '<gray>Старт через: <white>{seconds} с'
+
+# BowSpleef: через сколько тиков подожжённый стрелой TNT исчезает (падает вниз без взрыва)
+bowspleef:
+  fuse-ticks: 30

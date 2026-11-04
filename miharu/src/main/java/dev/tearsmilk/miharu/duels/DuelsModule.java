@@ -405,6 +405,8 @@ public final class DuelsModule extends MiharuModule implements Listener {
             case "bridge" -> "br";
             case "fireball" -> "fb";
             case "boxpvp" -> "box";
+            case "bowspleef" -> "bs";
+            case "gungame" -> "gg";
             default -> mode;
         };
     }
@@ -429,6 +431,21 @@ public final class DuelsModule extends MiharuModule implements Listener {
 
     /** Размер команды варианта (BoxPvP 2x4 → 2); 1 — каждый сам за себя. */
     private final java.util.Map<String, Integer> teamSizes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    /** Свой минимум для быстрого старта (quick-start-min в yml мини-игры, например BowSpleef — от 2). */
+    private final java.util.Map<String, Integer> quickMins = new java.util.concurrent.ConcurrentHashMap<>();
+
+    void setQuickMin(String kitId, int min) {
+        if (min > 0) {
+            quickMins.put(kitId.toLowerCase(java.util.Locale.ROOT), min);
+        } else {
+            quickMins.remove(kitId.toLowerCase(java.util.Locale.ROOT));
+        }
+    }
+
+    int quickMin(String kitId) {
+        return kitId == null ? 0 : quickMins.getOrDefault(kitId.toLowerCase(java.util.Locale.ROOT), 0);
+    }
 
     void setTeamSize(String kitId, int size) {
         teamSizes.put(kitId.toLowerCase(java.util.Locale.ROOT), size);

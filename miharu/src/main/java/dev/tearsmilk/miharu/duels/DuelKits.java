@@ -30,7 +30,7 @@ public final class DuelKits {
 
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
             "archer", "soup", "leather", "opdiamond", "diamond", "uhc");
-    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp");
+    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp", "bowspleef", "gungame");
     /** Режимы, которые переехали из дуэлей 1.8 в мини-игры. */
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
@@ -119,6 +119,37 @@ public final class DuelKits {
                     by.set("team-sizes", List.of(1, 2, 3, 4));
                     by.set("teams", 4);
                     by.save(box);
+                }
+            }
+            // 0.2.21: Танк без щита и с Защитой II; удержание квадрата 3 с
+            if (minigames && box.exists()) {
+                YamlConfiguration by = YamlConfiguration.loadConfiguration(box);
+                if (by.isConfigurationSection("classes.tank") && by.getInt("classes.tank.revision", 1) < 2) {
+                    if ("SHIELD".equalsIgnoreCase(by.getString("classes.tank.armor.offhand.material", ""))) {
+                        by.set("classes.tank.armor.offhand", null);
+                    }
+                    for (String part : List.of("helmet", "chestplate", "leggings", "boots")) {
+                        if (by.getInt("classes.tank.armor." + part + ".enchants.protection", 0) == 3) {
+                            by.set("classes.tank.armor." + part + ".enchants.protection", 2);
+                        }
+                    }
+                    List<String> lore = new ArrayList<>(by.getStringList("classes.tank.icon.lore"));
+                    if (lore.size() > 1) {
+                        lore.set(1, "<gray>Алмазная броня (Защита II), +4 сердца, Медлительность I");
+                        by.set("classes.tank.icon.lore", lore);
+                    }
+                    if ("SHIELD".equalsIgnoreCase(by.getString("classes.tank.icon.material", ""))) {
+                        by.set("classes.tank.icon.material", "DIAMOND_CHESTPLATE");
+                    }
+                    by.set("classes.tank.revision", 2);
+                    by.save(box);
+                }
+                File cfgFile = new File(module.folder(), "config.yml");
+                YamlConfiguration dc = YamlConfiguration.loadConfiguration(cfgFile);
+                if (dc.getInt("boxpvp.hold-time", 3) == 10) {
+                    dc.set("boxpvp.hold-time", 3);
+                    dc.save(cfgFile);
+                    module.config().set("boxpvp.hold-time", 3);
                 }
             }
             java.nio.file.Files.write(marker.toPath(), known);
@@ -228,6 +259,7 @@ public final class DuelKits {
                             KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
                                     arenaMode, spec.arenas(), spec.bot());
                             module.setTeamSize(v.id(), ts);
+                            module.setQuickMin(v.id(), y.getInt("quick-start-min", 0));
                             variants.add(v);
                             variantSpecs.put(v.id(), v);
                         }

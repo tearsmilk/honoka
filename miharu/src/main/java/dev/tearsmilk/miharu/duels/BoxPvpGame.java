@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 /**
  * BoxPvP 1x4: мини-лобби (pre1…pre4) — 30 секунд выбрать класс (Мечник, Лучник, Танк, Поддержка, Хиллер, Ассасин),
  * потом на точки p1…p4. В центре 3x3 белой шерсти (точка box — центральный блок): поставь все 9 своего цвета
- * и удержи 10 секунд. Смерть — 5 секунд в мини-лобби (можно сменить кит) и снова в бой.
+ * и удержи 3 секунды. Смерть — 5 секунд в мини-лобби (можно сменить кит) и снова в бой.
  */
 public final class BoxPvpGame extends Game implements KitGame {
 
@@ -580,13 +580,13 @@ public final class BoxPvpGame extends Game implements KitGame {
         if (owner != holder) {
             holder = owner;
             holdTicks = 0;
-            broadcast("boxpvp.box-captured", "player", teamName(owner), "seconds", cfg().getInt("hold-time", 10));
+            broadcast("boxpvp.box-captured", "player", teamName(owner), "seconds", cfg().getInt("hold-time", 3));
             for (Player m : members(owner)) {
                 m.playSound(m.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.4f);
             }
         }
         holdTicks++;
-        if (holdTicks >= cfg().getInt("hold-time", 10) * 20) {
+        if (holdTicks >= cfg().getInt("hold-time", 3) * 20) {
             finish(owner);
         }
     }
@@ -747,7 +747,7 @@ public final class BoxPvpGame extends Game implements KitGame {
         map.put("phase", plugin.messages().raw(selecting ? "boxpvp.phase-class" : "boxpvp.phase-fight"));
         map.put("select_left", Text.time(Math.max(0, selectLeft / 20)));
         map.put("holder", holder == null ? "-" : teamName(holder));
-        int hold = cfg().getInt("hold-time", 10);
+        int hold = cfg().getInt("hold-time", 3);
         map.put("hold_left", holder == null ? "-" : Text.time(Math.max(0, hold - holdTicks / 20)));
         map.put("own_blocks", order.contains(viewer) ? ownBlocks(team(viewer)) : 0);
         map.put("team", order.contains(viewer) ? plugin.messages().raw("boxpvp.team-" + team(viewer).name().toLowerCase(java.util.Locale.ROOT)) : "-");

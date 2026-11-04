@@ -113,16 +113,47 @@ kits:
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  gungame:
+    enabled: true
+    slot: 24
+    icon:
+      material: CROSSBOW
+      hide-attributes: true
+      name: '{kit} <gray>· 1x8'
+      lore:
+        - '<gray>Каждые N уровней — новый набор вещей'
+        - '<gray>Версия PvP выбирается в начале игры'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  bowspleef:
+    enabled: true
+    slot: 23
+    icon:
+      material: BOW
+      hide-attributes: true
+      name: '{kit} <gray>· 1x8'
+      lore:
+        - '<gray>Арена из TNT, лук с огненными стрелами'
+        - '<gray>Подожжённый TNT падает вниз — скинь остальных'
+        - '<gray>Последний живой побеждает · старт от 2 игроков'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
   boxpvp:
     enabled: true
     slot: 22
     icon:
       material: CYAN_CONCRETE
       hide-attributes: true
-      name: '{kit} <gray>· 1x4'
+      name: '{kit}'
       lore:
-        - '<gray>Каждый сам за себя · 4 игрока'
-        - '<gray>Режим в разработке'
+        - '<gray>1x4 · 2x4 · 3x4 · 4x4 — выбор класса'
+        - '<gray>Захвати квадрат 3x3 своей шерстью и удержи'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - ''
