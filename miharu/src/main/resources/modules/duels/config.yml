@@ -685,19 +685,6 @@ meetups:
       display: '2x8'
       team-size: 2
       players: 16
-  # голосование за досрочный старт в очереди: когда не хватает missing игроков (например 3 из 4),
-  # ожидающим выдаётся предмет; набралось min-votes голосов — митап стартует с теми, кто есть
-  start-vote:
-    enabled: true
-    missing: 1
-    min-votes: 2
-    slot: -1                    # -1 — первый свободный слот
-    item:
-      material: LIME_DYE
-      name: '<green><b>Голосовать за старт</b> <gray>(ПКМ)'
-      lore:
-        - '<gray>В очереди: <white>{waiting}/{players}'
-        - '<gray>Голосов: <white>{votes}/{need}'
   # лут шалкеров: у каждого полный сет брони и оружие (из предметов всех дуэльных китов), остальное случайно
   loot:
     shulker: PURPLE_SHULKER_BOX
@@ -784,3 +771,20 @@ boxpvp:
       material: IRON_SWORD
       hide-attributes: true
       name: '{kit}'
+
+# Быстрый старт во всех групповых режимах (мини-игры 1x3 / 1x4, BoxPvP, митапы):
+# в очереди набралась половина участников (fraction) — пошёл таймер seconds, по истечении игра стартует с теми, кто есть.
+# Набрались все — обычный старт сразу. Предмет «Быстрый старт» запускает раньше, если проголосовала vote-fraction ожидающих (минимум 2).
+quick-start:
+  enabled: true
+  fraction: 0.5
+  seconds: 30
+  vote-fraction: 0.5
+  slot: -1                      # -1 — первый свободный слот
+  item:
+    material: LIME_DYE
+    name: '<green><b>Быстрый старт</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>В очереди: <white>{waiting}/{players}'
+      - '<gray>Голосов: <white>{votes}/{need}'
+      - '<gray>Старт через: <white>{seconds} с'

@@ -178,6 +178,10 @@ bots:
     line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{score}</white> <gray>({cps} CPS)'
 
 duels:
+  quick-start:
+    started: '{prefix}<green>Быстрый старт!</green> <gray>В очереди <white>{waiting}/{players}</white> — игра начнётся через <white>{seconds} с</white> с теми, кто есть. Зелёный краситель — начать сразу.'
+    countdown: '{prefix}<gray>Быстрый старт через <white>{seconds} с</white> <dark_gray>(</dark_gray>{waiting}/{players}<dark_gray>)'
+    actionbar: ' <dark_gray>·</dark_gray> <green>старт через {seconds} с'
   help:
     - '<gradient:#ff9ecf:#c9a7ff><b>Дуэли</b></gradient>'
     - '<white>/duel</white> <gray>— меню китов'
@@ -366,7 +370,7 @@ boxpvp:
     - '<dark_gray>───────────────────────'
 
 meetups:
-  start-vote: '{prefix}<white>{player}</white> <gray>голосует за старт <green>({votes}/{need})'
+  start-vote: '{prefix}<white>{player}</white> <gray>голосует за быстрый старт <green>({votes}/{need})'
   start-vote-already: '{prefix}<gray>Ты уже проголосовал за старт.'
   force-prep: '{prefix}<green>Подготовка пропущена — все на арену!'
   force-not-prep: '{prefix}<red>Митап уже идёт: подготовка закончилась.'

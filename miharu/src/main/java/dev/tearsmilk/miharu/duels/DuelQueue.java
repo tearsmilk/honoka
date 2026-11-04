@@ -113,16 +113,59 @@ public final class DuelQueue {
         }
     }
 
-    /** Предмет «Голосовать за старт» у ожидающих митапа, когда очередь почти полная. */
+    /** Быстрый старт: секунд до старта по очереди key. */
+    private final Map<String, Integer> quickLeft = new HashMap<>();
+
+    int quickLeft(String key) {
+        return quickLeft.getOrDefault(key, 0);
+    }
+
+    /**
+     * Быстрый старт во всех групповых режимах: набралась половина участников — идёт таймер (quick-start.seconds),
+     * по истечении игра стартует с теми, кто есть; голосование предметом запускает сразу. Набрались все — обычный старт.
+     */
     private void updateStartVoteItems() {
+        quickLeft.keySet().removeIf(k -> !module.meetups().startVoteReady(k, waiting(k)));
         for (String key : List.copyOf(byKey.keySet())) {
-            if (module.meetups().mode(key) == null) {
+            if (module.meetups().groupSize(key) == 0) {
                 continue;
             }
             int n = waiting(key);
             boolean ready = module.meetups().startVoteReady(key, n);
             if (!ready) {
                 module.meetups().clearVotes(key);
+            } else {
+                int total = Math.max(5, module.meetups().quick().getInt("seconds", 30));
+                Integer left = quickLeft.get(key);
+                if (left == null) {
+                    left = total;
+                    for (UUID id : players(key)) {
+                        Player p = Bukkit.getPlayer(id);
+                        if (p != null) {
+                            module.plugin().messages().send(p, "duels.quick-start.started", "seconds", total, "waiting", n,
+                                    "players", module.meetups().groupSize(key));
+                        }
+                    }
+                } else {
+                    left--;
+                }
+                quickLeft.put(key, left);
+                if (left <= 0) {
+                    quickLeft.remove(key);
+                    module.meetups().clearVotes(key);
+                    KitSpec spec = module.meetups().mode(key) != null ? module.meetups().spec(key) : module.spec(key);
+                    if (spec != null && forceStart(key, spec) > 0) {
+                        continue;
+                    }
+                } else if (left <= 5 || left % 10 == 0) {
+                    for (UUID id : players(key)) {
+                        Player p = Bukkit.getPlayer(id);
+                        if (p != null) {
+                            module.plugin().messages().send(p, "duels.quick-start.countdown", "seconds", left, "waiting", n,
+                                    "players", module.meetups().groupSize(key));
+                        }
+                    }
+                }
             }
             for (UUID id : players(key)) {
                 Player p = Bukkit.getPlayer(id);
@@ -131,7 +174,7 @@ public final class DuelQueue {
                 }
                 removeStartVoteItem(p);
                 if (ready) {
-                    int slot = module.meetups().cfg().getInt("start-vote.slot", -1);
+                    int slot = module.meetups().quick().getInt("slot", -1);
                     ItemStack item = module.meetups().startVoteItem(key, n);
                     if (slot >= 0 && slot < 36 && p.getInventory().getItem(slot) == null) {
                         p.getInventory().setItem(slot, item);
@@ -293,7 +336,11 @@ public final class DuelQueue {
                         "size", rankedSize(e.kit()), "range", module.ranked().range(e), "elo", module.elo().elo(p.getUniqueId(), e.kit()));
             } else {
                 boolean group = spec != null && (spec.rules().players() > 2 || module.meetups().mode(spec.id()) != null);
-                String size = group ? size(e.kit()) + "/" + spec.rules().players() : String.valueOf(size(e.kit()));
+                int full = module.meetups().groupSize(e.kit());
+                String size = group ? size(e.kit()) + "/" + (full > 0 ? full : spec.rules().players()) : String.valueOf(size(e.kit()));
+                if (quickLeft.containsKey(e.key())) {
+                    size += module.plugin().messages().raw("duels.quick-start.actionbar").replace("{seconds}", String.valueOf(quickLeft.get(e.key())));
+                }
                 module.plugin().messages().actionBar(p, "duels.queue.actionbar", "kit", spec == null ? e.kit() : spec.display(),
                         "time", time, "size", size);
             }

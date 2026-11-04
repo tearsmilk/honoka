@@ -158,20 +158,47 @@ public final class Meetups implements Listener {
 
     // --- голосование за досрочный старт (в очереди) ---
 
-    /** Очередь почти полная (не хватает meetups.start-vote.missing и меньше) — можно голосовать за старт. */
-    boolean startVoteReady(String mode, int waiting) {
-        Mode m = modes.get(mode);
-        if (m == null || !cfg().getBoolean("start-vote.enabled", true)) {
-            return false;
+    // Быстрый старт для всех групповых режимов (мини-игры 1x3/1x4, BoxPvP, митапы): duels config → quick-start
+
+    org.bukkit.configuration.ConfigurationSection quick() {
+        var s = module.config().getConfigurationSection("quick-start");
+        return s != null ? s : module.config().createSection("quick-start");
+    }
+
+    /** Сколько игроков нужно для полного матча; 0 — режим не групповой (дуэль 1x1, рейтинг). */
+    int groupSize(String key) {
+        if (key == null || key.startsWith("ranked:")) {
+            return 0;
         }
-        int missing = Math.max(0, cfg().getInt("start-vote.missing", 1));
-        return waiting >= Math.max(2, cfg().getInt("start-vote.min-votes", 2)) && waiting >= m.players() - missing && waiting < m.players();
+        Mode m = modes.get(key);
+        if (m != null) {
+            return m.players();
+        }
+        KitSpec spec = module.spec(key);
+        return spec != null && spec.rules().players() > 2 ? spec.rules().players() : 0;
+    }
+
+    /** Минимум для быстрого старта: половина (quick-start.fraction) от нужного, но не меньше двух. */
+    int quickMin(String key) {
+        int need = groupSize(key);
+        return Math.max(2, (int) Math.ceil(need * quick().getDouble("fraction", 0.5)));
+    }
+
+    /** В очереди есть половина участников, но ещё не полная — идёт быстрый старт (таймер + голосование). */
+    boolean startVoteReady(String key, int waiting) {
+        int need = groupSize(key);
+        return need > 0 && quick().getBoolean("enabled", true) && waiting >= quickMin(key) && waiting < need;
+    }
+
+    /** Голосов для мгновенного старта: quick-start.vote-fraction от ожидающих (по умолчанию половина), минимум 2. */
+    int votesNeeded(int waiting) {
+        return Math.max(2, (int) Math.ceil(waiting * quick().getDouble("vote-fraction", 0.5)));
     }
 
     ItemStack startVoteItem(String mode, int waiting) {
-        Mode m = modes.get(mode);
-        ItemStack it = Items.parse(cfg().getConfigurationSection("start-vote.item"), Map.of("waiting", waiting, "players", m == null ? 0 : m.players(),
-                "votes", startVotes.getOrDefault(mode, java.util.Set.of()).size(), "need", cfg().getInt("start-vote.min-votes", 2)));
+        ItemStack it = Items.parse(quick().getConfigurationSection("item"), Map.of("waiting", waiting, "players", groupSize(mode),
+                "votes", startVotes.getOrDefault(mode, java.util.Set.of()).size(), "need", votesNeeded(waiting),
+                "seconds", module.queue().quickLeft(mode)));
         ItemMeta meta = it.getItemMeta();
         meta.getPersistentDataContainer().set(START_VOTE, PersistentDataType.STRING, mode);
         it.setItemMeta(meta);
@@ -203,7 +230,7 @@ public final class Meetups implements Listener {
         e.setCancelled(true);
         Player p = e.getPlayer();
         DuelQueue.Entry entry = module.queue().entry(p);
-        if (entry == null || modes.get(entry.kit()) == null) {
+        if (entry == null || entry.ranked() || groupSize(entry.kit()) == 0) {
             return;
         }
         String mode = entry.kit();
@@ -216,7 +243,7 @@ public final class Meetups implements Listener {
             module.plugin().messages().send(p, "meetups.start-vote-already");
             return;
         }
-        int need = Math.max(2, cfg().getInt("start-vote.min-votes", 2));
+        int need = votesNeeded(waiting);
         for (java.util.UUID id : module.queue().players(mode)) {
             Player q = org.bukkit.Bukkit.getPlayer(id);
             if (q != null) {
@@ -226,7 +253,7 @@ public final class Meetups implements Listener {
         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.4f);
         if (set.size() >= need) {
             startVotes.remove(mode);
-            KitSpec spec = specs.get(mode);
+            KitSpec spec = specs.containsKey(mode) ? specs.get(mode) : module.spec(mode);
             if (spec != null) {
                 module.queue().forceStart(mode, spec);
             }
