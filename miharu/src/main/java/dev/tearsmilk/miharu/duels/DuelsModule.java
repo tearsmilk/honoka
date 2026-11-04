@@ -404,6 +404,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
             case "bedwars" -> "bw";
             case "bridge" -> "br";
             case "fireball" -> "fb";
+            case "boxpvp" -> "box";
             default -> mode;
         };
     }

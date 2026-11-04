@@ -30,7 +30,7 @@ public final class DuelKits {
 
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
             "archer", "soup", "leather", "opdiamond", "diamond", "uhc");
-    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup");
+    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp");
     /** Режимы, которые переехали из дуэлей 1.8 в мини-игры. */
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",

@@ -113,3 +113,17 @@ kits:
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  boxpvp:
+    enabled: true
+    slot: 22
+    icon:
+      material: CYAN_CONCRETE
+      hide-attributes: true
+      name: '{kit} <gray>· 1x4'
+      lore:
+        - '<gray>Каждый сам за себя · 4 игрока'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

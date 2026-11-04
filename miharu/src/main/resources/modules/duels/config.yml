@@ -14,7 +14,7 @@ golden-head:
     - absorption:0:2400
 
 # Режимы арен по числу игроков для мини-игр с вариантами 1x1/1x3/1x4:
-# <короткое имя>-<размер>, например sw-duo (2 игрока), sw-trio (3), sw-quatro (4); bw-*, br-*, fb-*, sumo-*.
+# <короткое имя>-<размер>, например sw-duo (2 игрока), sw-trio (3), sw-quatro (4); bw-*, br-*, fb-*, sumo-*, box-quatro.
 # /arena mode sw-trio — плагин скажет, какие точки нужны. Старые арены с общим режимом (skywars) тоже подходят.
 arena-short:
   skywars: sw
@@ -22,6 +22,7 @@ arena-short:
   bridge: br
   fireball: fb
   sumo: sumo
+  boxpvp: box
 arena-size-names:
   '2': duo
   '3': trio

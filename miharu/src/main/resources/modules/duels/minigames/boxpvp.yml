@@ -1,0 +1,13 @@
+# Мини-игра (только против игроков, всегда PvP 1.8). Формат как у китов дуэлей (modules/duels/kits/).
+# BoxPvP — пока заготовка: кит и правила пустые, заполни позже.
+display: '<#5fd6c4>BoxPvP'
+version: "1.8"
+arena-mode: boxpvp        # режим арены box-quatro: точки p1, p2, p3, p4
+rounds: 1
+# режимы арены по числу игроков: box-quatro (см. arena-short в modules/duels/config.yml)
+players:
+  - 4
+players-suffix: '<gray>· {format}'
+armor: {}
+items: {}
+rules: {}
