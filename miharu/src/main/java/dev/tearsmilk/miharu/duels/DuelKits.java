@@ -111,6 +111,16 @@ public final class DuelKits {
             if (minigames && box.exists() && !YamlConfiguration.loadConfiguration(box).contains("classes")) {
                 module.plugin().saveResource("modules/duels/" + folder + "/boxpvp.yml", true);
             }
+            // 0.2.17 → командные режимы 2x4 / 3x4 / 4x4 (классы игрока не трогаем)
+            if (minigames && box.exists()) {
+                YamlConfiguration by = YamlConfiguration.loadConfiguration(box);
+                if (!by.contains("team-sizes")) {
+                    by.set("players", null);
+                    by.set("team-sizes", List.of(1, 2, 3, 4));
+                    by.set("teams", 4);
+                    by.save(box);
+                }
+            }
             java.nio.file.Files.write(marker.toPath(), known);
         } catch (java.io.IOException e) {
             module.plugin().getLogger().warning("Не удалось обновить список китов: " + e.getMessage());
@@ -169,6 +179,12 @@ public final class DuelKits {
                 List<KitSpec> variants = new ArrayList<>();
                 boolean legacyPlayers = "players".equalsIgnoreCase(y.getString("variants-type", "rounds"));
                 List<Integer> playerOpts = legacyPlayers ? y.getIntegerList("variants") : y.getIntegerList("players");
+                // командные варианты: team-sizes: [1, 2, 3, 4] и teams: 4 → 1x4, 2x4, 3x4, 4x4 (точки p1…p4 — по одной на команду)
+                List<Integer> teamSizes = y.getIntegerList("team-sizes");
+                int teamsCount = Math.max(2, y.getInt("teams", 4));
+                if (!legacyPlayers && !teamSizes.isEmpty()) {
+                    playerOpts = teamSizes.stream().map(t -> Math.max(1, t) * teamsCount).distinct().toList();
+                }
                 List<Integer> roundOpts = legacyPlayers ? List.of() : y.getIntegerList("variants");
                 String playersSuffix = y.getString(legacyPlayers ? "variant-suffix" : "players-suffix", "<gray>· {format}");
                 String roundsSuffix = legacyPlayers ? "" : y.getString("variant-suffix", "<gray>· {count}");
@@ -177,8 +193,12 @@ public final class DuelKits {
                     List<Integer> rList = roundOpts.isEmpty() ? java.util.Collections.singletonList(null) : roundOpts;
                     for (int n : pList) {
                         for (Integer r : rList) {
+                            int ts = teamSizes.isEmpty() ? 1 : Math.max(1, n / teamsCount);
+                            String format = ts > 1 ? ts + "x" + teamsCount : n <= 2 ? "1x1" : "1x" + n;
                             String vid;
-                            if (playerOpts.isEmpty()) {
+                            if (ts > 1) {
+                                vid = id + "-" + format + (r == null ? "" : "-" + r);
+                            } else if (playerOpts.isEmpty()) {
                                 vid = id + "-" + r;
                             } else if (roundOpts.isEmpty()) {
                                 vid = id + "-" + n;
@@ -187,7 +207,7 @@ public final class DuelKits {
                             }
                             StringBuilder name = new StringBuilder(spec.display());
                             if (!playerOpts.isEmpty()) {
-                                name.append(' ').append(playersSuffix.replace("{format}", n <= 2 ? "1x1" : "1x" + n)
+                                name.append(' ').append(playersSuffix.replace("{format}", format)
                                         .replace("{count}", String.valueOf(n)).replace("{opponents}", String.valueOf(Math.max(1, n - 1))));
                             }
                             if (r != null) {
@@ -201,12 +221,13 @@ public final class DuelKits {
                             String arenaMode = spec.arenaMode();
                             if (!playerOpts.isEmpty()) {
                                 String shortName = y.getString("arena-short", module.arenaShort(spec.arenaMode()));
-                                arenaMode = shortName + "-" + module.sizeName(n);
-                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n, rules.objective(), Text.plain(Text.mm(spec.display())),
-                                        y.getStringList("player-points"), y.getStringList("extra-points"));
+                                arenaMode = shortName + "-" + (ts > 1 ? format : module.sizeName(n));
+                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n / ts, rules.objective(), Text.plain(Text.mm(spec.display())),
+                                        y.getStringList("player-points"), y.getStringList("extra-points"), format);
                             }
                             KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
                                     arenaMode, spec.arenas(), spec.bot());
+                            module.setTeamSize(v.id(), ts);
                             variants.add(v);
                             variantSpecs.put(v.id(), v);
                         }

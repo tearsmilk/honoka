@@ -73,6 +73,7 @@ scoreboard:
     boxpvp:
       - '<dark_gray>#{game_id} · {arena}'
       - ''
+      - '<white>{format} <dark_gray>·</dark_gray> команда {team}'
       - '<white>Класс: {kit}'
       - '<white>Фаза: {phase}'
       - ''

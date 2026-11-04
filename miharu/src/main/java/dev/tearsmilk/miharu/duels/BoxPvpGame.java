@@ -68,7 +68,8 @@ public final class BoxPvpGame extends Game implements KitGame {
     private final List<Block> box = new ArrayList<>();
     private boolean selecting = true;
     private int selectLeft;
-    private UUID holder;
+    private final int teamSize;
+    private Kit.Team holder;
     private int holdTicks;
     private boolean finished;
     private String winnerName = "-";
@@ -79,6 +80,7 @@ public final class BoxPvpGame extends Game implements KitGame {
         this.spec = spec;
         this.combat = combat;
         this.order = new ArrayList<>(players);
+        this.teamSize = duels.teamSize(spec);
         // классы BoxPvP — modules/duels/minigames/boxpvp.yml → classes
         YamlConfiguration y = YamlConfiguration.loadConfiguration(new File(duels.folder(), "minigames/boxpvp.yml"));
         ConfigurationSection cls = y.getConfigurationSection("classes");
@@ -135,13 +137,17 @@ public final class BoxPvpGame extends Game implements KitGame {
         return Math.max(0, order.indexOf(p));
     }
 
-    private Kit.Team team(Player p) {
-        Kit.Team[] t = Kit.Team.values();
-        return t[index(p) % t.length];
+    /** Игроки раскладываются по 4 командам: 0,4,8… — красные, 1,5,9… — синие и т.д. */
+    private int teamIndex(Player p) {
+        return index(p) % Kit.Team.values().length;
     }
 
-    private Material wool(Player p) {
-        return switch (team(p)) {
+    private Kit.Team team(Player p) {
+        return Kit.Team.values()[teamIndex(p)];
+    }
+
+    private Material wool(Kit.Team t) {
+        return switch (t) {
             case RED -> Material.RED_WOOL;
             case BLUE -> Material.BLUE_WOOL;
             case GREEN -> Material.LIME_WOOL;
@@ -149,9 +155,52 @@ public final class BoxPvpGame extends Game implements KitGame {
         };
     }
 
+    private List<Player> members(Kit.Team t) {
+        List<Player> list = new ArrayList<>();
+        for (Player p : order) {
+            if (players.contains(p) && team(p) == t) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
+    private boolean sameTeam(Player a, Player b) {
+        return teamSize > 1 && order.contains(a) && order.contains(b) && team(a) == team(b);
+    }
+
+    /** Имя для сообщений: в 1x4 — ник, в командах — «Красные». */
+    private String teamName(Kit.Team t) {
+        if (teamSize <= 1) {
+            for (Player p : order) {
+                if (team(p) == t) {
+                    return p.getName();
+                }
+            }
+        }
+        return plugin.messages().raw("boxpvp.team-" + t.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    /** Класс занят напарником по команде. */
+    private Player takenBy(Player p, KitSpec k) {
+        if (teamSize <= 1) {
+            return null;
+        }
+        for (Player o : members(team(p))) {
+            if (o != p && chosen.get(o.getUniqueId()) == k) {
+                return o;
+            }
+        }
+        return null;
+    }
+
+    private Material wool(Player p) {
+        return wool(team(p));
+    }
+
     @Override
     protected Location spawnFor(Player p) {
-        int n = index(p) + 1;
+        int n = teamIndex(p) + 1; // точки p1…p4 / pre1…pre4 — по одной на команду
         return selecting || respawning.contains(p.getUniqueId()) ? instance.spawn("pre" + n, "p" + n) : instance.spawn("p" + n, "p1");
     }
 
@@ -197,9 +246,12 @@ public final class BoxPvpGame extends Game implements KitGame {
             ItemStack icon = Items.parse(iconCfg, ph);
             ItemMeta meta = icon.getItemMeta();
             boolean mine = chosen.get(p.getUniqueId()) == k;
+            Player taken = takenBy(p, k);
             List<String> lore = new ArrayList<>(iconCfg != null ? iconCfg.getStringList("lore") : List.of());
             lore.add("");
-            lore.add(plugin.messages().raw(mine ? "boxpvp.lore-chosen" : "boxpvp.lore-choose"));
+            lore.add(mine ? plugin.messages().raw("boxpvp.lore-chosen")
+                    : taken != null ? plugin.messages().raw("boxpvp.lore-taken").replace("{player}", taken.getName())
+                    : plugin.messages().raw("boxpvp.lore-choose"));
             meta.lore(Text.lore(lore, ph));
             meta.setEnchantmentGlintOverride(mine);
             icon.setItemMeta(meta);
@@ -208,7 +260,21 @@ public final class BoxPvpGame extends Game implements KitGame {
                     pl.closeInventory();
                     return;
                 }
+                Player tk = takenBy(pl, k);
+                if (tk != null) {
+                    plugin.messages().send(pl, "boxpvp.class-taken", "kit", k.display(), "player", tk.getName());
+                    pl.playSound(pl.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+                    return;
+                }
                 chosen.put(pl.getUniqueId(), k);
+                for (Player mate : members(team(pl))) {
+                    if (mate != pl) {
+                        plugin.messages().send(mate, "boxpvp.mate-chosen", "player", pl.getName(), "kit", k.display());
+                        if (mate.getOpenInventory().getTopInventory().getHolder(false) instanceof Menu && canChoose(mate)) {
+                            openSelect(mate); // обновить «занято»
+                        }
+                    }
+                }
                 pl.playSound(pl.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.3f);
                 plugin.messages().send(pl, "boxpvp.class-chosen", "kit", k.display());
                 pl.closeInventory();
@@ -265,7 +331,14 @@ public final class BoxPvpGame extends Game implements KitGame {
     private KitSpec kitOf(Player p) {
         KitSpec k = chosen.get(p.getUniqueId());
         if (k == null && !choices.isEmpty()) {
-            k = choices.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(choices.size()));
+            List<KitSpec> free = new ArrayList<>();
+            for (KitSpec c : choices) {
+                if (takenBy(p, c) == null) {
+                    free.add(c);
+                }
+            }
+            List<KitSpec> from = free.isEmpty() ? choices : free;
+            k = from.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(from.size()));
             chosen.put(p.getUniqueId(), k);
             plugin.messages().send(p, "boxpvp.class-random", "kit", k.display());
         }
@@ -319,21 +392,21 @@ public final class BoxPvpGame extends Game implements KitGame {
             }
         }
         if (spec.rules().maxDurationSeconds() > 0 && runningTicks >= spec.rules().maxDurationSeconds() * 20) {
-            Player best = null;
+            Kit.Team best = null;
             int bestCount = -1;
-            for (Player p : order) {
-                int c = ownBlocks(p);
-                if (players.contains(p) && c > bestCount) {
+            for (Kit.Team t : Kit.Team.values()) {
+                int c = ownBlocks(t);
+                if (!members(t).isEmpty() && c > bestCount) {
                     bestCount = c;
-                    best = p;
+                    best = t;
                 }
             }
             finish(best);
         }
     }
 
-    private int ownBlocks(Player p) {
-        Material w = wool(p);
+    private int ownBlocks(Kit.Team t) {
+        Material w = wool(t);
         int n = 0;
         for (Block b : box) {
             if (b.getType() == w) {
@@ -349,30 +422,29 @@ public final class BoxPvpGame extends Game implements KitGame {
             return;
         }
         Material first = box.getFirst().getType();
-        Player owner = null;
+        Kit.Team owner = null;
         if (box.stream().allMatch(b -> b.getType() == first)) {
-            for (Player p : order) {
-                if (players.contains(p) && wool(p) == first) {
-                    owner = p;
+            for (Kit.Team t : Kit.Team.values()) {
+                if (wool(t) == first && !members(t).isEmpty()) {
+                    owner = t;
                 }
             }
         }
         if (owner == null) {
             if (holder != null) {
-                Player old = Bukkit.getPlayer(holder);
-                if (old != null) {
-                    broadcast("boxpvp.lost", "player", old.getName());
-                }
+                broadcast("boxpvp.box-lost", "player", teamName(holder));
             }
             holder = null;
             holdTicks = 0;
             return;
         }
-        if (!owner.getUniqueId().equals(holder)) {
-            holder = owner.getUniqueId();
+        if (owner != holder) {
+            holder = owner;
             holdTicks = 0;
-            broadcast("boxpvp.captured", "player", owner.getName(), "seconds", cfg().getInt("hold-time", 10));
-            owner.playSound(owner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.4f);
+            broadcast("boxpvp.box-captured", "player", teamName(owner), "seconds", cfg().getInt("hold-time", 10));
+            for (Player m : members(owner)) {
+                m.playSound(m.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.4f);
+            }
         }
         holdTicks++;
         if (holdTicks >= cfg().getInt("hold-time", 10) * 20) {
@@ -392,7 +464,7 @@ public final class BoxPvpGame extends Game implements KitGame {
             Player attacker = ed.getDamager() instanceof Player dp ? dp
                     : ed.getDamager() instanceof Projectile pr && pr.getShooter() instanceof Player sp ? sp : null;
             if (attacker != null && attacker != p) {
-                if (respawning.contains(attacker.getUniqueId())) {
+                if (respawning.contains(attacker.getUniqueId()) || sameTeam(attacker, p)) {
                     e.setCancelled(true);
                     return true;
                 }
@@ -450,8 +522,29 @@ public final class BoxPvpGame extends Game implements KitGame {
         duels.stats().add(p, spec.id(), false);
         List<Player> rest = new ArrayList<>(players);
         rest.remove(p);
-        if (rest.size() <= 1) {
-            Bukkit.getScheduler().runTask(plugin, () -> finish(rest.isEmpty() ? null : rest.getFirst()));
+        Set<Kit.Team> teams = new HashSet<>();
+        for (Player o : rest) {
+            teams.add(team(o));
+        }
+        if (teams.size() <= 1) {
+            Bukkit.getScheduler().runTask(plugin, () -> finish(teams.isEmpty() ? null : teams.iterator().next()));
+        }
+    }
+
+    /** Вредные взрывные зелья (медлительность, слабость…) не действуют на напарников. */
+    void filterSplash(org.bukkit.event.entity.PotionSplashEvent e) {
+        if (teamSize <= 1 || !(e.getPotion().getShooter() instanceof Player shooter)) {
+            return;
+        }
+        boolean harmful = e.getPotion().getEffects().stream()
+                .anyMatch(ef -> ef.getType().getCategory() == org.bukkit.potion.PotionEffectTypeCategory.HARMFUL);
+        if (!harmful) {
+            return;
+        }
+        for (var le : e.getAffectedEntities()) {
+            if (le instanceof Player t && t != shooter && sameTeam(shooter, t)) {
+                e.setIntensity(le, 0);
+            }
         }
     }
 
@@ -478,22 +571,23 @@ public final class BoxPvpGame extends Game implements KitGame {
 
     // --- конец ---
 
-    private void finish(Player w) {
+    private void finish(Kit.Team w) {
         if (finished) {
             return;
         }
         finished = true;
-        winnerName = w == null ? "-" : w.getName();
+        winnerName = w == null ? "-" : teamName(w);
         for (Player p : order) {
             if (players.contains(p)) {
-                duels.stats().add(p, spec.id(), p == w);
+                duels.stats().add(p, spec.id(), team(p) == w);
             }
         }
         for (Player p : List.copyOf(players)) {
             Object[] kv = placeholders(p).entrySet().stream().flatMap(en -> Stream.of(en.getKey(), en.getValue())).toArray();
-            plugin.messages().title(p, p == w ? "duels.win" : "minigames.ffa-end", kv);
+            boolean won = team(p) == w;
+            plugin.messages().title(p, won ? "duels.win" : "minigames.ffa-end", kv);
             plugin.messages().sendList(p, "boxpvp.summary", kv);
-            p.playSound(p.getLocation(), p == w ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+            p.playSound(p.getLocation(), won ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
         end();
     }
@@ -513,11 +607,23 @@ public final class BoxPvpGame extends Game implements KitGame {
         map.put("kit", chosen.containsKey(viewer.getUniqueId()) ? chosen.get(viewer.getUniqueId()).display() : "-");
         map.put("phase", plugin.messages().raw(selecting ? "boxpvp.phase-class" : "boxpvp.phase-fight"));
         map.put("select_left", Text.time(Math.max(0, selectLeft / 20)));
-        Player h = holder == null ? null : Bukkit.getPlayer(holder);
-        map.put("holder", h == null ? "-" : h.getName());
+        map.put("holder", holder == null ? "-" : teamName(holder));
         int hold = cfg().getInt("hold-time", 10);
-        map.put("hold_left", h == null ? "-" : Text.time(Math.max(0, hold - holdTicks / 20)));
-        map.put("own_blocks", order.contains(viewer) ? ownBlocks(viewer) : 0);
+        map.put("hold_left", holder == null ? "-" : Text.time(Math.max(0, hold - holdTicks / 20)));
+        map.put("own_blocks", order.contains(viewer) ? ownBlocks(team(viewer)) : 0);
+        map.put("team", order.contains(viewer) ? plugin.messages().raw("boxpvp.team-" + team(viewer).name().toLowerCase(java.util.Locale.ROOT)) : "-");
+        map.put("format", duels.format(spec));
+        StringBuilder mates = new StringBuilder();
+        if (order.contains(viewer)) {
+            for (Player m : members(team(viewer))) {
+                if (m != viewer) {
+                    KitSpec mk = chosen.get(m.getUniqueId());
+                    mates.append(mates.isEmpty() ? "" : "<gray>, ").append("<white>").append(m.getName())
+                            .append(mk == null ? "" : " <gray>(" + mk.display() + "<gray>)");
+                }
+            }
+        }
+        map.put("teammates", mates.isEmpty() ? "-" : mates.toString());
         map.put("kills", kills.getOrDefault(viewer.getUniqueId(), 0));
         map.put("players_left", players.size());
         map.put("winner", winnerName);

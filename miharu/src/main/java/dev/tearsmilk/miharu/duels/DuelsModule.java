@@ -424,7 +424,25 @@ public final class DuelsModule extends MiharuModule implements Listener {
     }
 
     void registerVariantArenaMode(String id, String base, int players, dev.tearsmilk.miharu.core.kit.KitRules.Objective objective, String display) {
-        registerVariantArenaMode(id, base, players, objective, display, List.of(), List.of());
+        registerVariantArenaMode(id, base, players, objective, display, List.of(), List.of(), null);
+    }
+
+    /** Размер команды варианта (BoxPvP 2x4 → 2); 1 — каждый сам за себя. */
+    private final java.util.Map<String, Integer> teamSizes = new java.util.concurrent.ConcurrentHashMap<>();
+
+    void setTeamSize(String kitId, int size) {
+        teamSizes.put(kitId.toLowerCase(java.util.Locale.ROOT), size);
+    }
+
+    public int teamSize(KitSpec spec) {
+        return Math.max(1, teamSizes.getOrDefault(spec.id().toLowerCase(java.util.Locale.ROOT), 1));
+    }
+
+    /** 1x1 / 1x4 / 2x4 … */
+    public String format(KitSpec spec) {
+        int pl = spec.rules().players();
+        int ts = teamSize(spec);
+        return ts > 1 ? ts + "x" + Math.max(1, pl / ts) : pl <= 2 ? "1x1" : "1x" + pl;
     }
 
     /**
@@ -432,7 +450,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
      * @param extras    общие точки арены (box)
      */
     void registerVariantArenaMode(String id, String base, int players, dev.tearsmilk.miharu.core.kit.KitRules.Objective objective, String display,
-                                  List<String> perPlayer, List<String> extras) {
+                                  List<String> perPlayer, List<String> extras, String format) {
         variantBase.put(id, base);
         ArenaModule arenas = plugin.module(ArenaModule.class);
         if (arenas == null) {
@@ -454,12 +472,12 @@ public final class DuelsModule extends MiharuModule implements Listener {
             }
         }
         spawns.addAll(extras);
-        arenas.registerMode(new ArenaMode(id, display + " · " + (players <= 2 ? "1x1" : "1x" + players), spawns));
+        arenas.registerMode(new ArenaMode(id, display + " · " + (format != null ? format : players <= 2 ? "1x1" : "1x" + players), spawns));
     }
 
     public Arena arenaFor(KitSpec spec) {
         ArenaModule arenas = plugin.module(ArenaModule.class);
-        int need = spec.rules().players();
+        int need = spec.rules().players() / teamSize(spec); // в командных режимах точки на команду
         List<Arena> candidates = new ArrayList<>(arenas.arenas().forMode(spec.arenaMode()));
         String base = variantBase.get(spec.arenaMode());
         if (base != null) {

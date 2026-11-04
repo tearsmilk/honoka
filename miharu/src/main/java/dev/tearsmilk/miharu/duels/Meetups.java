@@ -261,6 +261,17 @@ public final class Meetups implements Listener {
         menu.open(p);
     }
 
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBoxSplash(org.bukkit.event.entity.PotionSplashEvent e) {
+        if (!(e.getPotion().getShooter() instanceof org.bukkit.entity.Player p)) {
+            return;
+        }
+        GameModule games = module.plugin().module(GameModule.class);
+        if (games != null && games.games().of(p) instanceof BoxPvpGame bg) {
+            bg.filterSplash(e);
+        }
+    }
+
     /** Сундук выбора кита в BoxPvP (мини-лобби). */
     @EventHandler(priority = EventPriority.HIGH)
     public void onBoxSelector(PlayerInteractEvent e) {

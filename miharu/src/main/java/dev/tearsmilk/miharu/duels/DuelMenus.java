@@ -129,13 +129,21 @@ public final class DuelMenus {
         Map<String, Object> ph = placeholders(p, entry.spec());
         Menu menu = new Menu(s.getInt("rows", 3), Text.mm(s.getString("title", "Вариант"), ph));
         java.util.List<Integer> slots = s.getIntegerList("slots");
+        if (options.size() > slots.size()) {
+            // вариантов больше, чем мест в конфиге (BoxPvP 1x4/2x4/3x4/4x4) — раскладываем по центру 2-го ряда
+            int k = Math.min(7, options.size());
+            slots = new java.util.ArrayList<>();
+            for (int i = 0; i < k; i++) {
+                slots.add(k <= 4 ? 13 - (k - 1) + i * 2 : 13 - (k - 1) / 2 + i);
+            }
+        }
         for (int i = 0; i < options.size() && i < slots.size(); i++) {
             KitSpec v = options.get(i);
             int pl = v.rules().players();
             int count = byPlayers ? pl : v.rules().scoreToWin();
             Map<String, Object> vph = placeholders(p, v);
             vph.put("count", count);
-            vph.put("format", pl <= 2 ? "1x1" : "1x" + pl);
+            vph.put("format", module.format(v));
             vph.put("opponents", Math.max(1, pl - 1));
             vph.put("goal", Text.plain(Text.mm(module.plugin().messages().raw(byPlayers ? "minigames.goal-players"
                     : "minigames.goal-" + v.rules().objective().name().toLowerCase()))));
