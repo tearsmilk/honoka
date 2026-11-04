@@ -11,7 +11,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 | `game` | Запуск/остановка игр, снимок инвентаря (переживает краш), своё табло и таб, изоляция игроков, возврат (в т.ч. на лобби через Velocity) | `modules/game/config.yml` |
 | `bots` | Пакетные фейк-игроки (без сущности на сервере), ИИ easy/medium/hard, дуэль с ботом (по киту) и клик-тест, меню, статистика | `modules/bots/config.yml`, `kits.yml`, `menu.yml` |
 | `duels` | Дуэли 1 на 1 по 16 китам 1.8 (NoDebuff, Debuff, Gapple, BuildUHC, Combo, Boxing, Sumo, Classic, Archer, Soup, Bridge, MLG Rush, Leather, OP Diamond, Diamond, UHC): очередь по киту, раунды, цели Bridge, кровати MLG, суп, золотые головы | `modules/duels/config.yml`, `kits/config.yml`, `kits/<id>.yml` |
-| `duels` (мини-игры) | Огненный заряд во 2-м слоте: BedWars, SkyWars, The Bridge (3/5/7), Fireball Fight, Sumo — 1x1 / 1x3 / 1x4 (каждый сам за себя); MLG Rush (5/10/20); Meetup 1x2 (тест); GunGame 1x8 (шаблон, без геймплея; режим арены gg-8); BowSpleef 1x8 (арена из TNT, лук Бесконечность+Огонь, TNT от стрелы падает без взрыва; точки p1–p8, режим арены bs-8, старт от 2); BoxPvP 1x4 / 2x4 / 3x4 / 4x4 (в командах — выбор команды в мини-лобби, классы в команде не повторяются; мини-лобби, выбор класса за 30 с — Мечник, Лучник, Танк, Поддержка, Хиллер, Ассасин; захват квадрата 3x3 шерстью и удержание 3 с; точки p1–p4, pre1–pre4, box) — 1x1, только игроки, PvP 1.8 | `modules/duels/minigames/` |
+| `duels` (мини-игры) | Огненный заряд во 2-м слоте: BedWars, SkyWars, The Bridge (3/5/7), Fireball Fight, Sumo — 1x1 / 1x3 / 1x4 (каждый сам за себя); MLG Rush (5/10/20); Meetup 1x2 (тест); GunGame 1x8 (шаблон, без геймплея; режим арены gg-8); BowSpleef 1x8 (арена из TNT, лук Бесконечность+Огонь, стрела поджигает TNT в радиусе 2–3 блока, он падает без взрыва; без урона и отдачи; перо — 3 двойных прыжка; точки p1–p8, режим арены bs-8, старт от 2); BoxPvP 1x4 / 2x4 / 3x4 / 4x4 (в командах — выбор команды в мини-лобби, классы в команде не повторяются; мини-лобби, выбор класса за 30 с — Мечник, Лучник, Танк, Поддержка, Хиллер, Ассасин; захват квадрата 3x3 шерстью и удержание 3 с; точки p1–p4, pre1–pre4, box) — 1x1, только игроки, PvP 1.8 | `modules/duels/minigames/` |
 | `duels` (1.9) | Медленное PvP: 16 китов (Sword & Shield, Diamond, OP Diamond, Heavy, Axe & Shield, Mace, OP Mace, Trident, Spear, Netherite Spear, Lunge Spear, Sword & Crossbow, Archer, Spear & Shield, Survival, Crystal). Щиты, топор выбивает щит, удар булавой, тотемы | `modules/duels/kits-1.9/` |
 | `duels` (рейтинг) | Рейтинговые дуэли: незеритовый меч в лобби, сверху выбор 1.8 / 1.9, только игроки, ELO по китам (старт 0, может уйти в минус), подбор соперника по ELO | `modules/duels/config.yml → ranked` |
 | `duels` (тиры) | PvP-тиры HT1…LT5 отдельно на каждый режим (кит): из ELO по порогам или вручную `/tier set`; статистика `/stats` | `modules/duels/config.yml → ranked.tiers, stats-menu` |
@@ -25,7 +25,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.21.jar
+mvn package                         # → target/Miharu-0.2.22.jar
 ```
 
 ## Как это работает

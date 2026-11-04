@@ -122,7 +122,7 @@ public final class DuelKits {
                 }
             }
             // 0.2.21: Танк без щита и с Защитой II; удержание квадрата 3 с
-            if (minigames && box.exists()) {
+            if (minigames) {
                 YamlConfiguration by = YamlConfiguration.loadConfiguration(box);
                 if (by.isConfigurationSection("classes.tank") && by.getInt("classes.tank.revision", 1) < 2) {
                     if ("SHIELD".equalsIgnoreCase(by.getString("classes.tank.armor.offhand.material", ""))) {
@@ -143,6 +143,19 @@ public final class DuelKits {
                     }
                     by.set("classes.tank.revision", 2);
                     by.save(box);
+                }
+                // 0.2.22: BowSpleef — перо двойного прыжка в 5-м слоте, лук без Откидывания
+                File bs = new File(dir, "bowspleef.yml");
+                if (bs.exists()) {
+                    YamlConfiguration sy = YamlConfiguration.loadConfiguration(bs);
+                    if (!sy.contains("items.4")) {
+                        sy.set("items.4.material", "FEATHER");
+                        sy.set("items.4.amount", 3);
+                        sy.set("items.4.name", "<white><b>Двойной прыжок</b> <gray>(2× пробел)");
+                        sy.set("items.4.lore", List.of("<gray>Дважды нажми пробел — подкинет вверх", "<gray>Перьев = оставшихся прыжков"));
+                        sy.set("items.0.enchants.punch", null);
+                        sy.save(bs);
+                    }
                 }
                 File cfgFile = new File(module.folder(), "config.yml");
                 YamlConfiguration dc = YamlConfiguration.loadConfiguration(cfgFile);

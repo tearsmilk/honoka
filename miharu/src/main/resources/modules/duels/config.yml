@@ -794,3 +794,8 @@ quick-start:
 # BowSpleef: через сколько тиков подожжённый стрелой TNT исчезает (падает вниз без взрыва)
 bowspleef:
   fuse-ticks: 30
+  radius-min: 2                 # стрела поджигает TNT в случайном радиусе radius-min…radius-max от точки попадания
+  radius-max: 3
+  double-jump:                  # перо: дважды пробел в воздухе
+    power: 0.75                 # вверх
+    forward: 0.35               # вперёд по взгляду

@@ -164,9 +164,8 @@ public final class FfaGame extends Game implements KitGame, BuildGame {
             }
         }
         if (!rules.damage()) {
-            // сумо / BowSpleef: урона нет, только отдача (удар или стрела)
-            if (attacker != null && (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                    || e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE)) {
+            // сумо: урона нет, только отдача от удара
+            if (attacker != null && e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
                 e.setDamage(0);
             } else {
                 e.setCancelled(true);

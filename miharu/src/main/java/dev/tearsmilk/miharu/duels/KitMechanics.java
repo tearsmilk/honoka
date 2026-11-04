@@ -227,21 +227,123 @@ final class KitMechanics implements Listener {
         return g instanceof KitGame kg && kg.kitSpec().id().toLowerCase(java.util.Locale.ROOT).startsWith("mg-bowspleef");
     }
 
+    /** Стрела попала в блок — весь TNT в радиусе 2–3 (случайно) от точки попадания поджигается и падает вниз. */
     @EventHandler(priority = EventPriority.HIGH)
     public void onSpleefArrow(org.bukkit.event.entity.ProjectileHitEvent e) {
-        org.bukkit.block.Block b = e.getHitBlock();
-        if (b == null || b.getType() != org.bukkit.Material.TNT || !spleef(b.getWorld())) {
+        org.bukkit.block.Block hit = e.getHitBlock();
+        if (hit == null || !spleef(hit.getWorld())) {
             return;
         }
-        Game g = gameIn(b.getWorld());
+        Game g = gameIn(hit.getWorld());
         if (g == null || g.state() != Game.State.RUNNING) {
             return;
         }
-        b.setType(org.bukkit.Material.AIR, false);
-        org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
-        tnt.setFuseTicks(Math.max(5, module.config().getInt("bowspleef.fuse-ticks", 30)));
-        tnt.setYield(0);
+        int min = Math.max(0, module.config().getInt("bowspleef.radius-min", 2));
+        int max = Math.max(min, module.config().getInt("bowspleef.radius-max", 3));
+        double r = min + java.util.concurrent.ThreadLocalRandom.current().nextDouble() * (max - min) + 0.5;
+        int ri = (int) Math.ceil(r);
+        int fuse = Math.max(5, module.config().getInt("bowspleef.fuse-ticks", 30));
+        org.bukkit.Location center = hit.getLocation().add(0.5, 0.5, 0.5);
+        for (int dx = -ri; dx <= ri; dx++) {
+            for (int dy = -ri; dy <= ri; dy++) {
+                for (int dz = -ri; dz <= ri; dz++) {
+                    if (dx * dx + dy * dy + dz * dz > r * r) {
+                        continue;
+                    }
+                    org.bukkit.block.Block b = hit.getRelative(dx, dy, dz);
+                    if (b.getType() != org.bukkit.Material.TNT) {
+                        continue;
+                    }
+                    b.setType(org.bukkit.Material.AIR, false);
+                    org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
+                    tnt.setFuseTicks(fuse + java.util.concurrent.ThreadLocalRandom.current().nextInt(10));
+                    tnt.setYield(0);
+                }
+            }
+        }
         e.getEntity().remove();
+    }
+
+    /** BowSpleef: удар (в т.ч. луком) ничего не делает; стрела по игроку — без урона, отдачи и огня, просто отскакивает. */
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onSpleefHit(org.bukkit.event.entity.EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player && spleef(e.getEntity().getWorld())
+                && (e.getCause() == org.bukkit.event.entity.EntityDamageEvent.DamageCause.ENTITY_ATTACK
+                || e.getCause() == org.bukkit.event.entity.EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK
+                || e.getCause() == org.bukkit.event.entity.EntityDamageEvent.DamageCause.PROJECTILE)) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onSpleefBurn(org.bukkit.event.entity.EntityCombustByEntityEvent e) {
+        if (e.getEntity() instanceof Player && spleef(e.getEntity().getWorld())) {
+            e.setCancelled(true);
+        }
+    }
+
+    // --- BowSpleef: перо — двойные прыжки (два раза пробел в воздухе) ---
+
+    private final java.util.Set<java.util.UUID> spleefFly = new java.util.HashSet<>();
+
+    private boolean spleefPlayer(Player p) {
+        Game g = gameIn(p.getWorld());
+        return g != null && g.state() == Game.State.RUNNING && spleef(p.getWorld())
+                && (p.getGameMode() == org.bukkit.GameMode.SURVIVAL || p.getGameMode() == org.bukkit.GameMode.ADVENTURE);
+    }
+
+    private ItemStack jumpFeather(Player p) {
+        for (ItemStack it : p.getInventory().getContents()) {
+            if (it != null && it.getType() == org.bukkit.Material.FEATHER) {
+                return it;
+            }
+        }
+        return null;
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onSpleefMove(org.bukkit.event.player.PlayerMoveEvent e) {
+        Player p = e.getPlayer();
+        if (p.getAllowFlight() || !((org.bukkit.entity.Entity) p).isOnGround() || !spleefPlayer(p) || jumpFeather(p) == null) {
+            return;
+        }
+        p.setAllowFlight(true); // пробел в воздухе даст ToggleFlight — это и есть двойной прыжок
+        spleefFly.add(p.getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSpleefDoubleJump(org.bukkit.event.player.PlayerToggleFlightEvent e) {
+        Player p = e.getPlayer();
+        if (!e.isFlying() || !spleefPlayer(p)) {
+            return;
+        }
+        e.setCancelled(true);
+        p.setFlying(false);
+        p.setAllowFlight(false);
+        ItemStack feather = jumpFeather(p);
+        if (feather == null) {
+            return;
+        }
+        feather.setAmount(feather.getAmount() - 1);
+        org.bukkit.util.Vector dir = p.getLocation().getDirection().setY(0);
+        if (dir.lengthSquared() > 0) {
+            dir.normalize().multiply(module.config().getDouble("bowspleef.double-jump.forward", 0.35));
+        }
+        p.setVelocity(dir.setY(module.config().getDouble("bowspleef.double-jump.power", 0.75)));
+        p.setFallDistance(0);
+        p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_BAT_TAKEOFF, 0.6f, 1.4f);
+        p.getWorld().spawnParticle(org.bukkit.Particle.CLOUD, p.getLocation(), 8, 0.2, 0.05, 0.2, 0.02);
+    }
+
+    /** Вышел из BowSpleef — снять разрешение полёта, выданное для двойного прыжка. */
+    @EventHandler
+    public void onSpleefWorldChange(org.bukkit.event.player.PlayerChangedWorldEvent e) {
+        Player p = e.getPlayer();
+        if (spleefFly.remove(p.getUniqueId()) && !spleef(p.getWorld())
+                && (p.getGameMode() == org.bukkit.GameMode.SURVIVAL || p.getGameMode() == org.bukkit.GameMode.ADVENTURE)) {
+            p.setAllowFlight(false);
+            p.setFlying(false);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
