@@ -279,14 +279,24 @@ public final class Meetups implements Listener {
             return;
         }
         ItemStack it = e.getItem();
-        if (it == null || !it.hasItemMeta() || !it.getItemMeta().getPersistentDataContainer().has(BoxPvpGame.SELECTOR)) {
+        if (it == null || !it.hasItemMeta()) {
+            return;
+        }
+        var pdc = it.getItemMeta().getPersistentDataContainer();
+        boolean kit = pdc.has(BoxPvpGame.SELECTOR);
+        boolean team = pdc.has(BoxPvpGame.TEAM_SELECTOR);
+        if (!kit && !team) {
             return;
         }
         e.setCancelled(true);
         GameModule games = module.plugin().module(GameModule.class);
         Game g = games == null ? null : games.games().of(e.getPlayer());
         if (g instanceof BoxPvpGame bg) {
-            bg.openSelect(e.getPlayer());
+            if (team) {
+                bg.openTeams(e.getPlayer());
+            } else {
+                bg.openSelect(e.getPlayer());
+            }
         }
     }
 

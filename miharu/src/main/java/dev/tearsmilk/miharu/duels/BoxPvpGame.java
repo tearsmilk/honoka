@@ -54,6 +54,7 @@ public final class BoxPvpGame extends Game implements KitGame {
 
     public static final String MODE = "boxpvp";
     static final NamespacedKey SELECTOR = new NamespacedKey("miharu", "box_kit");
+    static final NamespacedKey TEAM_SELECTOR = new NamespacedKey("miharu", "box_team");
 
     private final DuelsModule duels;
     private final KitSpec spec;
@@ -69,6 +70,8 @@ public final class BoxPvpGame extends Game implements KitGame {
     private boolean selecting = true;
     private int selectLeft;
     private final int teamSize;
+    /** Выбранные команды. В 1x4 — сразу по порядку; в командных режимах заполняется выбором, остальных докидывает в конце выбора. */
+    private final Map<UUID, Kit.Team> teams = new HashMap<>();
     private Kit.Team holder;
     private int holdTicks;
     private boolean finished;
@@ -81,6 +84,11 @@ public final class BoxPvpGame extends Game implements KitGame {
         this.combat = combat;
         this.order = new ArrayList<>(players);
         this.teamSize = duels.teamSize(spec);
+        if (teamSize <= 1) {
+            for (Player p : order) {
+                teams.put(p.getUniqueId(), Kit.Team.values()[index(p) % Kit.Team.values().length]);
+            }
+        }
         // классы BoxPvP — modules/duels/minigames/boxpvp.yml → classes
         YamlConfiguration y = YamlConfiguration.loadConfiguration(new File(duels.folder(), "minigames/boxpvp.yml"));
         ConfigurationSection cls = y.getConfigurationSection("classes");
@@ -137,13 +145,18 @@ public final class BoxPvpGame extends Game implements KitGame {
         return Math.max(0, order.indexOf(p));
     }
 
-    /** Игроки раскладываются по 4 командам: 0,4,8… — красные, 1,5,9… — синие и т.д. */
+    /** Команда игрока; пока не выбрана — временная по порядку (0,4,8… — красные, 1,5,9… — синие…). */
     private int teamIndex(Player p) {
-        return index(p) % Kit.Team.values().length;
+        return team(p).ordinal();
     }
 
     private Kit.Team team(Player p) {
-        return Kit.Team.values()[teamIndex(p)];
+        Kit.Team t = teams.get(p.getUniqueId());
+        return t != null ? t : Kit.Team.values()[index(p) % Kit.Team.values().length];
+    }
+
+    boolean teamMode() {
+        return teamSize > 1;
     }
 
     private Material wool(Kit.Team t) {
@@ -158,7 +171,7 @@ public final class BoxPvpGame extends Game implements KitGame {
     private List<Player> members(Kit.Team t) {
         List<Player> list = new ArrayList<>();
         for (Player p : order) {
-            if (players.contains(p) && team(p) == t) {
+            if (players.contains(p) && teams.get(p.getUniqueId()) == t) {
                 list.add(p);
             }
         }
@@ -166,7 +179,8 @@ public final class BoxPvpGame extends Game implements KitGame {
     }
 
     private boolean sameTeam(Player a, Player b) {
-        return teamSize > 1 && order.contains(a) && order.contains(b) && team(a) == team(b);
+        Kit.Team ta = teams.get(a.getUniqueId());
+        return teamSize > 1 && ta != null && ta == teams.get(b.getUniqueId());
     }
 
     /** Имя для сообщений: в 1x4 — ник, в командах — «Красные». */
@@ -186,7 +200,11 @@ public final class BoxPvpGame extends Game implements KitGame {
         if (teamSize <= 1) {
             return null;
         }
-        for (Player o : members(team(p))) {
+        Kit.Team mine = teams.get(p.getUniqueId());
+        if (mine == null) {
+            return null; // команда ещё не выбрана
+        }
+        for (Player o : members(mine)) {
             if (o != p && chosen.get(o.getUniqueId()) == k) {
                 return o;
             }
@@ -284,6 +302,119 @@ public final class BoxPvpGame extends Game implements KitGame {
         menu.open(p);
     }
 
+    // --- выбор команды (2x4 / 3x4 / 4x4) ---
+
+    private ItemStack teamSelectorItem(Player p) {
+        ConfigurationSection c = cfg().getConfigurationSection("team-selector");
+        ItemStack it = Items.parse(c, Map.of("team", teams.containsKey(p.getUniqueId()) ? teamName(team(p)) : plugin.messages().raw("boxpvp.team-none")));
+        if (teams.containsKey(p.getUniqueId())) {
+            it = it.withType(wool(team(p)));
+        }
+        ItemMeta meta = it.getItemMeta();
+        meta.getPersistentDataContainer().set(TEAM_SELECTOR, PersistentDataType.BYTE, (byte) 1);
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    void openTeams(Player p) {
+        if (!selecting || !teamMode() || !players.contains(p)) {
+            return;
+        }
+        ConfigurationSection m = cfg().getConfigurationSection("team-menu");
+        Menu menu = new Menu(3, Text.mm(m.getString("title", "Выбор команды")));
+        List<Integer> slots = m.getIntegerList("slots");
+        Kit.Team[] all = Kit.Team.values();
+        for (int i = 0; i < all.length && i < slots.size(); i++) {
+            Kit.Team t = all[i];
+            List<Player> mem = members(t);
+            List<String> lore = new ArrayList<>();
+            lore.add(plugin.messages().raw("boxpvp.team-lore-count").replace("{count}", String.valueOf(mem.size())).replace("{size}", String.valueOf(teamSize)));
+            for (Player o : mem) {
+                KitSpec k = chosen.get(o.getUniqueId());
+                lore.add("<dark_gray>• <white>" + o.getName() + (k == null ? "" : " <gray>(" + k.display() + "<gray>)"));
+            }
+            lore.add("");
+            lore.add(plugin.messages().raw(teams.get(p.getUniqueId()) == t ? "boxpvp.team-lore-yours"
+                    : mem.size() >= teamSize ? "boxpvp.team-lore-full" : "boxpvp.team-lore-join"));
+            ItemStack icon = new ItemStack(wool(t), Math.max(1, mem.size()));
+            ItemMeta meta = icon.getItemMeta();
+            meta.displayName(Text.item(teamName(t), Map.of()));
+            meta.lore(Text.lore(lore, Map.of()));
+            meta.setEnchantmentGlintOverride(teams.get(p.getUniqueId()) == t);
+            icon.setItemMeta(meta);
+            menu.set(slots.get(i), icon, pl -> joinTeam(pl, t));
+        }
+        menu.fill(Items.parse(cfg().getConfigurationSection("menu.filler"), Map.of()));
+        menu.open(p);
+    }
+
+    private void joinTeam(Player p, Kit.Team t) {
+        if (!selecting || !players.contains(p)) {
+            p.closeInventory();
+            return;
+        }
+        if (teams.get(p.getUniqueId()) == t) {
+            openSelect(p);
+            return;
+        }
+        if (members(t).size() >= teamSize) {
+            plugin.messages().send(p, "boxpvp.team-full", "team", teamName(t));
+            p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+            return;
+        }
+        teams.put(p.getUniqueId(), t);
+        KitSpec k = chosen.get(p.getUniqueId());
+        if (k != null && takenBy(p, k) != null) {
+            chosen.remove(p.getUniqueId()); // в новой команде этот класс уже занят
+            plugin.messages().send(p, "boxpvp.class-reset", "kit", k.display());
+        }
+        p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.3f);
+        for (Player o : players) {
+            plugin.messages().send(o, "boxpvp.team-joined", "player", p.getName(), "team", teamName(t));
+        }
+        p.teleport(spawnFor(p));
+        p.getInventory().setItem(cfg().getInt("team-selector.slot", 3), teamSelectorItem(p));
+        // обновить открытые меню команд у остальных
+        for (Player o : players) {
+            if (o != p && o.getOpenInventory().getTopInventory().getHolder(false) instanceof Menu
+                    && Text.plain(o.getOpenInventory().title()).equals(Text.plain(Text.mm(cfg().getString("team-menu.title", "")))) ) {
+                openTeams(o);
+            }
+        }
+        openSelect(p);
+    }
+
+    /** Конец выбора: кто не выбрал команду — в самые маленькие команды; повторы классов в команде — сброс на свободный. */
+    private void assignTeams() {
+        if (!teamMode()) {
+            return;
+        }
+        List<Player> rest = new ArrayList<>();
+        for (Player p : order) {
+            if (players.contains(p) && !teams.containsKey(p.getUniqueId())) {
+                rest.add(p);
+            }
+        }
+        Collections.shuffle(rest);
+        for (Player p : rest) {
+            Kit.Team best = null;
+            for (Kit.Team t : Kit.Team.values()) {
+                if (best == null || members(t).size() < members(best).size()) {
+                    best = t;
+                }
+            }
+            teams.put(p.getUniqueId(), best);
+            plugin.messages().send(p, "boxpvp.team-auto", "team", teamName(best));
+        }
+        for (Player p : order) {
+            KitSpec k = chosen.get(p.getUniqueId());
+            if (k != null && takenBy(p, k) != null && rest.contains(p)) {
+                chosen.remove(p.getUniqueId());
+                plugin.messages().send(p, "boxpvp.class-reset", "kit", k.display());
+            }
+        }
+    }
+
     private void toLobby(Player p) {
         p.getInventory().clear();
         for (PotionEffect e : p.getActivePotionEffects()) {
@@ -295,6 +426,9 @@ public final class BoxPvpGame extends Game implements KitGame {
         p.setGameMode(GameMode.ADVENTURE);
         p.teleport(spawnFor(p));
         p.getInventory().setItem(cfg().getInt("selector.slot", 4), selectorItem());
+        if (selecting && teamMode()) {
+            p.getInventory().setItem(cfg().getInt("team-selector.slot", 3), teamSelectorItem(p));
+        }
     }
 
     // --- старт ---
@@ -323,8 +457,12 @@ public final class BoxPvpGame extends Game implements KitGame {
     protected void onRunning() {
         super.onRunning();
         for (Player p : order) {
-            plugin.messages().send(p, "boxpvp.class-select-started", "seconds", selectLeft / 20);
-            openSelect(p);
+            plugin.messages().send(p, teamMode() ? "boxpvp.team-select-started" : "boxpvp.class-select-started", "seconds", selectLeft / 20);
+            if (teamMode()) {
+                openTeams(p);
+            } else {
+                openSelect(p);
+            }
         }
     }
 
@@ -375,6 +513,7 @@ public final class BoxPvpGame extends Game implements KitGame {
                 }
             }
             if (selectLeft <= 0) {
+                assignTeams();
                 selecting = false;
                 for (Player p : List.copyOf(players)) {
                     toFight(p);
