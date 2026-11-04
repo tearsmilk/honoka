@@ -325,13 +325,13 @@ custom-kits:
   wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
 
 boxpvp:
-  select-started: '{prefix}<gray>Выбери кит за <white>{seconds} с</white>! Сундук в руке — открыть меню снова.'
-  select-actionbar: '<#5fd6c4>Выбор кита</#5fd6c4> <gray>· <white>{seconds} с'
-  chosen: '{prefix}<gray>Твой кит: {kit}'
-  random-kit: '{prefix}<gray>Кит не выбран — случайный: {kit}'
+  class-select-started: '{prefix}<gray>Выбери класс за <white>{seconds} с</white>! Сундук в руке — открыть меню снова.'
+  class-actionbar: '<#5fd6c4>Выбор класса</#5fd6c4> <gray>· <white>{seconds} с'
+  class-chosen: '{prefix}<gray>Твой класс: {kit}'
+  class-random: '{prefix}<gray>Класс не выбран — случайный: {kit}'
   lore-choose: '<yellow>▶ Нажми, чтобы выбрать'
   lore-chosen: '<green>✔ Выбран'
-  phase-select: '<yellow>выбор кита'
+  phase-class: '<yellow>выбор класса'
   phase-fight: '<red>бой'
   fight:
     title: '<#5fd6c4><b>БОЙ!</b>'
@@ -340,7 +340,7 @@ boxpvp:
   fight-actionbar: '<gray>Квадрат: <white>{own_blocks}/9</white> <dark_gray>·</dark_gray> держит <white>{holder}</white> <dark_gray>·</dark_gray> <white>{hold_left}'
   captured: '{prefix}<white>{player}</white> <gray>захватил квадрат! Удержит <white>{seconds} с</white> — победа.'
   lost: '{prefix}<white>{player}</white> <gray>потерял квадрат!'
-  respawn-info: '{prefix}<gray>Возрождение через <white>{seconds} с</white>. Можешь сменить кит (сундук).'
+  respawn-class: '{prefix}<gray>Возрождение через <white>{seconds} с</white>. Можешь сменить класс (сундук).'
   summary:
     - '<dark_gray>───────────────────────'
     - ' {kit} <gray>· BoxPvP'

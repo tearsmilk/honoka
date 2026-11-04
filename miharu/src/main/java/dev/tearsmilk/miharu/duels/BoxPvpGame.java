@@ -24,6 +24,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -33,6 +34,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,9 +46,9 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
- * BoxPvP 1x4: мини-лобби (pre1…pre4) — 30 секунд выбрать один из 6 случайных китов 1.9,
+ * BoxPvP 1x4: мини-лобби (pre1…pre4) — 30 секунд выбрать класс (Мечник, Лучник, Танк, Поддержка, Хиллер, Ассасин),
  * потом на точки p1…p4. В центре 3x3 белой шерсти (точка box — центральный блок): поставь все 9 своего цвета
- * и удержи minute. Смерть — 5 секунд в мини-лобби (можно сменить кит) и снова в бой.
+ * и удержи 10 секунд. Смерть — 5 секунд в мини-лобби (можно сменить кит) и снова в бой.
  */
 public final class BoxPvpGame extends Game implements KitGame {
 
@@ -58,6 +60,7 @@ public final class BoxPvpGame extends Game implements KitGame {
     private final CombatService combat;
     private final List<Player> order;
     private final List<KitSpec> choices = new ArrayList<>();
+    private final Map<KitSpec, ConfigurationSection> icons = new HashMap<>();
     private final Map<UUID, KitSpec> chosen = new HashMap<>();
     private final Map<UUID, Integer> kills = new HashMap<>();
     private final Map<UUID, UUID> lastHit = new HashMap<>();
@@ -76,14 +79,36 @@ public final class BoxPvpGame extends Game implements KitGame {
         this.spec = spec;
         this.combat = combat;
         this.order = new ArrayList<>(players);
-        List<KitSpec> pool = new ArrayList<>();
-        for (DuelKits.Entry e : duels.modernKits().all()) {
-            if (e.enabled()) {
-                pool.add(e.spec());
+        // классы BoxPvP — modules/duels/minigames/boxpvp.yml → classes
+        YamlConfiguration y = YamlConfiguration.loadConfiguration(new File(duels.folder(), "minigames/boxpvp.yml"));
+        ConfigurationSection cls = y.getConfigurationSection("classes");
+        if (cls != null) {
+            for (String key : cls.getKeys(false)) {
+                ConfigurationSection c = cls.getConfigurationSection(key);
+                if (c == null || !c.getBoolean("enabled", true)) {
+                    continue;
+                }
+                String id = "box-" + key;
+                KitSpec k = new KitSpec(id, c.getString("display", key), CombatVersion.MODERN,
+                        combat.derive(CombatVersion.MODERN, c.getConfigurationSection("combat")), new Kit(id, c), spec.rules(),
+                        spec.arenaMode(), List.of(), KitSpec.Bot.DISABLED);
+                choices.add(k);
+                if (c.isConfigurationSection("icon")) {
+                    icons.put(k, c.getConfigurationSection("icon"));
+                }
             }
         }
-        Collections.shuffle(pool);
-        choices.addAll(pool.subList(0, Math.min(cfg().getInt("kit-choices", 6), pool.size())));
+        if (choices.isEmpty()) {
+            // классов нет — как раньше: случайные киты дуэлей 1.9
+            List<KitSpec> pool = new ArrayList<>();
+            for (DuelKits.Entry e : duels.modernKits().all()) {
+                if (e.enabled()) {
+                    pool.add(e.spec());
+                }
+            }
+            Collections.shuffle(pool);
+            choices.addAll(pool.subList(0, Math.min(cfg().getInt("kit-choices", 6), pool.size())));
+        }
     }
 
     private ConfigurationSection cfg() {
@@ -159,7 +184,8 @@ public final class BoxPvpGame extends Game implements KitGame {
         for (int i = 0; i < choices.size() && i < slots.size(); i++) {
             KitSpec k = choices.get(i);
             DuelKits.Entry e = duels.modernKits().get(k.id());
-            ConfigurationSection iconCfg = e != null && e.icon() != null ? e.icon() : m.getConfigurationSection("default-icon");
+            ConfigurationSection iconCfg = icons.containsKey(k) ? icons.get(k)
+                    : e != null && e.icon() != null ? e.icon() : m.getConfigurationSection("default-icon");
             Map<String, Object> ph = new HashMap<>();
             ph.put("kit", k.display());
             ph.put("queue", 0);
@@ -171,7 +197,10 @@ public final class BoxPvpGame extends Game implements KitGame {
             ItemStack icon = Items.parse(iconCfg, ph);
             ItemMeta meta = icon.getItemMeta();
             boolean mine = chosen.get(p.getUniqueId()) == k;
-            meta.lore(Text.lore(List.of(plugin.messages().raw(mine ? "boxpvp.lore-chosen" : "boxpvp.lore-choose")), Map.of()));
+            List<String> lore = new ArrayList<>(iconCfg != null ? iconCfg.getStringList("lore") : List.of());
+            lore.add("");
+            lore.add(plugin.messages().raw(mine ? "boxpvp.lore-chosen" : "boxpvp.lore-choose"));
+            meta.lore(Text.lore(lore, ph));
             meta.setEnchantmentGlintOverride(mine);
             icon.setItemMeta(meta);
             menu.set(slots.get(i), icon, pl -> {
@@ -181,7 +210,7 @@ public final class BoxPvpGame extends Game implements KitGame {
                 }
                 chosen.put(pl.getUniqueId(), k);
                 pl.playSound(pl.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.3f);
-                plugin.messages().send(pl, "boxpvp.chosen", "kit", k.display());
+                plugin.messages().send(pl, "boxpvp.class-chosen", "kit", k.display());
                 pl.closeInventory();
             });
         }
@@ -228,7 +257,7 @@ public final class BoxPvpGame extends Game implements KitGame {
     protected void onRunning() {
         super.onRunning();
         for (Player p : order) {
-            plugin.messages().send(p, "boxpvp.select-started", "seconds", selectLeft / 20);
+            plugin.messages().send(p, "boxpvp.class-select-started", "seconds", selectLeft / 20);
             openSelect(p);
         }
     }
@@ -238,7 +267,7 @@ public final class BoxPvpGame extends Game implements KitGame {
         if (k == null && !choices.isEmpty()) {
             k = choices.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(choices.size()));
             chosen.put(p.getUniqueId(), k);
-            plugin.messages().send(p, "boxpvp.random-kit", "kit", k.display());
+            plugin.messages().send(p, "boxpvp.class-random", "kit", k.display());
         }
         return k;
     }
@@ -269,7 +298,7 @@ public final class BoxPvpGame extends Game implements KitGame {
             selectLeft--;
             if (selectLeft % 20 == 0) {
                 for (Player p : players) {
-                    plugin.messages().actionBar(p, "boxpvp.select-actionbar", "seconds", selectLeft / 20);
+                    plugin.messages().actionBar(p, "boxpvp.class-actionbar", "seconds", selectLeft / 20);
                 }
             }
             if (selectLeft <= 0) {
@@ -342,11 +371,11 @@ public final class BoxPvpGame extends Game implements KitGame {
         if (!owner.getUniqueId().equals(holder)) {
             holder = owner.getUniqueId();
             holdTicks = 0;
-            broadcast("boxpvp.captured", "player", owner.getName(), "seconds", cfg().getInt("hold-seconds", 60));
+            broadcast("boxpvp.captured", "player", owner.getName(), "seconds", cfg().getInt("hold-time", 10));
             owner.playSound(owner.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.7f, 1.4f);
         }
         holdTicks++;
-        if (holdTicks >= cfg().getInt("hold-seconds", 60) * 20) {
+        if (holdTicks >= cfg().getInt("hold-time", 10) * 20) {
             finish(owner);
         }
     }
@@ -397,7 +426,7 @@ public final class BoxPvpGame extends Game implements KitGame {
         respawning.add(p.getUniqueId());
         toLobby(p);
         int sec = Math.max(1, cfg().getInt("respawn-seconds", 5));
-        plugin.messages().send(p, "boxpvp.respawn-info", "seconds", sec);
+        plugin.messages().send(p, "boxpvp.respawn-class", "seconds", sec);
         for (int i = 0; i < sec; i++) {
             int left = sec - i;
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -482,11 +511,11 @@ public final class BoxPvpGame extends Game implements KitGame {
     public Map<String, Object> placeholders(Player viewer) {
         Map<String, Object> map = super.placeholders(viewer);
         map.put("kit", chosen.containsKey(viewer.getUniqueId()) ? chosen.get(viewer.getUniqueId()).display() : "-");
-        map.put("phase", plugin.messages().raw(selecting ? "boxpvp.phase-select" : "boxpvp.phase-fight"));
+        map.put("phase", plugin.messages().raw(selecting ? "boxpvp.phase-class" : "boxpvp.phase-fight"));
         map.put("select_left", Text.time(Math.max(0, selectLeft / 20)));
         Player h = holder == null ? null : Bukkit.getPlayer(holder);
         map.put("holder", h == null ? "-" : h.getName());
-        int hold = cfg().getInt("hold-seconds", 60);
+        int hold = cfg().getInt("hold-time", 10);
         map.put("hold_left", h == null ? "-" : Text.time(Math.max(0, hold - holdTicks / 20)));
         map.put("own_blocks", order.contains(viewer) ? ownBlocks(viewer) : 0);
         map.put("kills", kills.getOrDefault(viewer.getUniqueId(), 0));

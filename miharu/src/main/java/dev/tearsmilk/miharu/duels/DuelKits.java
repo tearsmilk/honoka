@@ -106,9 +106,9 @@ public final class DuelKits {
                     module.plugin().saveResource("modules/duels/" + folder + "/" + id + ".yml", false);
                 }
             }
-            // BoxPvP из 0.2.15 был пустой заготовкой — заменяем на готовый режим
+            // BoxPvP без классов (0.2.15–0.2.16) — заменяем на версию с классами
             File box = new File(dir, "boxpvp.yml");
-            if (minigames && box.exists() && !YamlConfiguration.loadConfiguration(box).contains("player-points")) {
+            if (minigames && box.exists() && !YamlConfiguration.loadConfiguration(box).contains("classes")) {
                 module.plugin().saveResource("modules/duels/" + folder + "/boxpvp.yml", true);
             }
             java.nio.file.Files.write(marker.toPath(), known);
