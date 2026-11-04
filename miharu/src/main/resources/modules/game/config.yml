@@ -37,6 +37,9 @@ allowed-commands:
   - r
   - reply
   - pvp
+  - party
+  - p
+  - pc
 
 scoreboard:
   enabled: true

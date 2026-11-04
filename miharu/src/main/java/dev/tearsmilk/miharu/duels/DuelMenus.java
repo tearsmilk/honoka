@@ -36,7 +36,13 @@ public final class DuelMenus {
         if (m == null) {
             m = category.menuConfig().createSection("menu");
         }
-        Menu menu = new Menu(m.getInt("rows", 4), Text.mm(m.getString("title", "Киты")));
+        int rows = m.getInt("rows", 4);
+        for (DuelKits.Entry e : category.all()) {
+            if (e.enabled()) {
+                rows = Math.max(rows, e.slot() / 9 + 2); // меню растёт под занятые слоты (+ ряд снизу)
+            }
+        }
+        Menu menu = new Menu(Math.min(6, rows), Text.mm(m.getString("title", "Киты")));
         for (DuelKits.Entry e : category.all()) {
             if (!e.enabled()) {
                 continue;

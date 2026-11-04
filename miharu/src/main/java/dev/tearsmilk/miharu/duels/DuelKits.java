@@ -30,7 +30,7 @@ public final class DuelKits {
 
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
             "archer", "soup", "leather", "opdiamond", "diamond", "uhc");
-    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp", "bowspleef", "gungame");
+    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp", "bowspleef", "gungame", "skycontrol", "hfa", "thefight");
     /** Режимы, которые переехали из дуэлей 1.8 в мини-игры. */
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
@@ -183,6 +183,23 @@ public final class DuelKits {
             java.nio.file.Files.write(marker.toPath(), known);
         } catch (java.io.IOException e) {
             module.plugin().getLogger().warning("Не удалось обновить список китов: " + e.getMessage());
+        }
+        if (minigames) {
+            // 0.2.26: меню мини-игр расширено до 5 рядов
+            File mc = new File(dir, "config.yml");
+            if (mc.exists()) {
+                YamlConfiguration my = YamlConfiguration.loadConfiguration(mc);
+                if (my.getInt("menu.rows", 5) < 5) {
+                    my.set("menu.rows", 5);
+                    if ("<dark_gray>Мини-игры <gray>· 1x1".equals(my.getString("menu.title"))) {
+                        my.set("menu.title", "<dark_gray>Мини-игры");
+                    }
+                    try {
+                        my.save(mc);
+                    } catch (java.io.IOException ignored) {
+                    }
+                }
+            }
         }
         menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();

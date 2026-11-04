@@ -1,9 +1,10 @@
-# Меню мини-игр (огненный заряд во 2-м слоте лобби). Все 1x1, только против игрока, PvP 1.8.
+# Меню мини-игр (огненный заряд во 2-м слоте лобби). Только против игроков, PvP 1.8 (BoxPvP — 1.9).
+# Меню само добавляет ряды, если слоты не помещаются.
 # kits.<файл>: enabled, slot, icon. Сама игра — <файл>.yml рядом (id в очереди: mg-<файл>, с вариантом — mg-bridge-5).
 # Плейсхолдеры иконки: {kit} {queue} {playing} {wins} {losses}
 menu:
-  title: '<dark_gray>Мини-игры <gray>· 1x1'
-  rows: 3
+  title: '<dark_gray>Мини-игры'
+  rows: 5
   filler:
     enabled: true
     material: ORANGE_STAINED_GLASS_PANE
@@ -111,6 +112,48 @@ kits:
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  skycontrol:
+    enabled: true
+    slot: 19
+    icon:
+      material: FEATHER
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Скайконтрол'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  hfa:
+    enabled: true
+    slot: 20
+    icon:
+      material: IRON_AXE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>HFA'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  thefight:
+    enabled: true
+    slot: 21
+    icon:
+      material: NETHERITE_SWORD
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>TheFight'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
   gungame:

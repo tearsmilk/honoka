@@ -188,7 +188,8 @@ final class GameListener implements Listener {
             label = label.substring(label.indexOf(':') + 1);
         }
         List<String> allowed = module.config().getStringList("allowed-commands");
-        if (!allowed.contains(label)) {
+        // команды пати работают и в игре (чат с напарниками)
+        if (!allowed.contains(label) && !List.of("party", "p", "pc", "partychat").contains(label)) {
             e.setCancelled(true);
             module.plugin().messages().send(p, "game.command-blocked");
         }
