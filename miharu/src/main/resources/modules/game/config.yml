@@ -70,6 +70,17 @@ scoreboard:
       - ''
       - '<white>Время <aqua>{time}'
       - '<white>Пинг <gray>{ping} мс'
+    gungame:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Уровень <#ffb347>{level}<gray>/{max_level}'
+      - '<gray>{level_name}'
+      - ''
+      - '<white>Лидер <#ffb347>{leader} <gray>({leader_level})'
+      - '<white>Убийства <red>{kills} <dark_gray>·</dark_gray> <white>смерти <gray>{deaths}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Осталось <aqua>{time_left}'
     boxpvp:
       - '<dark_gray>#{game_id} · {arena}'
       - ''

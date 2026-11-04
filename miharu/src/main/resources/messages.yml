@@ -369,6 +369,23 @@ boxpvp:
     - ' <gray>Время: <white>{time}'
     - '<dark_gray>───────────────────────'
 
+gungame:
+  level-up:
+    title: '<#ffb347><b>Уровень {level}</b><gray>/{max}'
+    subtitle: '<gray>{name}'
+    stay: 1200
+  killed: '{prefix}<red>{player}</red> <gray>убит игроком <white>{killer}</white> <dark_gray>(ур. {level})'
+  died: '{prefix}<red>{player}</red> <gray>погиб'
+  last-level: '{prefix}<white>{player}</white> <gray>на последнем уровне <#ffb347>{level}</#ffb347>! Ещё одно убийство — победа.'
+  actionbar: '<#ffb347>Уровень {level}/{max_level}</#ffb347> <gray>{level_name} <dark_gray>·</dark_gray> убийств <white>{kills}</white> <dark_gray>·</dark_gray> лидер <white>{leader}</white> ({leader_level})'
+  summary:
+    - '<dark_gray>───────────────────────'
+    - ' {kit} <gray>· игроков <white>{total}'
+    - ' <gray>Победил: <green>{winner}</green> · твой уровень: <white>{level}/{max_level}'
+    - ' <gray>Убийства: <white>{kills}</white> · смерти: <white>{deaths}'
+    - ' <gray>Время: <white>{time}'
+    - '<dark_gray>───────────────────────'
+
 meetups:
   start-vote: '{prefix}<white>{player}</white> <gray>голосует за быстрый старт <green>({votes}/{need})'
   start-vote-already: '{prefix}<gray>Ты уже проголосовал за старт.'

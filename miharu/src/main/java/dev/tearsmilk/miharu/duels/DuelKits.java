@@ -144,6 +144,11 @@ public final class DuelKits {
                     by.set("classes.tank.revision", 2);
                     by.save(box);
                 }
+                // 0.2.23: GunGame из шаблона (0.2.21–0.2.22) → полноценный режим на 30 уровней
+                File gg = new File(dir, "gungame.yml");
+                if (gg.exists() && !YamlConfiguration.loadConfiguration(gg).isConfigurationSection("levels")) {
+                    module.plugin().saveResource("modules/duels/" + folder + "/gungame.yml", true);
+                }
                 // 0.2.22: BowSpleef — перо двойного прыжка в 5-м слоте, лук без Откидывания
                 File bs = new File(dir, "bowspleef.yml");
                 if (bs.exists()) {

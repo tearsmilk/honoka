@@ -559,6 +559,8 @@ public final class DuelsModule extends MiharuModule implements Listener {
             game = new MeetupGame(this, games, arena, spec, meetups.mode(spec.id()), players);
         } else if ("boxpvp".equalsIgnoreCase(spec.kit().id().replace("mg-", ""))) {
             game = new BoxPvpGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        } else if ("gungame".equalsIgnoreCase(spec.kit().id().replace("mg-", ""))) {
+            game = new GunGameGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
         } else {
             game = new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
         }

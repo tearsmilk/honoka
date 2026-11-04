@@ -1,9 +1,10 @@
-# GunGame — ШАБЛОН, геймплея пока нет (игра идёт как обычный FFA с пустым китом).
-# Задумка: за убийства растёт уровень; каждые levels-per-kit уровней меняется набор вещей (kits ниже).
-# Версия PvP (1.8 / 1.9) выбирается голосованием в начале игры. Кто первым прошёл все уровни — победил.
+# GunGame — PvP-режим на 30 уровней (PvP 1.8). За каждое убийство — следующий уровень и новый комплект:
+# старая экипировка полностью заменяется. За смерть уровень не понижается. Убийство на последнем уровне — победа.
+# Уровни 29–30 — только лук. Предметы неломаемые (без Unbreaking). Запрещены Flame, Punch, Thorns, Feather Falling.
+# levels — комплекты по порядку (формат как у китов дуэлей: armor, items, name — подпись уровня).
 display: '<#ffb347>GunGame'
 version: "1.8"
-arena-mode: gungame       # режим арены gg-8: точки p1..p8
+arena-mode: gungame       # режим арены gg-8: точки p1..p8 (после смерти — случайная из них)
 rounds: 1
 players:
   - 8
@@ -13,32 +14,772 @@ items: {}
 rules:
   damage: true
   hunger: false
+  natural-regen: true
   void-lose: false
-  max-duration-seconds: 900
+  max-duration-seconds: 900     # по истечении побеждает тот, у кого выше уровень (при равенстве — больше убийств)
 
-# --- настройки будущего геймплея (пока не используются) ---
 gungame:
-  kills-per-level: 1        # убийств для следующего уровня
-  levels-per-kit: 2         # каждые N уровней — новый набор вещей
-  max-level: 10             # прошёл последний уровень — победа
-  version-vote:
-    enabled: true           # голосование 1.8 / 1.9 в начале игры
-    seconds: 15
-  respawn-seconds: 3
-  # наборы по порядку: 1-й — уровни 1–2, 2-й — 3–4 и т.д. Формат как у китов дуэлей (armor, items)
-  kits:
-    k1:
-      armor: {}
-      items: {}
-    k2:
-      armor: {}
-      items: {}
-    k3:
-      armor: {}
-      items: {}
-    k4:
-      armor: {}
-      items: {}
-    k5:
-      armor: {}
-      items: {}
+  kill-credit-seconds: 10       # убийство засчитывается, если последний удар был не раньше N секунд (в т.ч. скинул в пустоту)
+  spawn-protection-seconds: 2   # неуязвимость после возрождения (снимается, если сам ударил)
+  heal-on-kill: true            # за убийство — полное здоровье
+  natural-regen: true
+
+levels:
+  '1':
+    name: 'Начальная'
+    armor: {}
+    items:
+      0:
+        material: WOODEN_SWORD
+        unbreakable: true
+  '2':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        unbreakable: true
+    items:
+      0:
+        material: WOODEN_SWORD
+        unbreakable: true
+  '3':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        unbreakable: true
+      chestplate:
+        material: LEATHER_CHESTPLATE
+        unbreakable: true
+    items:
+      0:
+        material: STONE_SWORD
+        unbreakable: true
+  '4':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        unbreakable: true
+      chestplate:
+        material: LEATHER_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: LEATHER_LEGGINGS
+        unbreakable: true
+    items:
+      0:
+        material: STONE_SWORD
+        unbreakable: true
+  '5':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        unbreakable: true
+      chestplate:
+        material: LEATHER_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: LEATHER_LEGGINGS
+        unbreakable: true
+      boots:
+        material: LEATHER_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: STONE_SWORD
+        unbreakable: true
+  '6':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        unbreakable: true
+      chestplate:
+        material: LEATHER_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: LEATHER_LEGGINGS
+        unbreakable: true
+      boots:
+        material: LEATHER_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 1
+  '7':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: GOLDEN_HELMET
+        unbreakable: true
+      chestplate:
+        material: LEATHER_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: LEATHER_LEGGINGS
+        unbreakable: true
+      boots:
+        material: LEATHER_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 1
+  '8':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: GOLDEN_HELMET
+        unbreakable: true
+      chestplate:
+        material: GOLDEN_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: LEATHER_LEGGINGS
+        unbreakable: true
+      boots:
+        material: LEATHER_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 1
+  '9':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: GOLDEN_HELMET
+        unbreakable: true
+      chestplate:
+        material: GOLDEN_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: GOLDEN_LEGGINGS
+        unbreakable: true
+      boots:
+        material: GOLDEN_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 1
+  '10':
+    name: 'Начальная'
+    armor:
+      helmet:
+        material: GOLDEN_HELMET
+        unbreakable: true
+      chestplate:
+        material: GOLDEN_CHESTPLATE
+        unbreakable: true
+      leggings:
+        material: GOLDEN_LEGGINGS
+        unbreakable: true
+      boots:
+        material: GOLDEN_BOOTS
+        unbreakable: true
+    items:
+      0:
+        material: GOLDEN_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '11':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: CHAINMAIL_HELMET
+        unbreakable: true
+        enchants:
+          protection: 1
+      chestplate:
+        material: CHAINMAIL_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 1
+      leggings:
+        material: CHAINMAIL_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 1
+      boots:
+        material: CHAINMAIL_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 1
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '12':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 1
+      chestplate:
+        material: CHAINMAIL_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 1
+      leggings:
+        material: CHAINMAIL_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 1
+      boots:
+        material: CHAINMAIL_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 1
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '13':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 1
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 1
+      leggings:
+        material: CHAINMAIL_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 1
+      boots:
+        material: CHAINMAIL_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 1
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '14':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 1
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 1
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 1
+      boots:
+        material: CHAINMAIL_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 1
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '15':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 1
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 1
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 1
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 1
+    items:
+      0:
+        material: IRON_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 2
+  '16':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 2
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 2
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 2
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 2
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 3
+  '17':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 2
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 2
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 2
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 2
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 3
+  '18':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: IRON_HELMET
+        unbreakable: true
+        enchants:
+          protection: 2
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 2
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 2
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 2
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 3
+  '19':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 3
+      chestplate:
+        material: IRON_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 3
+      leggings:
+        material: IRON_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 3
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 3
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 4
+  '20':
+    name: 'Средняя'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 3
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 3
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 3
+      boots:
+        material: IRON_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 3
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 4
+  '21':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 3
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 3
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 3
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 3
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 4
+  '22':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 3
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 3
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 3
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 3
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 4
+  '23':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 3
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 3
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 3
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 3
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+  '24':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+  '25':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+  '26':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+          knockback: 1
+  '27':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+  '28':
+    name: 'Продвинутая'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: DIAMOND_SWORD
+        unbreakable: true
+        enchants:
+          sharpness: 5
+          fire_aspect: 1
+  '29':
+    name: 'Bow I'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: BOW
+        unbreakable: true
+        enchants:
+          power: 3
+      9:
+        material: ARROW
+        amount: 32
+  '30':
+    name: 'Bow Master'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        unbreakable: true
+        enchants:
+          protection: 4
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        unbreakable: true
+        enchants:
+          protection: 4
+      leggings:
+        material: DIAMOND_LEGGINGS
+        unbreakable: true
+        enchants:
+          protection: 4
+      boots:
+        material: DIAMOND_BOOTS
+        unbreakable: true
+        enchants:
+          protection: 4
+    items:
+      0:
+        material: BOW
+        unbreakable: true
+        enchants:
+          power: 5
+      9:
+        material: ARROW
+        amount: 64
