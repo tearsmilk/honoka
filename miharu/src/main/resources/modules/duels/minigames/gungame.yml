@@ -9,6 +9,7 @@ rounds: 1
 players:
   - 8
 players-suffix: '<gray>· {format}'
+quick-start-min: 2        # быстрый старт уже от 2 игроков
 armor: {}
 items: {}
 rules:

@@ -149,6 +149,14 @@ public final class DuelKits {
                 if (gg.exists() && !YamlConfiguration.loadConfiguration(gg).isConfigurationSection("levels")) {
                     module.plugin().saveResource("modules/duels/" + folder + "/gungame.yml", true);
                 }
+                // 0.2.24: GunGame — быстрый старт от 2
+                if (gg.exists()) {
+                    YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);
+                    if (!gy.contains("quick-start-min")) {
+                        gy.set("quick-start-min", 2);
+                        gy.save(gg);
+                    }
+                }
                 // 0.2.22: BowSpleef — перо двойного прыжка в 5-м слоте, лук без Откидывания
                 File bs = new File(dir, "bowspleef.yml");
                 if (bs.exists()) {
