@@ -146,7 +146,9 @@ public final class DuelKits {
                 }
                 // 0.2.23: GunGame из шаблона (0.2.21–0.2.22) → полноценный режим на 30 уровней
                 File gg = new File(dir, "gungame.yml");
-                if (gg.exists() && !YamlConfiguration.loadConfiguration(gg).isConfigurationSection("levels")) {
+                // 0.2.25: лук с 27 уровня, 3–4 убийства на уровень — уровни из jar
+                if (gg.exists() && (!YamlConfiguration.loadConfiguration(gg).isConfigurationSection("levels")
+                        || !YamlConfiguration.loadConfiguration(gg).contains("gungame.kills-per-level-min"))) {
                     module.plugin().saveResource("modules/duels/" + folder + "/gungame.yml", true);
                 }
                 // 0.2.24: GunGame — быстрый старт от 2

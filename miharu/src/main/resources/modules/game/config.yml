@@ -77,6 +77,7 @@ scoreboard:
       - '<gray>{level_name}'
       - ''
       - '<white>Лидер <#ffb347>{leader} <gray>({leader_level})'
+      - '<white>До уровня <green>{level_kills}<gray>/{level_need}'
       - '<white>Убийства <red>{kills} <dark_gray>·</dark_gray> <white>смерти <gray>{deaths}'
       - '<white>Твоё ❤ <red>{player_hp}'
       - ''

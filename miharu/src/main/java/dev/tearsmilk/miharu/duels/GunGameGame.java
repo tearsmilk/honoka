@@ -33,7 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 /**
- * GunGame: за каждое убийство — следующий уровень и новый комплект (levels в modules/duels/minigames/gungame.yml).
+ * GunGame: за 3–4 убийства (kills-per-level-min…max) — следующий уровень и новый комплект (levels в modules/duels/minigames/gungame.yml).
  * За смерть уровень не понижается. Убийство на последнем уровне — победа. PvP — как в ките (1.8).
  */
 public final class GunGameGame extends Game implements KitGame {
@@ -49,6 +49,9 @@ public final class GunGameGame extends Game implements KitGame {
     private final Map<UUID, Integer> level = new HashMap<>();
     private final Map<UUID, Integer> kills = new HashMap<>();
     private final Map<UUID, Integer> deaths = new HashMap<>();
+    /** Убийств на текущем уровне и сколько нужно для следующего (случайно kills-per-level-min…max). */
+    private final Map<UUID, Integer> progress = new HashMap<>();
+    private final Map<UUID, Integer> needed = new HashMap<>();
     private final Map<UUID, UUID> lastHit = new HashMap<>();
     private final Map<UUID, Long> lastHitAt = new HashMap<>();
     private final Map<UUID, Long> protectedUntil = new HashMap<>();
@@ -79,7 +82,21 @@ public final class GunGameGame extends Game implements KitGame {
         }
         for (Player p : order) {
             level.put(p.getUniqueId(), 1);
+            rollNeeded(p.getUniqueId(), 1);
         }
+    }
+
+    private void rollNeeded(UUID id, int lvl) {
+        int n;
+        if (lvl >= maxLevel()) {
+            n = Math.max(1, cfg.getInt("final-kills", 1));
+        } else {
+            int min = Math.max(1, cfg.getInt("kills-per-level-min", 3));
+            int max = Math.max(min, cfg.getInt("kills-per-level-max", 4));
+            n = ThreadLocalRandom.current().nextInt(min, max + 1);
+        }
+        needed.put(id, n);
+        progress.put(id, 0);
     }
 
     private static int num(String s) {
@@ -154,7 +171,8 @@ public final class GunGameGame extends Game implements KitGame {
             levels.get(Math.min(lvl, levels.size()) - 1).apply(p, combat, spec.profile(), null);
         }
         p.setLevel(lvl);
-        p.setExp(0);
+        int need = needed.getOrDefault(p.getUniqueId(), 1);
+        p.setExp(Math.min(0.99f, progress.getOrDefault(p.getUniqueId(), 0) / (float) need));
         if (announce) {
             plugin.messages().title(p, "gungame.level-up", "level", lvl, "max", maxLevel(), "name", levelNames.get(Math.min(lvl, levelNames.size()) - 1));
             p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.8f, 1.2f);
@@ -211,19 +229,33 @@ public final class GunGameGame extends Game implements KitGame {
         respawn(p);
         if (killer != null && players.contains(killer) && killer != p) {
             kills.merge(killer.getUniqueId(), 1, Integer::sum);
-            int lvl = level.getOrDefault(killer.getUniqueId(), 1);
+            UUID kidU = killer.getUniqueId();
+            int lvl = level.getOrDefault(kidU, 1);
+            int done = progress.merge(kidU, 1, Integer::sum);
+            int need = needed.getOrDefault(kidU, 1);
             broadcast("gungame.killed", "player", p.getName(), "killer", killer.getName(), "level", lvl);
+            if (done < need) {
+                // уровень ещё не набран — только лечение и счётчик
+                plugin.messages().actionBar(killer, "gungame.progress", "done", done, "need", need, "level", lvl);
+                killer.playSound(killer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7f, 1.3f);
+                if (cfg.getBoolean("heal-on-kill", true)) {
+                    heal(killer);
+                }
+                killer.setExp(Math.min(0.99f, done / (float) need));
+                return;
+            }
             if (lvl >= maxLevel()) {
                 finish(killer);
                 return;
             }
-            level.put(killer.getUniqueId(), lvl + 1);
+            level.put(kidU, lvl + 1);
+            rollNeeded(kidU, lvl + 1);
             giveLevel(killer, true);
             if (cfg.getBoolean("heal-on-kill", true)) {
                 heal(killer);
             }
             if (lvl + 1 == maxLevel()) {
-                broadcast("gungame.last-level", "player", killer.getName(), "level", lvl + 1);
+                broadcast("gungame.final-level", "player", killer.getName(), "level", lvl + 1, "need", needed.get(kidU));
             }
         } else {
             broadcast("gungame.died", "player", p.getName());
@@ -262,7 +294,7 @@ public final class GunGameGame extends Game implements KitGame {
         }
         if (runningTicks % 20 == 0) {
             for (Player p : players) {
-                plugin.messages().actionBar(p, "gungame.actionbar", kv(p));
+                plugin.messages().actionBar(p, "gungame.level-actionbar", kv(p));
             }
         }
         if (spec.rules().maxDurationSeconds() > 0 && runningTicks >= spec.rules().maxDurationSeconds() * 20) {
@@ -278,7 +310,7 @@ public final class GunGameGame extends Game implements KitGame {
             }
             if (best == null || level.get(p.getUniqueId()) > level.get(best.getUniqueId())
                     || (level.get(p.getUniqueId()).equals(level.get(best.getUniqueId()))
-                    && kills.getOrDefault(p.getUniqueId(), 0) > kills.getOrDefault(best.getUniqueId(), 0))) {
+                    && progress.getOrDefault(p.getUniqueId(), 0) > progress.getOrDefault(best.getUniqueId(), 0))) {
                 best = p;
             }
         }
@@ -327,6 +359,8 @@ public final class GunGameGame extends Game implements KitGame {
         map.put("max_level", maxLevel());
         map.put("level_name", levelNames.isEmpty() ? "" : levelNames.get(Math.min(lvl, levelNames.size()) - 1));
         map.put("kills", kills.getOrDefault(viewer.getUniqueId(), 0));
+        map.put("level_kills", progress.getOrDefault(viewer.getUniqueId(), 0));
+        map.put("level_need", needed.getOrDefault(viewer.getUniqueId(), 1));
         map.put("deaths", deaths.getOrDefault(viewer.getUniqueId(), 0));
         Player lead = leader();
         map.put("leader", lead == null ? "-" : lead.getName());
