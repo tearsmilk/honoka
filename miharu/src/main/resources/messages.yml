@@ -324,6 +324,30 @@ custom-kits:
   inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
   wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
 
+boxpvp:
+  select-started: '{prefix}<gray>Выбери кит за <white>{seconds} с</white>! Сундук в руке — открыть меню снова.'
+  select-actionbar: '<#5fd6c4>Выбор кита</#5fd6c4> <gray>· <white>{seconds} с'
+  chosen: '{prefix}<gray>Твой кит: {kit}'
+  random-kit: '{prefix}<gray>Кит не выбран — случайный: {kit}'
+  lore-choose: '<yellow>▶ Нажми, чтобы выбрать'
+  lore-chosen: '<green>✔ Выбран'
+  phase-select: '<yellow>выбор кита'
+  phase-fight: '<red>бой'
+  fight:
+    title: '<#5fd6c4><b>БОЙ!</b>'
+    subtitle: '<gray>Захвати квадрат 3x3 своей шерстью'
+    stay: 2000
+  fight-actionbar: '<gray>Квадрат: <white>{own_blocks}/9</white> <dark_gray>·</dark_gray> держит <white>{holder}</white> <dark_gray>·</dark_gray> <white>{hold_left}'
+  captured: '{prefix}<white>{player}</white> <gray>захватил квадрат! Удержит <white>{seconds} с</white> — победа.'
+  lost: '{prefix}<white>{player}</white> <gray>потерял квадрат!'
+  respawn-info: '{prefix}<gray>Возрождение через <white>{seconds} с</white>. Можешь сменить кит (сундук).'
+  summary:
+    - '<dark_gray>───────────────────────'
+    - ' {kit} <gray>· BoxPvP'
+    - ' <gray>Победил: <green>{winner}</green> · твои убийства: <white>{kills}'
+    - ' <gray>Время: <white>{time}'
+    - '<dark_gray>───────────────────────'
+
 meetups:
   start-vote: '{prefix}<white>{player}</white> <gray>голосует за старт <green>({votes}/{need})'
   start-vote-already: '{prefix}<gray>Ты уже проголосовал за старт.'

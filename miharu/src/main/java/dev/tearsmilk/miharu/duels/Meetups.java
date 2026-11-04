@@ -261,6 +261,24 @@ public final class Meetups implements Listener {
         menu.open(p);
     }
 
+    /** Сундук выбора кита в BoxPvP (мини-лобби). */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBoxSelector(PlayerInteractEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND || e.getAction() == Action.PHYSICAL) {
+            return;
+        }
+        ItemStack it = e.getItem();
+        if (it == null || !it.hasItemMeta() || !it.getItemMeta().getPersistentDataContainer().has(BoxPvpGame.SELECTOR)) {
+            return;
+        }
+        e.setCancelled(true);
+        GameModule games = module.plugin().module(GameModule.class);
+        Game g = games == null ? null : games.games().of(e.getPlayer());
+        if (g instanceof BoxPvpGame bg) {
+            bg.openSelect(e.getPlayer());
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onVoteItem(PlayerInteractEvent e) {
         if (e.getHand() != EquipmentSlot.HAND || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK)) {

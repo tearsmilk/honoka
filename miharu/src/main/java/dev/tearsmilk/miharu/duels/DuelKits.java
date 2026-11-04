@@ -106,6 +106,11 @@ public final class DuelKits {
                     module.plugin().saveResource("modules/duels/" + folder + "/" + id + ".yml", false);
                 }
             }
+            // BoxPvP из 0.2.15 был пустой заготовкой — заменяем на готовый режим
+            File box = new File(dir, "boxpvp.yml");
+            if (minigames && box.exists() && !YamlConfiguration.loadConfiguration(box).contains("player-points")) {
+                module.plugin().saveResource("modules/duels/" + folder + "/boxpvp.yml", true);
+            }
             java.nio.file.Files.write(marker.toPath(), known);
         } catch (java.io.IOException e) {
             module.plugin().getLogger().warning("Не удалось обновить список китов: " + e.getMessage());
@@ -144,7 +149,7 @@ public final class DuelKits {
             try {
                 YamlConfiguration y = YamlConfiguration.loadConfiguration(f);
                 CombatVersion version = CombatVersion.parse(y.getString("version", defaultVersion.id()));
-                if (version == null || minigames) {
+                if (version == null || (minigames && !"boxpvp".equals(file))) { // BoxPvP — только PvP 1.9
                     version = defaultVersion;
                 }
                 KitRules rules = KitRules.load(y.getConfigurationSection("rules"), y.getInt("rounds", 1));
@@ -197,7 +202,8 @@ public final class DuelKits {
                             if (!playerOpts.isEmpty()) {
                                 String shortName = y.getString("arena-short", module.arenaShort(spec.arenaMode()));
                                 arenaMode = shortName + "-" + module.sizeName(n);
-                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n, rules.objective(), Text.plain(Text.mm(spec.display())));
+                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n, rules.objective(), Text.plain(Text.mm(spec.display())),
+                                        y.getStringList("player-points"), y.getStringList("extra-points"));
                             }
                             KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
                                     arenaMode, spec.arenas(), spec.bot());

@@ -1,13 +1,24 @@
-# Мини-игра (только против игроков, всегда PvP 1.8). Формат как у китов дуэлей (modules/duels/kits/).
-# BoxPvP — пока заготовка: кит и правила пустые, заполни позже.
+# BoxPvP 1x4: мини-лобби → выбор одного из 6 случайных китов дуэлей 1.9 (PvP только 1.9) → бой за квадрат 3x3.
+# Поставь все 9 блоков шерсти своего цвета и удержи их (boxpvp.hold-seconds в modules/duels/config.yml).
+# Кит берётся из выбранного кита 1.9; здесь armor/items пустые. Каждому дополнительно: 64 шерсти своего цвета и ножницы.
 display: '<#5fd6c4>BoxPvP'
-version: "1.8"
-arena-mode: boxpvp        # режим арены box-quatro: точки p1, p2, p3, p4
+version: "1.9"
+arena-mode: boxpvp        # режим арены box-quatro
 rounds: 1
-# режимы арены по числу игроков: box-quatro (см. arena-short в modules/duels/config.yml)
+# точки арены: p1..p4 — места появления в бою, pre1..pre4 — места в мини-лобби,
+# box — встань на ЦЕНТРАЛЬНЫЙ блок квадрата 3x3 (под ногами) и поставь точку
 players:
   - 4
 players-suffix: '<gray>· {format}'
+player-points:
+  - pre
+extra-points:
+  - box
 armor: {}
 items: {}
-rules: {}
+rules:
+  build: true
+  break-placed-only: false
+  natural-regen: true
+  hunger: false
+  max-duration-seconds: 900   # по истечении побеждает тот, у кого больше своих блоков в квадрате

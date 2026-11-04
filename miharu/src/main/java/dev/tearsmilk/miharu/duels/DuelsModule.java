@@ -424,9 +424,18 @@ public final class DuelsModule extends MiharuModule implements Listener {
     }
 
     void registerVariantArenaMode(String id, String base, int players, dev.tearsmilk.miharu.core.kit.KitRules.Objective objective, String display) {
+        registerVariantArenaMode(id, base, players, objective, display, List.of(), List.of());
+    }
+
+    /**
+     * @param perPlayer доп. точки на каждого игрока (pre → pre1…preN)
+     * @param extras    общие точки арены (box)
+     */
+    void registerVariantArenaMode(String id, String base, int players, dev.tearsmilk.miharu.core.kit.KitRules.Objective objective, String display,
+                                  List<String> perPlayer, List<String> extras) {
         variantBase.put(id, base);
         ArenaModule arenas = plugin.module(ArenaModule.class);
-        if (arenas == null || arenas.mode(id) != null) {
+        if (arenas == null) {
             return;
         }
         String extra = switch (objective) {
@@ -440,7 +449,11 @@ public final class DuelsModule extends MiharuModule implements Listener {
             if (extra != null) {
                 spawns.add(extra + i);
             }
+            for (String pp : perPlayer) {
+                spawns.add(pp + i);
+            }
         }
+        spawns.addAll(extras);
         arenas.registerMode(new ArenaMode(id, display + " · " + (players <= 2 ? "1x1" : "1x" + players), spawns));
     }
 
@@ -456,7 +469,9 @@ public final class DuelsModule extends MiharuModule implements Listener {
                 }
             }
         }
+        ArenaMode required = arenas.mode(spec.arenaMode());
         List<Arena> list = candidates.stream()
+                .filter(a -> required == null || a.spawns().keySet().containsAll(required.requiredSpawns()))
                 .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
                 .filter(a -> {
                     // нужны точки p1…pN, а для кроватей/ворот ещё bed1…bedN / goal1…goalN
@@ -504,9 +519,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
             return false;
         }
         GameModule games = plugin.module(GameModule.class);
-        Game game = meetups.mode(spec.id()) != null
-                ? new MeetupGame(this, games, arena, spec, meetups.mode(spec.id()), players)
-                : new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        Game game;
+        if (meetups.mode(spec.id()) != null) {
+            game = new MeetupGame(this, games, arena, spec, meetups.mode(spec.id()), players);
+        } else if ("boxpvp".equalsIgnoreCase(spec.kit().id().replace("mg-", ""))) {
+            game = new BoxPvpGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        } else {
+            game = new FfaGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), players);
+        }
         return games.games().start(game, players);
     }
 
