@@ -160,6 +160,10 @@ public final class DuelKits {
                 if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("skycontrol.base-damage")) {
                     module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
                 }
+                // 0.2.30: SkyControl — ожидание с выбором версии, точки red/blue…, 3–12 точек захвата
+                if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("arena-points")) {
+                    module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
+                }
                 // 0.2.24: GunGame — быстрый старт от 2
                 if (gg.exists()) {
                     YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);
@@ -307,8 +311,19 @@ public final class DuelKits {
                             if (!playerOpts.isEmpty()) {
                                 String shortName = y.getString("arena-short", module.arenaShort(spec.arenaMode()));
                                 arenaMode = shortName + "-" + (ts > 1 ? format : module.sizeName(n));
-                                module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n / ts, rules.objective(), Text.plain(Text.mm(spec.display())),
-                                        y.getStringList("player-points"), y.getStringList("extra-points"), format);
+                                if (y.isList("arena-points")) {
+                                    // своя схема точек (SkyControl): обязательные точки списком, старые имена — arena-point-aliases
+                                    java.util.Map<String, String> aliases = new java.util.HashMap<>();
+                                    ConfigurationSection al = y.getConfigurationSection("arena-point-aliases");
+                                    if (al != null) {
+                                        al.getKeys(false).forEach(k -> aliases.put(k, al.getString(k)));
+                                    }
+                                    module.registerCustomArenaMode(arenaMode, spec.arenaMode(), Text.plain(Text.mm(spec.display())) + " · " + format,
+                                            y.getStringList("arena-points"), aliases);
+                                } else {
+                                    module.registerVariantArenaMode(arenaMode, spec.arenaMode(), n / ts, rules.objective(), Text.plain(Text.mm(spec.display())),
+                                            y.getStringList("player-points"), y.getStringList("extra-points"), format);
+                                }
                             }
                             KitSpec v = new KitSpec(vid, name.toString(), spec.version(), spec.profile(), spec.kit(), vr,
                                     arenaMode, spec.arenas(), spec.bot());

@@ -76,6 +76,15 @@ public abstract class Game {
     }
 
     /** Зритель вошёл (показать ботов и т.п.). */
+    /** Можно ли сейчас зайти в игру из очереди (по умолчанию — нет). */
+    public boolean canLateJoin() {
+        return false;
+    }
+
+    /** Игрок зашёл в уже идущую игру (после телепорта на spawnFor). */
+    protected void onLateJoin(Player p) {
+    }
+
     protected void onSpectate(Player p) {
     }
 

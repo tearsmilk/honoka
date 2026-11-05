@@ -57,8 +57,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
- * SkyControl 2x2: красные против синих. Острова команд (p1 / p2) с торговцем (shop1 / shop2) и генератором бетона (gen1 / gen2).
- * 7 точек захвата 3x3 (cp1…cp7): каждая захваченная точка даёт команде +1 очко в секунду. Цель — 1200 очков.
+ * SkyControl 2x2: красные против синих. Острова команд (red / blue) с торговцем (red-shop / blue-shop) и точкой команды (red-gen / blue-gen).
+ * Зона ожидания wait: выбор команды и версии PvP, быстрый старт, добор игроков. 3–12 точек захвата 3x3 (cp1…cp12): каждая захваченная точка даёт команде +1 очко в секунду. Цель — 1200 очков.
  * Монеты: 1 за убийство и 1 за захват точки (каждому захватившему) — тратятся у торговца на улучшения и предметы.
  */
 public final class SkyControlGame extends Game implements KitGame, BuildGame {
@@ -153,6 +153,12 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
     private final BuildTracker build = new BuildTracker();
     private boolean selecting = true;
     private int selectLeft;
+    private int waitedTicks;
+    private final Map<UUID, CombatVersion> versionVotes = new HashMap<>();
+    private final Set<UUID> startVotes = new HashSet<>();
+    private CombatVersion version = CombatVersion.LEGACY;
+    static final NamespacedKey VERSION_ITEM = new NamespacedKey("miharu", "sc_version");
+    static final NamespacedKey START_ITEM = new NamespacedKey("miharu", "sc_start");
     private boolean finished;
     private String winnerName = "-";
 
@@ -178,7 +184,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
 
     @Override
     public CombatVersion combatVersion() {
-        return spec.version();
+        return version;
     }
 
     @Override
@@ -195,6 +201,22 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
 
     private int teamIndex(Kit.Team t) {
         return t == Kit.Team.BLUE ? 2 : 1;
+    }
+
+    private static String teamKey(Kit.Team t) {
+        return t == Kit.Team.BLUE ? "blue" : "red";
+    }
+
+    /** Новые имена точек и старые (арены до 0.2.30): red → p1, red-shop → shop1, red-gen → gen1. */
+    private static final Map<String, String> ALIASES = Map.of("red", "p1", "blue", "p2", "red-shop", "shop1", "blue-shop", "shop2",
+            "red-gen", "gen1", "blue-gen", "gen2");
+
+    private boolean hasPt(String name) {
+        return instance.has(name) || (ALIASES.containsKey(name) && instance.has(ALIASES.get(name)));
+    }
+
+    private Location pt(String name) {
+        return instance.has(name) ? instance.spawn(name) : instance.spawn(ALIASES.getOrDefault(name, name), "p1");
     }
 
     private List<Player> members(Kit.Team t) {
@@ -225,7 +247,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         if (selecting && instance.has("wait")) {
             return instance.spawn("wait");
         }
-        return instance.spawn("p" + teamIndex(team(p)), "p1");
+        return pt(teamKey(team(p)));
     }
 
     @Override
@@ -240,20 +262,20 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         instance.world().setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, true);
         instance.world().setGameRule(GameRules.FALL_DAMAGE, true);
         List<String> names = cfg.getStringList("point-names");
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= 12; i++) {
             String key = "cp" + i;
             if (instance.has(key)) {
-                Point pt = new Point(key, i <= names.size() ? names.get(i - 1) : String.valueOf((char) ('A' + i - 1)),
+                Point cp = new Point(key, i <= names.size() ? names.get(i - 1) : String.valueOf((char) ('A' + i - 1)),
                         instance.spawn(key).getBlock().getRelative(BlockFace.DOWN));
-                pt.beacon();
-                pt.paint();
-                points.add(pt);
+                cp.beacon();
+                cp.paint();
+                points.add(cp);
             }
         }
         for (Kit.Team t : TEAMS) {
-            String key = "shop" + teamIndex(t);
-            if (instance.has(key)) {
-                Location l = instance.spawn(key);
+            String key = teamKey(t) + "-shop";
+            if (hasPt(key)) {
+                Location l = pt(key);
                 Villager v = l.getWorld().spawn(l, Villager.class, vl -> {
                     vl.setAI(false);
                     vl.setInvulnerable(true);
@@ -270,13 +292,136 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
         selectLeft = Math.max(5, cfg.getInt("team-select-seconds", 15)) * 20;
         for (Player p : order) {
-            reset(p);
-            p.setGameMode(GameMode.ADVENTURE);
-            p.teleport(spawnFor(p));
-            p.getInventory().setItem(4, teamItem(p));
-            coins.put(p.getUniqueId(), 0);
-            p.setLevel(0);
-            p.setExp(0);
+            toWait(p);
+        }
+    }
+
+    /** Зона ожидания: шерсть — команда, бумага — версия PvP, краситель — быстрый старт. */
+    private void toWait(Player p) {
+        reset(p);
+        p.setGameMode(GameMode.ADVENTURE);
+        p.teleport(spawnFor(p));
+        coins.put(p.getUniqueId(), 0);
+        p.setLevel(0);
+        p.setExp(0);
+        giveWaitItems(p);
+    }
+
+    private void giveWaitItems(Player p) {
+        PlayerInventory inv = p.getInventory();
+        inv.setItem(3, tagged(Items.parse(cfg.getConfigurationSection("version-item"), Map.of("version", versionOf(p))), VERSION_ITEM));
+        inv.setItem(4, teamItem(p));
+        if (canSplit()) {
+            inv.setItem(5, tagged(Items.parse(cfg.getConfigurationSection("start-item"),
+                    Map.of("votes", startVotes.size(), "need", startNeed())), START_ITEM));
+        } else {
+            inv.setItem(5, null);
+        }
+    }
+
+    private static ItemStack tagged(ItemStack it, NamespacedKey key) {
+        ItemMeta meta = it.getItemMeta();
+        meta.getPersistentDataContainer().set(key, PersistentDataType.BYTE, (byte) 1);
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private String versionOf(Player p) {
+        CombatVersion v = versionVotes.get(p.getUniqueId());
+        return v == null ? plugin.messages().raw("skycontrol.version-none") : v.id();
+    }
+
+    private int full() {
+        return teamSize * TEAMS.length;
+    }
+
+    /** Можно начинать: игроков хватает на две команды (явно выбравшие не сидят все в одной). */
+    private boolean canSplit() {
+        List<Player> list = new ArrayList<>(players);
+        if (list.size() < 2) {
+            return false;
+        }
+        Set<Kit.Team> chosen = new HashSet<>();
+        int free = 0;
+        for (Player p : list) {
+            Kit.Team t = teams.get(p.getUniqueId());
+            if (t == null) {
+                free++;
+            } else {
+                chosen.add(t);
+            }
+        }
+        return chosen.size() >= 2 || free > 0;
+    }
+
+    private int startNeed() {
+        return Math.max(2, (int) Math.ceil(players.size() * cfg.getDouble("quick-start.vote-fraction", 0.5)));
+    }
+
+    @Override
+    public boolean canLateJoin() {
+        return selecting && !finished && (state == State.RUNNING || state == State.COUNTDOWN) && players.size() < full();
+    }
+
+    @Override
+    protected void onLateJoin(Player p) {
+        order.add(p);
+        toWait(p);
+        broadcast("skycontrol.joined", "player", p.getName(), "count", players.size(), "max", full());
+        refreshWaitItems();
+        // после смены мира клиент закрывает окна — открываем меню чуть позже
+        Bukkit.getScheduler().runTaskLater(plugin, () -> openTeams(p), 10L);
+    }
+
+    private void refreshWaitItems() {
+        for (Player p : players) {
+            giveWaitItems(p);
+        }
+    }
+
+    void openVersion(Player p) {
+        if (!selecting || !players.contains(p)) {
+            return;
+        }
+        ConfigurationSection v = cfg.getConfigurationSection("version-menu");
+        Menu menu = new Menu(3, Text.mm(v.getString("title", "Версия PvP")));
+        for (CombatVersion ver : CombatVersion.values()) {
+            ConfigurationSection c = v.getConfigurationSection(ver == CombatVersion.MODERN ? "modern" : "legacy");
+            int votes = (int) versionVotes.values().stream().filter(x -> x == ver).count();
+            Map<String, Object> ph = Map.of("votes", votes, "mine", versionVotes.get(p.getUniqueId()) == ver ? plugin.messages().raw("skycontrol.your-vote") : "");
+            menu.set(c.getInt("slot"), Items.parse(c, ph), pl -> {
+                if (!selecting) {
+                    pl.closeInventory();
+                    return;
+                }
+                versionVotes.put(pl.getUniqueId(), ver);
+                pl.playSound(pl.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
+                plugin.messages().send(pl, "skycontrol.voted", "version", ver.id());
+                giveWaitItems(pl);
+                openVersion(pl);
+            });
+        }
+        menu.fill(Items.parse(cfg.getConfigurationSection("menu-filler"), Map.of()));
+        menu.open(p);
+    }
+
+    void voteStart(Player p) {
+        if (!selecting || !players.contains(p)) {
+            return;
+        }
+        if (!canSplit()) {
+            plugin.messages().send(p, "skycontrol.start-same-team");
+            return;
+        }
+        if (!startVotes.add(p.getUniqueId())) {
+            plugin.messages().send(p, "skycontrol.start-already");
+            return;
+        }
+        broadcast("skycontrol.start-vote", "player", p.getName(), "votes", startVotes.size(), "need", startNeed());
+        if (startVotes.size() >= startNeed()) {
+            startFight();
+        } else {
+            refreshWaitItems();
         }
     }
 
@@ -284,9 +429,10 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
     protected void onRunning() {
         super.onRunning();
         for (Player p : order) {
-            plugin.messages().send(p, "skycontrol.select-started", "seconds", selectLeft / 20);
-            openTeams(p);
+            plugin.messages().send(p, "skycontrol.wait-started", "seconds", selectLeft / 20);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> openTeams(p), 10L);
         }
+        refreshWaitItems();
     }
 
     private void reset(Player p) {
@@ -369,7 +515,8 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         for (Player o : players) {
             plugin.messages().send(o, "skycontrol.team-joined", "player", p.getName(), "team", teamName(t));
         }
-        p.getInventory().setItem(4, teamItem(p));
+        startVotes.clear();
+        refreshWaitItems();
         p.closeInventory();
         for (Player o : players) {
             if (o != p && o.getOpenInventory().getTopInventory().getHolder(false) instanceof Menu
@@ -396,8 +543,15 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
     }
 
     private void startFight() {
+        if (!selecting) {
+            return;
+        }
         assignTeams();
         selecting = false;
+        int v18 = (int) versionVotes.values().stream().filter(v -> v == CombatVersion.LEGACY).count();
+        int v19 = (int) versionVotes.values().stream().filter(v -> v == CombatVersion.MODERN).count();
+        CombatVersion def = CombatVersion.parse(cfg.getString("default-version", "1.8"));
+        version = v18 > v19 ? CombatVersion.LEGACY : v19 > v18 ? CombatVersion.MODERN : def == null ? CombatVersion.LEGACY : def;
         for (Player p : List.copyOf(players)) {
             if (p.getOpenInventory().getTopInventory().getHolder(false) instanceof Menu) {
                 p.closeInventory();
@@ -406,7 +560,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
             p.setGameMode(GameMode.SURVIVAL);
             p.teleport(spawnFor(p));
             giveStart(p);
-            plugin.messages().title(p, "skycontrol.fight", "team", teamName(team(p)));
+            plugin.messages().title(p, "skycontrol.fight", "team", teamName(team(p)), "version", version.id(), "votes_18", v18, "votes_19", v19);
         }
     }
 
@@ -454,7 +608,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         inv.setItem(1, tool(tiers("pickaxe").isEmpty() ? "WOODEN_PICKAXE" : tiers("pickaxe").get(up(p, "pickaxe")), "pickaxe"));
         applyArmor(p);
         applyEffects(p);
-        combat.force(p, spec.profile());
+        combat.force(p, combat.profile(version));
     }
 
     private void replaceTool(Player p, String tag, ItemStack it) {
@@ -664,13 +818,24 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
         if (selecting) {
             selectLeft--;
+            waitedTicks++;
             if (selectLeft % 20 == 0) {
                 for (Player p : players) {
-                    plugin.messages().actionBar(p, "skycontrol.select-actionbar", "seconds", selectLeft / 20);
+                    plugin.messages().actionBar(p, canSplit() ? "skycontrol.select-actionbar" : "skycontrol.wait-actionbar",
+                            "seconds", selectLeft / 20, "count", players.size(), "max", full());
                 }
             }
             if (selectLeft <= 0) {
-                startFight();
+                if (canSplit()) {
+                    startFight();
+                } else if (waitedTicks >= cfg.getInt("max-wait-seconds", 300) * 20) {
+                    broadcast("skycontrol.wait-timeout");
+                    finish(null);
+                } else {
+                    // все в одной команде (или игрок один) — ждём ещё игроков
+                    selectLeft = Math.max(5, cfg.getInt("team-select-seconds", 15)) * 20;
+                    broadcast("skycontrol.waiting-more", "count", players.size(), "max", full());
+                }
             }
             return;
         }
@@ -700,8 +865,8 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
                 if (respawning.contains(p.getUniqueId()) || p.getGameMode() != GameMode.SURVIVAL) {
                     continue;
                 }
-                String key = "gen" + teamIndex(team(p));
-                if (!instance.has(key) || !onGen(p.getLocation(), instance.spawn(key))) {
+                String key = teamKey(team(p)) + "-gen";
+                if (!hasPt(key) || !onGen(p.getLocation(), pt(key))) {
                     continue;
                 }
                 Material c = concrete(team(p));
@@ -724,8 +889,8 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
                     continue;
                 }
                 Kit.Team enemy = team(p) == Kit.Team.RED ? Kit.Team.BLUE : Kit.Team.RED;
-                String key = "gen" + teamIndex(enemy);
-                if (instance.has(key) && p.getLocation().distance(instance.spawn(key)) <= r) {
+                String key = teamKey(enemy) + "-gen";
+                if (hasPt(key) && p.getLocation().distance(pt(key)) <= r) {
                     p.damage(cfg.getDouble("base-damage.damage", 2.0));
                     plugin.messages().actionBar(p, "skycontrol.enemy-base");
                 }
@@ -946,6 +1111,12 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         for (Player o : rest) {
             left.add(team(o));
         }
+        startVotes.remove(p.getUniqueId());
+        versionVotes.remove(p.getUniqueId());
+        if (selecting && !rest.isEmpty()) {
+            Bukkit.getScheduler().runTask(plugin, this::refreshWaitItems);
+            return;
+        }
         if (!selecting && left.size() <= 1) {
             Bukkit.getScheduler().runTask(plugin, () -> finish(left.isEmpty() ? null : left.iterator().next()));
         } else if (rest.isEmpty()) {
@@ -961,9 +1132,9 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
                 return true;
             }
         }
-        for (String key : List.of("p1", "p2", "shop1", "shop2", "gen1", "gen2")) {
-            if (instance.has(key)) {
-                Location s = instance.spawn(key);
+        for (String key : List.of("red", "blue", "red-shop", "blue-shop", "red-gen", "blue-gen")) {
+            if (hasPt(key)) {
+                Location s = pt(key);
                 if (Math.abs(s.getBlockX() - b.getX()) <= 1 && Math.abs(s.getBlockZ() - b.getZ()) <= 1 && Math.abs(s.getBlockY() - b.getY()) <= 2) {
                     return true;
                 }
@@ -1064,6 +1235,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         map.put("kills", kills.getOrDefault(viewer.getUniqueId(), 0));
         map.put("captures", captures.getOrDefault(viewer.getUniqueId(), 0));
         map.put("phase", plugin.messages().raw(selecting ? "skycontrol.phase-select" : "skycontrol.phase-fight"));
+        map.put("version", selecting ? "-" : version.id());
         map.put("winner", winnerName);
         map.put("player_hp", Text.num(Math.round(viewer.getHealth() * 10) / 10.0));
         map.put("time_left", Text.time(Math.max(0, spec.rules().maxDurationSeconds() - runningTicks / 20)));

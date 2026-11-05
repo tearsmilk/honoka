@@ -448,6 +448,47 @@ public final class DuelsModule extends MiharuModule implements Listener {
         return kitId == null ? 0 : quickMins.getOrDefault(kitId.toLowerCase(java.util.Locale.ROOT), 0);
     }
 
+    /** Своя схема точек арены (SkyControl: red, blue, red-shop…) — p1…pN не проверяются. */
+    private final java.util.Map<String, List<String>> customPoints = new java.util.concurrent.ConcurrentHashMap<>();
+    /** Старые имена точек: red → p1 и т.д. (арены, настроенные до переименования). */
+    private final java.util.Map<String, String> pointAliases = new java.util.concurrent.ConcurrentHashMap<>();
+
+    void registerCustomArenaMode(String id, String base, String display, List<String> required, java.util.Map<String, String> aliases) {
+        variantBase.put(id, base);
+        customPoints.put(id, List.copyOf(required));
+        pointAliases.putAll(aliases);
+        ArenaModule arenas = plugin.module(ArenaModule.class);
+        if (arenas != null) {
+            arenas.registerMode(new ArenaMode(id, display, required));
+        }
+    }
+
+    private boolean hasPoint(Arena a, String name) {
+        return a.spawn(name) != null || (pointAliases.containsKey(name) && a.spawn(pointAliases.get(name)) != null);
+    }
+
+    /** Зайти в игру, которая ещё набирает игроков (вместо очереди). */
+    boolean lateJoin(Player p, KitSpec spec) {
+        GameModule games = plugin.module(GameModule.class);
+        if (games == null) {
+            return false;
+        }
+        for (Game g : games.games().games()) {
+            if (g instanceof SkyControlGame sg && sg.kitSpec().id().equalsIgnoreCase(spec.id()) && sg.canLateJoin()) {
+                if (games.games().addPlayer(sg, p)) {
+                    changed(p);
+                    return true;
+                }
+            }
+        }
+        // SkyControl: зона ожидания и есть «лобби» — первый игрок сразу создаёт игру, остальные заходят в неё
+        if ("skycontrol".equalsIgnoreCase(spec.kit().id().replace("mg-", ""))) {
+            plugin.messages().send(p, "skycontrol.lobby-created", "kit", spec.display());
+            return startFfa(new ArrayList<>(List.of(p)), spec);
+        }
+        return false;
+    }
+
     void setTeamSize(String kitId, int size) {
         teamSizes.put(kitId.toLowerCase(java.util.Locale.ROOT), size);
     }
@@ -506,6 +547,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
             }
         }
         ArenaMode required = arenas.mode(spec.arenaMode());
+        List<String> custom = customPoints.get(spec.arenaMode());
+        if (custom != null) {
+            List<Arena> list = candidates.stream()
+                    .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
+                    .filter(a -> custom.stream().allMatch(n -> hasPoint(a, n)))
+                    .toList();
+            return list.isEmpty() ? null : list.get(ThreadLocalRandom.current().nextInt(list.size()));
+        }
         List<Arena> list = candidates.stream()
                 .filter(a -> required == null || a.spawns().keySet().containsAll(required.requiredSpawns()))
                 .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))

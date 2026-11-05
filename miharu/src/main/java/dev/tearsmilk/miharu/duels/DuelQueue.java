@@ -76,6 +76,9 @@ public final class DuelQueue {
             return;
         }
         leave(p, true);
+        if (!ranked && module.lateJoin(p, spec)) {
+            return; // зашёл в игру, которая ждёт игроков (SkyControl)
+        }
         Entry e = new Entry(p.getUniqueId(), spec.id(), ranked, System.currentTimeMillis());
         byKey.computeIfAbsent(e.key(), k -> new ArrayDeque<>()).addLast(p.getUniqueId());
         entries.put(p.getUniqueId(), e);

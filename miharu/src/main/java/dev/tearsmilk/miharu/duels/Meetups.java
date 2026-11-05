@@ -329,7 +329,9 @@ public final class Meetups implements Listener {
         var pdc = it.getItemMeta().getPersistentDataContainer();
         boolean rod = pdc.has(SkyControlGame.ROD);
         boolean team = pdc.has(SkyControlGame.TEAM_ITEM);
-        if (!rod && !team) {
+        boolean ver = pdc.has(SkyControlGame.VERSION_ITEM);
+        boolean start = pdc.has(SkyControlGame.START_ITEM);
+        if (!rod && !team && !ver && !start) {
             return;
         }
         e.setCancelled(true);
@@ -337,6 +339,10 @@ public final class Meetups implements Listener {
         if (games != null && games.games().of(e.getPlayer()) instanceof SkyControlGame sg) {
             if (team) {
                 sg.openTeams(e.getPlayer());
+            } else if (ver) {
+                sg.openVersion(e.getPlayer());
+            } else if (start) {
+                sg.voteStart(e.getPlayer());
             } else if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 sg.useRod(e.getPlayer(), it);
             }

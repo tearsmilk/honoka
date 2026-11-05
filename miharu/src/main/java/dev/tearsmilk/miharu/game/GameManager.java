@@ -182,6 +182,17 @@ public final class GameManager {
         return true;
     }
 
+    /** Добавить игрока в уже идущую игру (например, SkyControl на этапе ожидания). */
+    public boolean addPlayer(Game game, Player p) {
+        if (busy(p) || !games.containsKey(game.id) || !game.canLateJoin()) {
+            return false;
+        }
+        join(game, p);
+        refreshBoard(game);
+        safe(() -> game.onLateJoin(p));
+        return true;
+    }
+
     private void join(Game game, Player p) {
         for (java.util.function.Consumer<Player> hook : joinHooks) {
             safe(() -> hook.accept(p));
