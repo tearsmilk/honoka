@@ -151,6 +151,11 @@ public final class DuelKits {
                         || !YamlConfiguration.loadConfiguration(gg).contains("gungame.kills-per-level-min"))) {
                     module.plugin().saveResource("modules/duels/" + folder + "/gungame.yml", true);
                 }
+                // 0.2.27: SkyControl из пустышки → полноценный режим
+                File sc = new File(dir, "skycontrol.yml");
+                if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("team-sizes")) {
+                    module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
+                }
                 // 0.2.24: GunGame — быстрый старт от 2
                 if (gg.exists()) {
                     YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);

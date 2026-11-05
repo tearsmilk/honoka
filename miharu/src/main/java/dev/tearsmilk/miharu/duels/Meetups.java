@@ -303,6 +303,54 @@ public final class Meetups implements Listener {
         }
     }
 
+    // --- SkyControl: торговец, выбор команды, стержень молнии ---
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSkyShop(org.bukkit.event.player.PlayerInteractEntityEvent e) {
+        if (!e.getRightClicked().getPersistentDataContainer().has(SkyControlGame.SHOP)) {
+            return;
+        }
+        e.setCancelled(true);
+        GameModule games = module.plugin().module(GameModule.class);
+        if (games != null && games.games().of(e.getPlayer()) instanceof SkyControlGame sg) {
+            sg.openShop(e.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSkyItem(PlayerInteractEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND || e.getAction() == Action.PHYSICAL) {
+            return;
+        }
+        ItemStack it = e.getItem();
+        if (it == null || !it.hasItemMeta()) {
+            return;
+        }
+        var pdc = it.getItemMeta().getPersistentDataContainer();
+        boolean rod = pdc.has(SkyControlGame.ROD);
+        boolean team = pdc.has(SkyControlGame.TEAM_ITEM);
+        if (!rod && !team) {
+            return;
+        }
+        e.setCancelled(true);
+        GameModule games = module.plugin().module(GameModule.class);
+        if (games != null && games.games().of(e.getPlayer()) instanceof SkyControlGame sg) {
+            if (team) {
+                sg.openTeams(e.getPlayer());
+            } else if (e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                sg.useRod(e.getPlayer(), it);
+            }
+        }
+    }
+
+    /** Торговца нельзя бить. */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onSkyShopDamage(org.bukkit.event.entity.EntityDamageEvent e) {
+        if (e.getEntity().getPersistentDataContainer().has(SkyControlGame.SHOP)) {
+            e.setCancelled(true);
+        }
+    }
+
     /** Сундук выбора кита в BoxPvP (мини-лобби). */
     @EventHandler(priority = EventPriority.HIGH)
     public void onBoxSelector(PlayerInteractEvent e) {

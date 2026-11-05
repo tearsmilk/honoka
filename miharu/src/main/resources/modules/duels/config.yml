@@ -25,6 +25,7 @@ arena-short:
   boxpvp: box
   bowspleef: bs
   gungame: gg
+  skycontrol: sc
 arena-size-names:
   '2': duo
   '3': trio

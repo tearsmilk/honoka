@@ -369,6 +369,47 @@ boxpvp:
     - ' <gray>Время: <white>{time}'
     - '<dark_gray>───────────────────────'
 
+skycontrol:
+  team-red: '<red>Красные</red>'
+  team-blue: '<blue>Синие</blue>'
+  team-none: '<gray>не выбрана'
+  team-lore-count: '<gray>Игроков: <white>{count}/{size}'
+  team-lore-join: '<yellow>▶ Нажми, чтобы вступить'
+  team-lore-full: '<red>✘ Команда заполнена'
+  team-lore-yours: '<green>✔ Твоя команда'
+  team-full: '{prefix}<red>Команда {team}<red> уже заполнена.'
+  team-joined: '{prefix}<white>{player}</white> <gray>→ {team}'
+  team-auto: '{prefix}<gray>Команда не выбрана — ты в команде {team}'
+  select-started: '{prefix}<gray>Выбери команду за <white>{seconds} с</white>! Шерсть в руке — открыть меню снова.'
+  select-actionbar: '<#7fd4ff>Выбор команды</#7fd4ff> <gray>· <white>{seconds} с'
+  fight:
+    title: '<#7fd4ff><b>SkyControl</b>'
+    subtitle: '<gray>Ты в команде {team}<gray> · захватывай точки!'
+    stay: 2000
+  phase-select: '<yellow>выбор команды'
+  phase-fight: '<red>бой'
+  capturing: '<gray>Захват <white>{point}</white> {bar} <white>{percent}%'
+  contested: '<red>Точка {point} оспаривается!'
+  captured: '{prefix}{team}<gray> захватили точку <white>{point}</white>!'
+  killed: '{prefix}<red>{player}</red> <gray>убит игроком <white>{killer}</white> <gold>(+1 монета)'
+  died: '{prefix}<red>{player}</red> <gray>погиб'
+  shop-buy: '<yellow>▶ Нажми, чтобы купить'
+  shop-no-coins: '<red>✘ Не хватает монет'
+  shop-maxed: '<green>✔ Максимальный уровень'
+  no-coins: '{prefix}<red>Не хватает монет: нужно {price}, у тебя {coins}.'
+  maxed: '{prefix}<gray>Уже максимальный уровень.'
+  bought-upgrade: '{prefix}<green>Улучшено:</green> <white>{name}</white> <gray>{level}/{max}'
+  bought-item: '{prefix}<green>Куплено:</green> <white>{name}'
+  rod-no-target: '<red>Нет цели — посмотри на блок'
+  draw: '<gray>ничья'
+  summary:
+    - '<dark_gray>───────────────────────'
+    - ' {kit} <gray>· <red>{red_score}</red> : <blue>{blue_score}</blue> <gray>(до {goal})'
+    - ' <gray>Победили: <green>{winner}'
+    - ' <gray>Убийства: <white>{kills}</white> · захваты: <white>{captures}'
+    - ' <gray>Время: <white>{time}'
+    - '<dark_gray>───────────────────────'
+
 gungame:
   level-up:
     title: '<#ffb347><b>Уровень {level}</b><gray>/{max}'
