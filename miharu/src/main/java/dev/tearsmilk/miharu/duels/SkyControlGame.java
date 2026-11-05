@@ -773,6 +773,11 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
     }
 
+    /** Слоты брони в PlayerInventory (36–39). */
+    private static boolean isArmorSlot(int i) {
+        return i >= 36 && i <= 39;
+    }
+
     private void hideBars(Player p) {
         bars.values().forEach(p::hideBossBar);
     }
@@ -894,18 +899,17 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
         respawning.add(p.getUniqueId());
         heal(p);
-        // купленные меч, кирка и броня остаются; TNT, фаерболы и стержни молнии пропадают
+        // остаются только купленные меч, кирка и броня; всё остальное (бетон, яблоки, TNT, фаерболы, стержни) пропадает
         PlayerInventory inv = p.getInventory();
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack it = inv.getItem(i);
-            if (it != null && (it.getType() == Material.TNT || it.getType() == Material.FIRE_CHARGE
-                    || (it.hasItemMeta() && it.getItemMeta().getPersistentDataContainer().has(ROD)))) {
+            boolean tool = it != null && it.hasItemMeta() && it.getItemMeta().getPersistentDataContainer().has(TOOL);
+            if (it != null && !tool && !isArmorSlot(i)) {
                 inv.setItem(i, null);
             }
         }
-        if (p.getItemOnCursor().getType() == Material.TNT || p.getItemOnCursor().getType() == Material.FIRE_CHARGE) {
-            p.setItemOnCursor(null);
-        }
+        inv.setItemInOffHand(null);
+        p.setItemOnCursor(null);
         p.setGameMode(GameMode.SPECTATOR);
         p.teleport(spawnFor(p).clone().add(0, 4, 0));
         int sec = Math.max(1, cfg.getInt("respawn-seconds", 3));
