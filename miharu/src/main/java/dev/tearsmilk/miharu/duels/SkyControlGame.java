@@ -102,10 +102,32 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
 
         void paint() {
-            Material m = Material.matchMaterial(cfg.getString("point-floor." + (owner == null ? "neutral" : owner.name().toLowerCase(Locale.ROOT)),
-                    owner == null ? "WHITE_WOOL" : owner == Kit.Team.RED ? "RED_WOOL" : "BLUE_WOOL"));
+            String def = owner == null ? "WHITE_STAINED_GLASS" : owner == Kit.Team.RED ? "RED_STAINED_GLASS" : "BLUE_STAINED_GLASS";
+            Material m = Material.matchMaterial(cfg.getString("point-floor." + (owner == null ? "neutral" : owner.name().toLowerCase(Locale.ROOT)), def));
             for (Block b : floor) {
-                b.setType(m == null ? Material.WHITE_WOOL : m, false);
+                b.setType(m == null ? Material.matchMaterial(def) : m, false);
+            }
+        }
+
+        /** Маяк под центром точки (луч проходит через цветное стекло): маяк + основание 3x3 из железа. */
+        void beacon() {
+            if (!cfg.getBoolean("point-beacon", true)) {
+                return;
+            }
+            Block b = center.getRelative(BlockFace.DOWN);
+            b.setType(Material.BEACON, false);
+            Block base = b.getRelative(BlockFace.DOWN);
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    base.getRelative(dx, 0, dz).setType(Material.IRON_BLOCK, false);
+                }
+            }
+            // над точкой ничего не должно закрывать луч
+            for (int y = 1; y <= 4; y++) {
+                Block up = center.getRelative(0, y, 0);
+                if (!up.getType().isAir()) {
+                    up.setType(Material.AIR, false);
+                }
             }
         }
     }
@@ -223,6 +245,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
             if (instance.has(key)) {
                 Point pt = new Point(key, i <= names.size() ? names.get(i - 1) : String.valueOf((char) ('A' + i - 1)),
                         instance.spawn(key).getBlock().getRelative(BlockFace.DOWN));
+                pt.beacon();
                 pt.paint();
                 points.add(pt);
             }
@@ -672,25 +695,86 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
         int genEvery = Math.max(1, cfg.getInt("generator.interval-ticks", 20));
         if (runningTicks % genEvery == 0) {
-            for (Kit.Team t : TEAMS) {
-                String key = "gen" + teamIndex(t);
-                if (!instance.has(key)) {
+            // точка команды 3x3: бетон своей команды сразу в инвентарь тому, кто на ней стоит
+            for (Player p : players) {
+                if (respawning.contains(p.getUniqueId()) || p.getGameMode() != GameMode.SURVIVAL) {
                     continue;
                 }
-                Location l = instance.spawn(key);
-                int near = 0;
-                for (Item it : l.getWorld().getNearbyEntitiesByType(Item.class, l, 2.0)) {
-                    near += it.getItemStack().getAmount();
+                String key = "gen" + teamIndex(team(p));
+                if (!instance.has(key) || !onGen(p.getLocation(), instance.spawn(key))) {
+                    continue;
                 }
-                if (near < cfg.getInt("generator.max-items", 64)) {
-                    Item drop = l.getWorld().dropItem(l.clone().add(0, 0.3, 0), new ItemStack(concrete(t), Math.max(1, cfg.getInt("generator.amount", 1))));
-                    drop.setVelocity(new Vector());
+                Material c = concrete(team(p));
+                int have = 0;
+                for (ItemStack it : p.getInventory().getStorageContents()) {
+                    if (it != null && it.getType() == c) {
+                        have += it.getAmount();
+                    }
+                }
+                if (have < cfg.getInt("generator.max-items", 64)) {
+                    p.getInventory().addItem(new ItemStack(c, Math.max(1, cfg.getInt("generator.amount", 1))));
                 }
             }
         }
+        if (runningTicks % 20 == 0) {
+            // чужая база: в радиусе base-damage.radius от точки противника — урон каждую секунду
+            double r = cfg.getDouble("base-damage.radius", 5);
+            for (Player p : List.copyOf(players)) {
+                if (respawning.contains(p.getUniqueId()) || p.getGameMode() != GameMode.SURVIVAL) {
+                    continue;
+                }
+                Kit.Team enemy = team(p) == Kit.Team.RED ? Kit.Team.BLUE : Kit.Team.RED;
+                String key = "gen" + teamIndex(enemy);
+                if (instance.has(key) && p.getLocation().distance(instance.spawn(key)) <= r) {
+                    p.damage(cfg.getDouble("base-damage.damage", 2.0));
+                    plugin.messages().actionBar(p, "skycontrol.enemy-base");
+                }
+            }
+        }
+        updateBars();
         if (spec.rules().maxDurationSeconds() > 0 && runningTicks >= spec.rules().maxDurationSeconds() * 20) {
             finish(score.get(Kit.Team.RED) >= score.get(Kit.Team.BLUE) ? (score.get(Kit.Team.RED).equals(score.get(Kit.Team.BLUE)) ? null : Kit.Team.RED) : Kit.Team.BLUE);
         }
+    }
+
+    private boolean onGen(Location l, Location gen) {
+        Block c = gen.getBlock().getRelative(BlockFace.DOWN);
+        return Math.abs(l.getBlockX() - c.getX()) <= 1 && Math.abs(l.getBlockZ() - c.getZ()) <= 1
+                && l.getY() >= c.getY() && l.getY() <= c.getY() + 3;
+    }
+
+    // --- боссбары: прогресс команд ---
+
+    private final Map<Kit.Team, net.kyori.adventure.bossbar.BossBar> bars = new HashMap<>();
+
+    private void updateBars() {
+        int goal = Math.max(1, cfg.getInt("goal", 1200));
+        for (Kit.Team t : TEAMS) {
+            int owned = (int) points.stream().filter(pt -> pt.owner == t).count();
+            net.kyori.adventure.text.Component title = Text.mm(plugin.messages().raw("skycontrol.bossbar-" + t.name().toLowerCase(Locale.ROOT)),
+                    Map.of("score", score.get(t), "goal", goal, "points", owned, "total", points.size()));
+            float prog = Math.max(0f, Math.min(1f, score.get(t) / (float) goal));
+            net.kyori.adventure.bossbar.BossBar bar = bars.get(t);
+            if (bar == null) {
+                bar = net.kyori.adventure.bossbar.BossBar.bossBar(title, prog,
+                        t == Kit.Team.RED ? net.kyori.adventure.bossbar.BossBar.Color.RED : net.kyori.adventure.bossbar.BossBar.Color.BLUE,
+                        net.kyori.adventure.bossbar.BossBar.Overlay.NOTCHED_10);
+                bars.put(t, bar);
+            } else {
+                bar.name(title);
+                bar.progress(prog);
+            }
+            for (Player p : players) {
+                p.showBossBar(bar);
+            }
+            for (Player p : spectators()) {
+                p.showBossBar(bar);
+            }
+        }
+    }
+
+    private void hideBars(Player p) {
+        bars.values().forEach(p::hideBossBar);
     }
 
     private void tickPoints(int step) {
@@ -725,13 +809,13 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
                 continue;
             }
             if (pt.capturing != t) {
-                pt.progress -= step * who.size();
+                pt.progress -= step;
                 if (pt.progress <= 0) {
                     pt.capturing = t;
                     pt.progress = 0;
                 }
             } else {
-                pt.progress += step * who.size();
+                pt.progress += step; // 5 секунд независимо от числа тиммейтов
             }
             int pct = pt.capturing == t ? Math.min(100, pt.progress * 100 / need) : 0;
             for (Player p : who) {
@@ -810,6 +894,18 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         }
         respawning.add(p.getUniqueId());
         heal(p);
+        // купленные меч, кирка и броня остаются; TNT, фаерболы и стержни молнии пропадают
+        PlayerInventory inv = p.getInventory();
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack it = inv.getItem(i);
+            if (it != null && (it.getType() == Material.TNT || it.getType() == Material.FIRE_CHARGE
+                    || (it.hasItemMeta() && it.getItemMeta().getPersistentDataContainer().has(ROD)))) {
+                inv.setItem(i, null);
+            }
+        }
+        if (p.getItemOnCursor().getType() == Material.TNT || p.getItemOnCursor().getType() == Material.FIRE_CHARGE) {
+            p.setItemOnCursor(null);
+        }
         p.setGameMode(GameMode.SPECTATOR);
         p.teleport(spawnFor(p).clone().add(0, 4, 0));
         int sec = Math.max(1, cfg.getInt("respawn-seconds", 3));
@@ -835,6 +931,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
 
     @Override
     protected void onPlayerLeave(Player p, boolean quit) {
+        hideBars(p);
         if (finished || !(state == State.RUNNING || state == State.COUNTDOWN)) {
             return;
         }
@@ -922,6 +1019,12 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
             p.playSound(p.getLocation(), won ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
         shops.forEach(Entity::remove);
+        for (Player p : order) {
+            hideBars(p);
+        }
+        for (Player p : spectators()) {
+            hideBars(p);
+        }
         end();
     }
 

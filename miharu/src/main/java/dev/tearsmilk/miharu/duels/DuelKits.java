@@ -156,6 +156,10 @@ public final class DuelKits {
                 if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("team-sizes")) {
                     module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
                 }
+                // 0.2.28: SkyControl — стекло и маяки, золотое яблоко, урон на чужой базе
+                if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("skycontrol.base-damage")) {
+                    module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
+                }
                 // 0.2.24: GunGame — быстрый старт от 2
                 if (gg.exists()) {
                     YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);

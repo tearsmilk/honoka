@@ -401,6 +401,9 @@ skycontrol:
   bought-upgrade: '{prefix}<green>Улучшено:</green> <white>{name}</white> <gray>{level}/{max}'
   bought-item: '{prefix}<green>Куплено:</green> <white>{name}'
   rod-no-target: '<red>Нет цели — посмотри на блок'
+  enemy-base: '<red>⚠ Чужая база — урон каждую секунду!'
+  bossbar-red: '<red><b>Красные</b></red> <white>{score}<gray>/{goal} <dark_gray>·</dark_gray> <white>точек {points}<gray>/{total}'
+  bossbar-blue: '<blue><b>Синие</b></blue> <white>{score}<gray>/{goal} <dark_gray>·</dark_gray> <white>точек {points}<gray>/{total}'
   draw: '<gray>ничья'
   summary:
     - '<dark_gray>───────────────────────'

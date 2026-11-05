@@ -3,12 +3,16 @@
 # Точки арены (режим арены sc-2x2):
 #   p1 / p2       — спавн красных / синих (остров команды)
 #   shop1 / shop2 — торговец (NPC) красных / синих
-#   gen1 / gen2   — точка на спавне, с неё падает бетон своей команды (захватить нельзя)
-#   cp1 … cp7     — точки захвата 3x3: встань на ЦЕНТРАЛЬНЫЙ блок квадрата и поставь точку
+#   gen1 / gen2   — точка команды 3x3 на спавне (центр квадрата): стоишь на ней — бетон своей команды сразу в инвентарь;
+#                   захватить нельзя; чужим в радиусе base-damage.radius — урон каждую секунду
+#   cp1 … cp7     — точки захвата 3x3 из стекла с маяком: встань на ЦЕНТРАЛЬНЫЙ блок квадрата и поставь точку
+#                   (под центром плагин ставит маяк и железное основание 3x3, над точкой должно быть небо)
 #                   (например cp1–cp3 — центр, cp4–cp5 — острова слева/справа у красных, cp6–cp7 — у синих)
 #   wait          — (необязательно) где стоять во время выбора команды; иначе — на спавнах
 # Захваченная точка даёт команде +1 очко в секунду (2 точки — +2 и т.д.). Цель — goal очков.
 # Монеты: 1 за убийство, 1 за захват точки (каждому из команды, кто стоял на точке). Тратятся у торговца.
+# После смерти купленные меч, кирка и броня остаются; TNT, фаерболы и стержни молнии пропадают.
+# Прогресс команд — в двух боссбарах (очки до goal и число точек).
 display: '<#7fd4ff>SkyControl'
 version: "1.8"
 arena-mode: skycontrol
@@ -44,7 +48,7 @@ rules:
 skycontrol:
   goal: 1200
   score-per-point: 1            # очков в секунду за каждую захваченную точку
-  capture-seconds: 5            # сколько стоять на точке (вдвоём — в 2 раза быстрее)
+  capture-seconds: 5            # сколько стоять на точке (сколько бы тиммейтов ни стояло)
   respawn-seconds: 3
   team-select-seconds: 15
   point-names:                 # подписи cp1…cp7
@@ -55,17 +59,21 @@ skycontrol:
     - E
     - F
     - G
+  point-beacon: true            # маяк под каждой точкой: луч белый / красный / синий по владельцу
   point-floor:                  # пол точки 3x3 по владельцу
-    neutral: WHITE_WOOL
-    red: RED_WOOL
-    blue: BLUE_WOOL
+    neutral: WHITE_STAINED_GLASS
+    red: RED_STAINED_GLASS
+    blue: BLUE_STAINED_GLASS
+  base-damage:                  # чужая база: урон в радиусе от точки команды противника (gen1 / gen2)
+    radius: 5
+    damage: 2.0                 # 1 сердце в секунду
   coins:
     kill: 1
     capture: 1
   generator:
-    interval-ticks: 20          # раз в секунду падает бетон своей команды
+    interval-ticks: 20          # раз в секунду — бетон своей команды в инвентарь стоящему на точке команды
     amount: 1
-    max-items: 64               # не больше стольких блоков лежит у генератора
+    max-items: 64               # не больше стольких блоков бетона в инвентаре
   rod:                          # стержень молнии: ПКМ — молния в точку взгляда
     range: 50
     radius: 3.0
@@ -193,8 +201,20 @@ skycontrol:
           - DIAMOND protection 1
           - DIAMOND protection 2
     items:
+      gapple:
+        slot: 30
+        price: 1
+        icon:
+          material: GOLDEN_APPLE
+          name: '<gold><b>Золотое яблоко</b>'
+          lore:
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        give:
+          material: GOLDEN_APPLE
       tnt:
-        slot: 29
+        slot: 31
         price: 1
         icon:
           material: TNT
@@ -207,7 +227,7 @@ skycontrol:
         give:
           material: TNT
       fireball:
-        slot: 31
+        slot: 32
         price: 1
         icon:
           material: FIRE_CHARGE
@@ -220,7 +240,7 @@ skycontrol:
         give:
           material: FIRE_CHARGE
       rod:
-        slot: 33
+        slot: 34
         price: 1
         icon:
           material: LIGHTNING_ROD
