@@ -805,7 +805,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
                 dir.normalize();
             }
             double k = 1 - d / (radius + 0.5);
-            Vector v = dir.multiply(cfg.getDouble("fireball.knockback", 1.6) * k).setY(cfg.getDouble("fireball.knockback-y", 0.75) * Math.max(0.4, k));
+            Vector v = dir.multiply(cfg.getDouble("fireball.knockback", 1.3) * k).setY(cfg.getDouble("fireball.knockback-y", 0.75) * Math.max(0.4, k));
             Bukkit.getScheduler().runTask(plugin, () -> t.setVelocity(t.getVelocity().add(v)));
             if (shooter != null && t != shooter) {
                 lastHit.put(t.getUniqueId(), shooter.getUniqueId());

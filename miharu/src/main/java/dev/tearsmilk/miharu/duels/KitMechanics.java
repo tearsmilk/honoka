@@ -227,7 +227,7 @@ final class KitMechanics implements Listener {
         return g instanceof KitGame kg && kg.kitSpec().id().toLowerCase(java.util.Locale.ROOT).startsWith("mg-bowspleef");
     }
 
-    /** Стрела попала в блок — весь TNT в радиусе 2–3 (случайно) от точки попадания поджигается и падает вниз. */
+    /** Стрела попала в блок — 4–5 ближайших блоков TNT поджигаются и падают вниз. */
     @EventHandler(priority = EventPriority.HIGH)
     public void onSpleefArrow(org.bukkit.event.entity.ProjectileHitEvent e) {
         org.bukkit.block.Block hit = e.getHitBlock();
@@ -238,28 +238,30 @@ final class KitMechanics implements Listener {
         if (g == null || g.state() != Game.State.RUNNING) {
             return;
         }
-        int min = Math.max(0, module.config().getInt("bowspleef.radius-min", 2));
-        int max = Math.max(min, module.config().getInt("bowspleef.radius-max", 3));
-        double r = min + java.util.concurrent.ThreadLocalRandom.current().nextDouble() * (max - min) + 0.5;
-        int ri = (int) Math.ceil(r);
+        // ломается не весь радиус, а 4–5 ближайших блоков TNT к точке попадания (blocks-min…blocks-max)
+        int min = Math.max(1, module.config().getInt("bowspleef.blocks-min", 4));
+        int max = Math.max(min, module.config().getInt("bowspleef.blocks-max", 5));
+        int count = java.util.concurrent.ThreadLocalRandom.current().nextInt(min, max + 1);
+        int ri = Math.max(1, module.config().getInt("bowspleef.search-radius", 2));
         int fuse = Math.max(5, module.config().getInt("bowspleef.fuse-ticks", 30));
-        org.bukkit.Location center = hit.getLocation().add(0.5, 0.5, 0.5);
+        java.util.List<org.bukkit.block.Block> found = new java.util.ArrayList<>();
         for (int dx = -ri; dx <= ri; dx++) {
             for (int dy = -ri; dy <= ri; dy++) {
                 for (int dz = -ri; dz <= ri; dz++) {
-                    if (dx * dx + dy * dy + dz * dz > r * r) {
-                        continue;
-                    }
                     org.bukkit.block.Block b = hit.getRelative(dx, dy, dz);
-                    if (b.getType() != org.bukkit.Material.TNT) {
-                        continue;
+                    if (b.getType() == org.bukkit.Material.TNT) {
+                        found.add(b);
                     }
-                    b.setType(org.bukkit.Material.AIR, false);
-                    org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
-                    tnt.setFuseTicks(fuse + java.util.concurrent.ThreadLocalRandom.current().nextInt(10));
-                    tnt.setYield(0);
                 }
             }
+        }
+        java.util.Collections.shuffle(found); // при равном расстоянии — случайно
+        found.sort(java.util.Comparator.comparingDouble(b -> b.getLocation().distanceSquared(hit.getLocation())));
+        for (org.bukkit.block.Block b : found.subList(0, Math.min(count, found.size()))) {
+            b.setType(org.bukkit.Material.AIR, false);
+            org.bukkit.entity.TNTPrimed tnt = b.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), org.bukkit.entity.TNTPrimed.class);
+            tnt.setFuseTicks(fuse + java.util.concurrent.ThreadLocalRandom.current().nextInt(10));
+            tnt.setYield(0);
         }
         e.getEntity().remove();
     }

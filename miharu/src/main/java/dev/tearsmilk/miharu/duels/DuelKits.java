@@ -173,9 +173,13 @@ public final class DuelKits {
                         sy.set("arena-points", pts);
                         sy.save(sc);
                     }
+                    if (sy.getDouble("skycontrol.fireball.knockback", 0) == 1.6) {
+                        sy.set("skycontrol.fireball.knockback", 1.3); // 0.2.32: фаербол слабее
+                        sy.save(sc);
+                    }
                     if (!sy.contains("skycontrol.fireball")) {
                         sy.set("skycontrol.fireball.radius", 4.0);
-                        sy.set("skycontrol.fireball.knockback", 1.6);
+                        sy.set("skycontrol.fireball.knockback", 1.3);
                         sy.set("skycontrol.fireball.knockback-y", 0.75);
                         if (sy.getInt("skycontrol.generator.max-items", 64) == 64) {
                             sy.set("skycontrol.generator.max-items", 256);
