@@ -261,6 +261,8 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
     protected void onSetup() {
         instance.world().setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, true);
         instance.world().setGameRule(GameRules.FALL_DAMAGE, true);
+        // фаерболы ломают блоки только при mobGriefing; что именно ломать — решает filterExplosion (только поставленные)
+        instance.world().setGameRule(GameRules.MOB_GRIEFING, true);
         List<String> names = cfg.getStringList("point-names");
         for (int i = 1; i <= 12; i++) {
             String key = "cp" + i;
@@ -294,6 +296,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         for (Player p : order) {
             toWait(p);
         }
+        applyTeams();
     }
 
     /** Зона ожидания: шерсть — команда, бумага — версия PvP, краситель — быстрый старт. */
@@ -369,6 +372,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         toWait(p);
         broadcast("skycontrol.joined", "player", p.getName(), "count", players.size(), "max", full());
         refreshWaitItems();
+        applyTeams();
         // после смены мира клиент закрывает окна — открываем меню чуть позже
         Bukkit.getScheduler().runTaskLater(plugin, () -> openTeams(p), 10L);
     }
@@ -550,6 +554,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         selecting = false;
         int v18 = (int) versionVotes.values().stream().filter(v -> v == CombatVersion.LEGACY).count();
         int v19 = (int) versionVotes.values().stream().filter(v -> v == CombatVersion.MODERN).count();
+        applyTeams();
         CombatVersion def = CombatVersion.parse(cfg.getString("default-version", "1.8"));
         version = v18 > v19 ? CombatVersion.LEGACY : v19 > v18 ? CombatVersion.MODERN : def == null ? CombatVersion.LEGACY : def;
         for (Player p : List.copyOf(players)) {
@@ -672,6 +677,12 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         return t != null && players.contains(p) && !selecting && !respawning.contains(p.getUniqueId());
     }
 
+    /** Открыть магазин со следующего тика — как будто через команду (без окна торговли жителя). */
+    void openShopLater(Player p) {
+        p.closeInventory();
+        Bukkit.getScheduler().runTask(plugin, () -> openShop(p));
+    }
+
     void openShop(Player p) {
         if (selecting || !players.contains(p) || respawning.contains(p.getUniqueId())) {
             return;
@@ -772,6 +783,35 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         Map<Integer, ItemStack> left = p.getInventory().addItem(give);
         left.values().forEach(x -> p.getWorld().dropItem(p.getLocation(), x));
         plugin.messages().send(p, "skycontrol.bought-item", "name", Text.plain(Text.mm(it.getString("icon.name", key))));
+    }
+
+    /** Взрыв фаербола: сильнее откидывает игроков вокруг. */
+    void fireballBlast(Location at, org.bukkit.entity.Entity source) {
+        double radius = cfg.getDouble("fireball.radius", 4.0);
+        Player shooter = source instanceof Projectile pr && pr.getShooter() instanceof Player sp ? sp : null;
+        for (Player t : players) {
+            if (respawning.contains(t.getUniqueId()) || t.getGameMode() != GameMode.SURVIVAL) {
+                continue;
+            }
+            double d = t.getLocation().distance(at);
+            if (d > radius || (shooter != null && t != shooter && sameTeam(shooter, t))) {
+                continue;
+            }
+            Vector dir = t.getLocation().toVector().subtract(at.toVector());
+            dir.setY(0);
+            if (dir.lengthSquared() < 0.01) {
+                dir = new Vector(0, 0, 0);
+            } else {
+                dir.normalize();
+            }
+            double k = 1 - d / (radius + 0.5);
+            Vector v = dir.multiply(cfg.getDouble("fireball.knockback", 1.6) * k).setY(cfg.getDouble("fireball.knockback-y", 0.75) * Math.max(0.4, k));
+            Bukkit.getScheduler().runTask(plugin, () -> t.setVelocity(t.getVelocity().add(v)));
+            if (shooter != null && t != shooter) {
+                lastHit.put(t.getUniqueId(), shooter.getUniqueId());
+                lastHitAt.put(t.getUniqueId(), System.currentTimeMillis());
+            }
+        }
     }
 
     // --- стержень: молния в точку взгляда ---
@@ -943,6 +983,36 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         return i >= 36 && i <= 39;
     }
 
+    /** Команды в скорбордах всех игроков: без толкания (collision never) и цветные ники. */
+    private void applyTeams() {
+        eachBoard(b -> {
+            org.bukkit.scoreboard.Scoreboard sb = b.scoreboard();
+            for (String key : List.of("sc_wait", "sc_red", "sc_blue")) {
+                org.bukkit.scoreboard.Team t = sb.getTeam(key);
+                if (t == null) {
+                    t = sb.registerNewTeam(key);
+                }
+                t.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
+                t.setCanSeeFriendlyInvisibles(true);
+                if (key.equals("sc_red")) {
+                    t.color(net.kyori.adventure.text.format.NamedTextColor.RED);
+                } else if (key.equals("sc_blue")) {
+                    t.color(net.kyori.adventure.text.format.NamedTextColor.BLUE);
+                }
+            }
+            for (Player p : order) {
+                String key = selecting || !teams.containsKey(p.getUniqueId()) ? "sc_wait" : team(p) == Kit.Team.BLUE ? "sc_blue" : "sc_red";
+                org.bukkit.scoreboard.Team t = sb.getTeam(key);
+                if (t != null && !t.hasEntry(p.getName())) {
+                    t.addEntry(p.getName());
+                }
+            }
+        });
+        for (Player p : players) {
+            p.setCollidable(false);
+        }
+    }
+
     private void hideBars(Player p) {
         bars.values().forEach(p::hideBossBar);
     }
@@ -1101,6 +1171,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
     @Override
     protected void onPlayerLeave(Player p, boolean quit) {
         hideBars(p);
+        p.setCollidable(true);
         if (finished || !(state == State.RUNNING || state == State.COUNTDOWN)) {
             return;
         }
@@ -1189,7 +1260,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         for (Player p : List.copyOf(players)) {
             Object[] kv = kv(p);
             boolean won = team(p) == w;
-            plugin.messages().title(p, won ? "duels.win" : "minigames.ffa-end", kv);
+            plugin.messages().title(p, won ? "skycontrol.win" : "skycontrol.lose", kv);
             plugin.messages().sendList(p, "skycontrol.summary", kv);
             p.playSound(p.getLocation(), won ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
@@ -1221,6 +1292,7 @@ public final class SkyControlGame extends Game implements KitGame, BuildGame {
         Map<String, Object> map = super.placeholders(viewer);
         map.put("kit", spec.display());
         map.put("team", order.contains(viewer) ? teamName(team(viewer)) : "-");
+        map.put("opponent", order.contains(viewer) ? teamName(team(viewer) == Kit.Team.RED ? Kit.Team.BLUE : Kit.Team.RED) : "-");
         map.put("red_score", score.get(Kit.Team.RED));
         map.put("blue_score", score.get(Kit.Team.BLUE));
         map.put("goal", cfg.getInt("goal", 1200));

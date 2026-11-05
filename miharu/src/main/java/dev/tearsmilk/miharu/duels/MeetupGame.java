@@ -339,7 +339,7 @@ public final class MeetupGame extends Game implements KitGame, BuildGame {
         for (Player p : List.copyOf(players)) {
             boolean won = winningTeam >= 0 && team(p) == winningTeam;
             Object[] kv = placeholders(p).entrySet().stream().flatMap(en -> Stream.of(en.getKey(), en.getValue())).toArray();
-            plugin.messages().title(p, won ? "duels.win" : "minigames.ffa-end", kv);
+            plugin.messages().title(p, won ? "minigames.win" : "minigames.ffa-end", kv);
             plugin.messages().sendList(p, "minigames.ffa-summary", kv);
             p.playSound(p.getLocation(), won ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }

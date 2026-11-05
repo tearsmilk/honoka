@@ -313,7 +313,32 @@ public final class Meetups implements Listener {
         e.setCancelled(true);
         GameModule games = module.plugin().module(GameModule.class);
         if (games != null && games.games().of(e.getPlayer()) instanceof SkyControlGame sg) {
-            sg.openShop(e.getPlayer());
+            sg.openShopLater(e.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSkyShopAt(org.bukkit.event.player.PlayerInteractAtEntityEvent e) {
+        if (e.getRightClicked().getPersistentDataContainer().has(SkyControlGame.SHOP)) {
+            e.setCancelled(true);
+        }
+    }
+
+    /** Фаербол в SkyControl — сильнее откидывает. */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSkyFireball(org.bukkit.event.entity.EntityExplodeEvent e) {
+        if (!(e.getEntity() instanceof org.bukkit.entity.Fireball)) {
+            return;
+        }
+        GameModule games = module.plugin().module(GameModule.class);
+        if (games == null) {
+            return;
+        }
+        for (Game g : games.games().games()) {
+            if (g instanceof SkyControlGame sg && g.instance() != null && g.instance().world().equals(e.getLocation().getWorld())) {
+                sg.fireballBlast(e.getLocation(), e.getEntity());
+                return;
+            }
         }
     }
 

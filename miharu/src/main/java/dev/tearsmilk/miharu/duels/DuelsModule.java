@@ -549,6 +549,19 @@ public final class DuelsModule extends MiharuModule implements Listener {
         ArenaMode required = arenas.mode(spec.arenaMode());
         List<String> custom = customPoints.get(spec.arenaMode());
         if (custom != null) {
+            // старые имена точек (p1, shop1…) — берём арены без строгой проверки и проверяем с учётом псевдонимов
+            for (Arena a : arenas.arenas().forModeAnyPoints(spec.arenaMode())) {
+                if (!candidates.contains(a)) {
+                    candidates.add(a);
+                }
+            }
+            if (base != null) {
+                for (Arena a : arenas.arenas().forModeAnyPoints(base)) {
+                    if (!candidates.contains(a)) {
+                        candidates.add(a);
+                    }
+                }
+            }
             List<Arena> list = candidates.stream()
                     .filter(a -> spec.arenas().isEmpty() || spec.arenas().contains(a.id()))
                     .filter(a -> custom.stream().allMatch(n -> hasPoint(a, n)))

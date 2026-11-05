@@ -164,6 +164,25 @@ public final class DuelKits {
                 if (sc.exists() && !YamlConfiguration.loadConfiguration(sc).contains("arena-points")) {
                     module.plugin().saveResource("modules/duels/" + folder + "/skycontrol.yml", true);
                 }
+                // 0.2.31: SkyControl — больше бетона в инвентарь, отброс фаерболом
+                if (sc.exists()) {
+                    YamlConfiguration sy = YamlConfiguration.loadConfiguration(sc);
+                    List<String> pts = new ArrayList<>(sy.getStringList("arena-points"));
+                    if (!pts.isEmpty() && !pts.contains("wait")) {
+                        pts.add(0, "wait"); // точка ожидания — в списке настройки арены
+                        sy.set("arena-points", pts);
+                        sy.save(sc);
+                    }
+                    if (!sy.contains("skycontrol.fireball")) {
+                        sy.set("skycontrol.fireball.radius", 4.0);
+                        sy.set("skycontrol.fireball.knockback", 1.6);
+                        sy.set("skycontrol.fireball.knockback-y", 0.75);
+                        if (sy.getInt("skycontrol.generator.max-items", 64) == 64) {
+                            sy.set("skycontrol.generator.max-items", 256);
+                        }
+                        sy.save(sc);
+                    }
+                }
                 // 0.2.24: GunGame — быстрый старт от 2
                 if (gg.exists()) {
                     YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);

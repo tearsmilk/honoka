@@ -71,6 +71,15 @@ public final class ArenaManager {
                 .toList();
     }
 
+    /** Включённые арены с этим режимом и схематикой, без проверки точек (её делает сам режим). */
+    public List<Arena> forModeAnyPoints(String mode) {
+        return arenas.values().stream()
+                .filter(Arena::enabled)
+                .filter(a -> a.supports(mode))
+                .filter(a -> a.schematic() != null && new File(schematicsDir(), a.schematic()).exists())
+                .toList();
+    }
+
     public Arena random(String mode) {
         List<Arena> list = forMode(mode);
         return list.isEmpty() ? null : list.get(ThreadLocalRandom.current().nextInt(list.size()));

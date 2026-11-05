@@ -330,7 +330,7 @@ public final class GunGameGame extends Game implements KitGame {
         }
         for (Player p : List.copyOf(players)) {
             Object[] kv = kv(p);
-            plugin.messages().title(p, p == w ? "duels.win" : "minigames.ffa-end", kv);
+            plugin.messages().title(p, p == w ? "minigames.win" : "minigames.ffa-end", kv);
             plugin.messages().sendList(p, "gungame.summary", kv);
             p.playSound(p.getLocation(), p == w ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         }
