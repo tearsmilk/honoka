@@ -314,6 +314,7 @@ free-arena:
   player-left: '{prefix}<white>{player}</white> <gray>ушёл с арены'
   killed: '{prefix}<red>{player}</red> <gray>убит игроком <white>{killer}</white> <dark_gray>(серия {streak})'
   died: '{prefix}<red>{player}</red> <gray>погиб'
+  you-died: '{prefix}<red>Ты погиб на арене {arena}<red>.</red> <gray>Вернуться — через NPC в лобби.'
   bossbar: '<red><b>⚔ Ты в PvP</b></red> <gray>— не получай урон <white>{seconds} с</white>, тогда можно /lobby'
   out-of-combat: '<green>Ты вне боя — можно выйти: /lobby'
   status-combat: '<red>в бою ({seconds} с)'

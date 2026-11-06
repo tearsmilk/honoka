@@ -32,7 +32,7 @@ import java.util.UUID;
 
 /**
  * Свободная арена (Sword / SpearMace / ElytraMace): одна точка spawn, игра не начинается и не кончается.
- * Заходят со своим китом через NPC, умер — сразу снова на spawn с китом. Ломаются только блоки игроков.
+ * Заходят со своим китом через NPC, умер — обратно в лобби. Ломаются только блоки игроков.
  * Выйти — /lobby, но не в бою: пока не прошло combat-seconds без урона, сверху боссбар «Ты в PvP».
  * Мир не удаляется и не чистится, пока сервер работает.
  */
@@ -212,8 +212,18 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
             broadcast("free-arena.died", "player", p.getName());
         }
         combatUntil.remove(p.getUniqueId());
-        p.teleport(spawnFor(p));
-        equip(p);
+        // умер — обратно в лобби (арена живёт дальше); заново — через NPC
+        var max = p.getAttribute(Attribute.MAX_HEALTH);
+        p.setHealth(max == null ? 20 : max.getValue());
+        p.setFireTicks(0);
+        p.setFallDistance(0);
+        p.getInventory().clear();
+        plugin.messages().send(p, "free-arena.you-died", "arena", spec.display());
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (players.contains(p)) {
+                module.games().leave(p, false);
+            }
+        });
     }
 
     @Override
