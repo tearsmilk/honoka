@@ -101,6 +101,9 @@ public final class Items {
             // например стак зелий: max-stack: 64
             meta.setMaxStackSize(Math.max(1, Math.min(99, s.getInt("max-stack"))));
         }
+        if (s.contains("flight") && meta instanceof org.bukkit.inventory.meta.FireworkMeta fm) {
+            fm.setPower(Math.max(0, Math.min(127, s.getInt("flight", 1)))); // длительность полёта фейерверка
+        }
         if (s.getBoolean("hide-attributes", false)) {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         }

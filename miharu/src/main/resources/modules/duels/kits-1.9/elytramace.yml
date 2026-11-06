@@ -1,5 +1,5 @@
-# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
-# Щит/тотем — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+# Кит Elytra Mace (1.9). Раскладка: элитры надеты, незеритовый нагрудник — в инвентаре (переодеться), тотем во второй руке.
+revision: 2
 display: '<#c9a7ff>Elytra Mace'
 version: "1.9"
 arena-mode: duel          # точки p1/p2 можно ставить в воздухе или на платформах
@@ -9,55 +9,89 @@ armor:
     material: NETHERITE_HELMET
     enchants:
       protection: 4
+      unbreaking: 3
+      mending: 1
   chestplate:
     material: ELYTRA
-    unbreakable: true
+    enchants:
+      unbreaking: 3
+      mending: 1
   leggings:
     material: NETHERITE_LEGGINGS
     enchants:
       protection: 4
+      unbreaking: 3
+      mending: 1
   boots:
     material: NETHERITE_BOOTS
     enchants:
       protection: 4
-      feather_falling: 4
+      unbreaking: 3
+      mending: 1
   offhand:
     material: TOTEM_OF_UNDYING
 items:
+  # хотбар
   0:
-    material: MACE
-    enchants:
-      density: 5
-      wind_burst: 3
-  1:
     material: NETHERITE_SWORD
     enchants:
       sharpness: 5
-  2:
-    material: WIND_CHARGE
-    amount: 32
-  3:
-    material: FIREWORK_ROCKET
-    amount: 32
-  4:
-    material: GOLDEN_APPLE
-    amount: 16
-  5:
-    material: ENCHANTED_GOLDEN_APPLE
-    amount: 2
-  6:
-    material: POTION
-    potion: slow_falling
-  7:
-    material: POTION
-    potion: slow_falling
-  8:
+      unbreaking: 3
+      mending: 1
+  1:
     material: COOKED_BEEF
     amount: 32
-  9:
+  2:
+    material: MACE
+    enchants:
+      wind_burst: 3
+      breach: 4
+      mending: 1
+  3:
+    material: FIREWORK_ROCKET
+    amount: 64
+    flight: 1
+  4:
+    material: POTION
+    potion: slow_falling        # плавное падение I, 1:30
+  5:
     material: POTION
     potion: slow_falling
-rules:
-  fall-damage: true
+  6:
+    material: GOLDEN_APPLE
+    amount: 32
+  7:
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 2
+  8:
+    material: WIND_CHARGE
+    amount: 64
+  # инвентарь
+  12:
+    material: TOTEM_OF_UNDYING
+  13:
+    material: TOTEM_OF_UNDYING
+  14:
+    material: TOTEM_OF_UNDYING
+  24:
+    material: SHIELD
+  28:
+    material: NETHERITE_CHESTPLATE
+    enchants:
+      protection: 4
+      unbreaking: 3
+      mending: 1
+  32:
+    material: ENDER_PEARL
+    amount: 16
+  33:
+    material: ENDER_PEARL
+    amount: 16
+  34:
+    material: BREEZE_ROD
+    amount: 16
+  35:
+    material: WIND_CHARGE
+    amount: 64
 bot:
-  enabled: false           # бот не летает на элитрах
+  enabled: false

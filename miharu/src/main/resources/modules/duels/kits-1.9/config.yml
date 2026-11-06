@@ -278,7 +278,6 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   elytramace:
     enabled: true
-    locked: true
     slot: 30
     icon:
       material: ELYTRA

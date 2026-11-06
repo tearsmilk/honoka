@@ -256,6 +256,20 @@ public final class DuelKits {
                 }
             }
         }
+        if (folder.equals("kits-1.9")) {
+            // 0.2.47: новый кит ElytraMace (раскладка из редактора) и он открыт
+            File em = new File(dir, "elytramace.yml");
+            if (em.exists() && YamlConfiguration.loadConfiguration(em).getInt("revision", 1) < 2) {
+                module.plugin().saveResource("modules/duels/" + folder + "/elytramace.yml", true);
+                File mc = new File(dir, "config.yml");
+                YamlConfiguration my = YamlConfiguration.loadConfiguration(mc);
+                my.set("kits.elytramace.locked", null);
+                try {
+                    my.save(mc);
+                } catch (java.io.IOException ignored) {
+                }
+            }
+        }
         menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();
         variantSpecs.clear();
