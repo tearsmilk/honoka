@@ -109,6 +109,33 @@ public final class FreeArenas implements Listener {
         }
     }
 
+    /** Запрещённые на арене предметы, которые есть в ките (banned-items: MACE, ELYTRA, *_SPEAR…). */
+    List<String> banned(String type, CustomKits.CustomKit kit) {
+        List<String> rules = cfg().getStringList("types." + type + ".banned-items");
+        List<String> found = new ArrayList<>();
+        if (rules.isEmpty() || kit == null) {
+            return found;
+        }
+        List<org.bukkit.inventory.ItemStack> all = new ArrayList<>(kit.items().values());
+        all.addAll(kit.armor().values());
+        for (org.bukkit.inventory.ItemStack it : all) {
+            if (it == null) {
+                continue;
+            }
+            String m = it.getType().name();
+            for (String r : rules) {
+                String rule = r.trim().toUpperCase(Locale.ROOT);
+                boolean hit = rule.startsWith("*") ? m.endsWith(rule.substring(1))
+                        : rule.endsWith("*") ? m.startsWith(rule.substring(0, rule.length() - 1)) : m.equals(rule);
+                String name = Text.plain(it.effectiveName());
+                if (hit && !found.contains(name)) {
+                    found.add(name);
+                }
+            }
+        }
+        return found;
+    }
+
     Collection<String> types() {
         return specs.keySet();
     }
@@ -136,10 +163,16 @@ public final class FreeArenas implements Listener {
         for (int i = 1; i <= CustomKits.SLOTS && i - 1 < slots.size(); i++) {
             int n = i;
             CustomKits.CustomKit kit = module.customKits().get(p.getUniqueId(), n);
-            Map<String, Object> ph = Map.of("slot", n, "name", kit == null ? "" : kit.name(), "items", kit == null ? 0 : kit.size(), "arena", spec.display());
-            menu.set(slots.get(i - 1), Items.parse(m.getConfigurationSection(kit == null ? "empty" : "kit"), ph), pl -> {
+            List<String> bad = banned(type, kit);
+            Map<String, Object> ph = Map.of("slot", n, "name", kit == null ? "" : kit.name(), "items", kit == null ? 0 : kit.size(), "arena", spec.display(),
+                    "banned", String.join(", ", bad));
+            String icon = kit == null ? "empty" : bad.isEmpty() ? "kit" : "blocked";
+            menu.set(slots.get(i - 1), Items.parse(m.getConfigurationSection(icon), ph), pl -> {
                 pl.playSound(pl.getLocation(), Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
-                if (kit == null) {
+                if (!bad.isEmpty()) {
+                    module.plugin().messages().send(pl, "free-arena.kit-banned", "arena", spec.display(), "items", String.join(", ", bad));
+                    pl.playSound(pl.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+                } else if (kit == null) {
                     pl.closeInventory();
                     module.builder().openSlots(pl);
                 } else {
@@ -147,7 +180,7 @@ public final class FreeArenas implements Listener {
                     join(pl, type, kit);
                 }
             });
-            any |= kit != null;
+            any |= kit != null && bad.isEmpty();
         }
         ConfigurationSection f = m.getConfigurationSection("filler");
         if (f != null) {
@@ -167,6 +200,10 @@ public final class FreeArenas implements Listener {
         }
         if (games.games().busy(p)) {
             module.plugin().messages().send(p, "game.already-in-game");
+            return;
+        }
+        if (!banned(type, kit).isEmpty()) {
+            module.plugin().messages().send(p, "free-arena.kit-banned", "arena", spec.display(), "items", String.join(", ", banned(type, kit)));
             return;
         }
         module.queue().leave(p, true);

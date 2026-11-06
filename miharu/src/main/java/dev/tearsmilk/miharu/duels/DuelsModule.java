@@ -596,6 +596,13 @@ public final class DuelsModule extends MiharuModule implements Listener {
             y.set("custom-kits.builder.title", bt.replace(" <gray>· {version}", "").replace("{version}", ""));
             changed = true;
         }
+        // 0.2.38: запрещённые предметы на свободных аренах
+        if (y.isConfigurationSection("free-arenas.types") && !y.contains("free-arenas.types.sword.banned-items")) {
+            y.set("free-arenas.types.sword.banned-items", List.of("ELYTRA", "WIND_CHARGE", "MACE", "*_SPEAR"));
+            y.set("free-arenas.types.spearmace.banned-items", List.of("ELYTRA"));
+            y.set("free-arenas.types.elytramace.banned-items", List.of());
+            changed = true;
+        }
         // 0.2.37: свободные арены — ванильное PvP 1.21.11
         if (y.isConfigurationSection("free-arenas.types") && !y.getBoolean("free-arenas.vanilla-migrated", false)) {
             for (String t : y.getConfigurationSection("free-arenas.types").getKeys(false)) {

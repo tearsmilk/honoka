@@ -617,6 +617,11 @@ free-arenas:
       display: '<#ff6b6b>Sword'
       npc-name: '<#ff6b6b><b>Sword</b> <gray>(ПКМ)'
       version: vanilla          # vanilla — обычное PvP 1.21.11 (плагин не трогает бой); можно "1.8" / "1.9"
+      banned-items:             # нельзя в ките: материал или шаблон (*_SPEAR — все копья)
+        - ELYTRA
+        - WIND_CHARGE
+        - MACE
+        - '*_SPEAR'
       rules:
         build: true
         break-placed-only: true
@@ -626,6 +631,8 @@ free-arenas:
       display: '<#7fd4ff>SpearMace'
       npc-name: '<#7fd4ff><b>SpearMace</b> <gray>(ПКМ)'
       version: vanilla
+      banned-items:
+        - ELYTRA
       rules:
         build: true
         break-placed-only: true
@@ -635,6 +642,7 @@ free-arenas:
       display: '<#c9a7ff>ElytraMace'
       npc-name: '<#c9a7ff><b>ElytraMace</b> <gray>(ПКМ)'
       version: vanilla
+      banned-items: []          # можно всё
       rules:
         build: true
         break-placed-only: true
@@ -655,6 +663,12 @@ free-arenas:
         - '<gray>Предметов: <white>{items}'
         - ''
         - '<yellow>▶ На арену с этим китом'
+    blocked:
+      material: BARRIER
+      name: '<red>{name}'
+      lore:
+        - '<red>Нельзя на этой арене:'
+        - '<gray>{banned}'
     empty:
       material: LIGHT_GRAY_STAINED_GLASS
       name: '<gray>Слот {slot} · пусто'

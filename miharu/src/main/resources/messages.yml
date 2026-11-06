@@ -318,6 +318,7 @@ free-arena:
   out-of-combat: '<green>Ты вне боя — можно выйти: /lobby'
   status-combat: '<red>в бою ({seconds} с)'
   status-free: '<green>вне боя'
+  kit-banned: '{prefix}<red>Этот кит нельзя на арену {arena}<red>:</red> <gray>{items}. Убери их из кита (/kit create).'
   no-kits: '{prefix}<red>У тебя нет своих китов.</red> <gray>Собери кит: <white>/kit create</white> — на эти арены только со своими китами.'
   npc-placed: '{prefix}<green>NPC арены {arena}<green> поставлен.</green> <gray>Убрать — встань рядом и /ffa npc remove'
   npc-removed: '{prefix}<gray>NPC убран.'
