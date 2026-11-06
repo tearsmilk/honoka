@@ -596,6 +596,14 @@ public final class DuelsModule extends MiharuModule implements Listener {
             y.set("custom-kits.builder.title", bt.replace(" <gray>· {version}", "").replace("{version}", ""));
             changed = true;
         }
+        // 0.2.37: свободные арены — ванильное PvP 1.21.11
+        if (y.isConfigurationSection("free-arenas.types") && !y.getBoolean("free-arenas.vanilla-migrated", false)) {
+            for (String t : y.getConfigurationSection("free-arenas.types").getKeys(false)) {
+                y.set("free-arenas.types." + t + ".version", "vanilla");
+            }
+            y.set("free-arenas.vanilla-migrated", true);
+            changed = true;
+        }
         if (y.getIntegerList("custom-kits.slots-menu.slots").size() < CustomKits.SLOTS) {
             y.set("custom-kits.slots-menu.slots", List.of(11, 12, 13, 14, 15));
             changed = true;

@@ -51,6 +51,12 @@ public final class FreeArenas implements Listener {
     private final Map<String, KitSpec> specs = new LinkedHashMap<>();
     private final Map<String, FreeArenaGame> running = new HashMap<>();
     private final Map<UUID, Kit> pendingKit = new HashMap<>();
+    /** Типы с ванильным PvP 1.21.11 (version: vanilla) — плагин не трогает бой. */
+    private final java.util.Set<String> vanilla = new java.util.HashSet<>();
+
+    boolean vanilla(String type) {
+        return vanilla.contains(type);
+    }
 
     FreeArenas(DuelsModule module) {
         this.module = module;
@@ -72,6 +78,7 @@ public final class FreeArenas implements Listener {
     /** Режимы арен и описания игр по типам из конфига. */
     void load() {
         specs.clear();
+        vanilla.clear();
         ArenaModule arenas = module.plugin().module(ArenaModule.class);
         ConfigurationSection types = cfg().getConfigurationSection("types");
         if (types == null) {
@@ -84,7 +91,11 @@ public final class FreeArenas implements Listener {
                 continue;
             }
             String key = id.toLowerCase(Locale.ROOT);
-            CombatVersion v = CombatVersion.parse(t.getString("version", "1.9"));
+            String ver = t.getString("version", "vanilla");
+            if (ver.equalsIgnoreCase("vanilla")) {
+                vanilla.add(key);
+            }
+            CombatVersion v = CombatVersion.parse(ver);
             if (v == null) {
                 v = CombatVersion.MODERN;
             }

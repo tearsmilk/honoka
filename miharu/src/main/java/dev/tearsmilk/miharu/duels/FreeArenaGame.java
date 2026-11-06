@@ -148,7 +148,11 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
         p.setSaturation(20);
         p.setFireTicks(0);
         p.setFallDistance(0);
-        combat.force(p, spec.profile());
+        if (arenas.vanilla(type)) {
+            combat.force(p, (CombatVersion) null); // ванильное PvP 1.21.11 — без правок плагина
+        } else {
+            combat.force(p, spec.profile());
+        }
         Kit k = kits.get(p.getUniqueId());
         if (k != null) {
             k.apply(p, combat, spec.profile(), null);

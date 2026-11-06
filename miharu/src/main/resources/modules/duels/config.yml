@@ -616,7 +616,7 @@ free-arenas:
     sword:
       display: '<#ff6b6b>Sword'
       npc-name: '<#ff6b6b><b>Sword</b> <gray>(ПКМ)'
-      version: "1.8"            # версия PvP на арене
+      version: vanilla          # vanilla — обычное PvP 1.21.11 (плагин не трогает бой); можно "1.8" / "1.9"
       rules:
         build: true
         break-placed-only: true
@@ -625,7 +625,7 @@ free-arenas:
     spearmace:
       display: '<#7fd4ff>SpearMace'
       npc-name: '<#7fd4ff><b>SpearMace</b> <gray>(ПКМ)'
-      version: "1.9"
+      version: vanilla
       rules:
         build: true
         break-placed-only: true
@@ -634,7 +634,7 @@ free-arenas:
     elytramace:
       display: '<#c9a7ff>ElytraMace'
       npc-name: '<#c9a7ff><b>ElytraMace</b> <gray>(ПКМ)'
-      version: "1.9"
+      version: vanilla
       rules:
         build: true
         break-placed-only: true
