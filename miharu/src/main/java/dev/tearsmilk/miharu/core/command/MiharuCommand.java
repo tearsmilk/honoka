@@ -52,6 +52,27 @@ public final class MiharuCommand extends SubCommands {
             }
             lobby.adminMode().toggle(p);
         });
+        sub("combat-mode", null, false, (s, a) -> {
+            if (!s.isOp()) {
+                plugin.messages().send(s, "no-permission");
+                return;
+            }
+            Player target = a.length > 0 ? Bukkit.getPlayerExact(a[0]) : s instanceof Player p ? p : null;
+            if (target == null) {
+                plugin.messages().send(s, "player-not-found", "player", a.length > 0 ? a[0] : "?");
+                return;
+            }
+            dev.tearsmilk.miharu.lobby.LobbyModule lobby = plugin.module(dev.tearsmilk.miharu.lobby.LobbyModule.class);
+            if (lobby == null) {
+                plugin.messages().send(s, "lobby.adm-no-lobby");
+                return;
+            }
+            lobby.combatMode().toggle(s, target);
+        }, (s, a) -> {
+            List<String> out = new ArrayList<>();
+            Bukkit.getOnlinePlayers().forEach(p -> out.add(p.getName()));
+            return out;
+        });
         sub("start", perm, false, this::start, this::completeStart);
         sub("stop", perm, false, this::stop, (s, a) -> {
             List<String> out = new ArrayList<>(List.of("all"));

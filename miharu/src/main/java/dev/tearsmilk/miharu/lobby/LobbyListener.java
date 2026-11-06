@@ -37,6 +37,9 @@ final class LobbyListener implements Listener {
     }
 
     private boolean protect(Player p, String key) {
+        if (module.combatMode().active(p) && (key.equals("inventory") || key.equals("drop") || key.equals("pickup"))) {
+            return false; // тест-режим: вещи можно брать, выбрасывать и перекладывать
+        }
         return module.isLobby(p) && module.config().getBoolean("protect." + key, true) && !p.hasPermission("miharu.lobby.bypass")
                 && !module.adminMode().active(p) && !building(p);
     }
@@ -54,6 +57,7 @@ final class LobbyListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         module.adminMode().exit(e.getPlayer(), false);
+        module.combatMode().exit(e.getPlayer(), false);
         module.forget(e.getPlayer());
     }
 
@@ -107,7 +111,7 @@ final class LobbyListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player p && module.isLobby(p) && module.config().getBoolean("protect.damage", true)
-                && !module.adminMode().active(p)) {
+                && !module.adminMode().active(p) && !module.combatMode().active(p)) {
             e.setCancelled(true);
             if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
                 Location spawn = module.spawn();

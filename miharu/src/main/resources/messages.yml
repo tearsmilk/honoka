@@ -237,6 +237,12 @@ duels:
     actionbar: '<gray>Поиск соперника · {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> в очереди {size}'
 
 lobby:
+  combat-on: '{prefix}<green>Тест-режим включён:</green> <gray>пустой инвентарь, можно брать и выбрасывать вещи, урон проходит. Выйти — <white>/miharu combat-mode</white>.'
+  combat-off: '{prefix}<gray>Тест-режим выключен.'
+  combat-on-other: '{prefix}<gray>Тест-режим включён игроку <white>{player}</white>.'
+  combat-off-other: '{prefix}<gray>Тест-режим выключен игроку <white>{player}</white>.'
+  combat-in-game: '{prefix}<red>{player} сейчас в игре — тест-режим только в лобби.'
+  combat-actionbar: '<#ff9ecf>⚔ Тест-режим</#ff9ecf> <gray>· выйти: /miharu combat-mode'
   cosmetics-soon: '{prefix}<gray>{name}<gray> — скоро будет доступно.'
   spawn-set: '{prefix}<green>Спавн лобби сохранён.'
   adm-on: '{prefix}<gold>Режим строителя включён.</gold> <gray>Свой инвентарь, креатив, защиты лобби выключены. Выйти — <white>/miharu adm-mode'

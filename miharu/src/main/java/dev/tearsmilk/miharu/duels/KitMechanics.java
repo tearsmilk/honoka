@@ -220,6 +220,68 @@ final class KitMechanics implements Listener {
         }
     }
 
+    // --- Рывок копьём после заряда ветра: подкинуло зарядом → в воздухе жмёшь копьём с «Рывком» → летишь вперёд ---
+
+    private final java.util.Map<java.util.UUID, Long> windBoost = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Long> dashCooldown = new java.util.HashMap<>();
+
+    private org.bukkit.configuration.ConfigurationSection dashCfg() {
+        var s = module.config().getConfigurationSection("spear-dash");
+        return s != null ? s : module.config().createSection("spear-dash");
+    }
+
+    /** Заряд ветра взорвался — все игроки рядом «подкинуты» на boost-seconds. */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onWindCharge(org.bukkit.event.entity.ProjectileHitEvent e) {
+        if (!(e.getEntity() instanceof org.bukkit.entity.AbstractWindCharge wc)) {
+            return;
+        }
+        double r = dashCfg().getDouble("boost-radius", 3.5);
+        long until = System.currentTimeMillis() + (long) (dashCfg().getDouble("boost-seconds", 2.5) * 1000);
+        for (Player p : wc.getWorld().getNearbyPlayers(wc.getLocation(), r)) {
+            windBoost.put(p.getUniqueId(), until);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onSpearDash(PlayerInteractEvent e) {
+        if (e.getHand() != EquipmentSlot.HAND || e.getAction() == Action.PHYSICAL || !dashCfg().getBoolean("enabled", true)) {
+            return;
+        }
+        ItemStack item = e.getItem();
+        if (item == null || !item.getType().name().endsWith("_SPEAR")) {
+            return;
+        }
+        org.bukkit.enchantments.Enchantment lunge = org.bukkit.Registry.ENCHANTMENT.get(org.bukkit.NamespacedKey.minecraft("lunge"));
+        int lvl = lunge == null ? 0 : item.getEnchantmentLevel(lunge);
+        if (lvl <= 0) {
+            return;
+        }
+        Player p = e.getPlayer();
+        dev.tearsmilk.miharu.lobby.LobbyModule lobby = module.plugin().module(dev.tearsmilk.miharu.lobby.LobbyModule.class);
+        boolean testMode = lobby != null && lobby.combatMode().active(p);
+        if ((rules(p) == null && !testMode) || ((org.bukkit.entity.Entity) p).isOnGround()) {
+            return; // только в играх (и в тест-режиме /miharu combat-mode) и в воздухе
+        }
+        long now = System.currentTimeMillis();
+        Long boost = windBoost.get(p.getUniqueId());
+        if (boost == null || boost < now) {
+            return; // рывок — только после подброса зарядом ветра
+        }
+        if (now - dashCooldown.getOrDefault(p.getUniqueId(), 0L) < dashCfg().getLong("cooldown-ticks", 20) * 50L) {
+            return;
+        }
+        dashCooldown.put(p.getUniqueId(), now);
+        windBoost.remove(p.getUniqueId()); // один рывок на один подброс
+        double power = dashCfg().getDouble("base", 1.4) + dashCfg().getDouble("per-level", 0.6) * lvl;
+        org.bukkit.util.Vector dir = p.getLocation().getDirection().normalize().multiply(power);
+        dir.setY(dir.getY() + dashCfg().getDouble("lift", 0.15));
+        p.setVelocity(dir);
+        p.setFallDistance(0);
+        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BREEZE_WIND_BURST, 0.8f, 1.3f);
+        p.getWorld().spawnParticle(org.bukkit.Particle.GUST, p.getLocation().add(0, 1, 0), 3, 0.3, 0.3, 0.3, 0);
+    }
+
     // --- BowSpleef: огненная стрела поджигает TNT, он падает вниз и исчезает без взрыва ---
 
     private boolean spleef(org.bukkit.World world) {

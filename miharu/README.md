@@ -19,6 +19,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 | `duels` (FFA-арены 1.8) | KnockbackFFA (палка Отбрасывание I + удочка, без урона — только в пустоту), BowFFA (лук Откидывание I + Бесконечность, стрела, палка Отбрасывание I), SwordFFA (железный меч Острота I, 4 золотых яблока, удочка, железная броня Защита I): одна точка `spawn`, вход через NPC (`/ffa npc knockbackffa\|bowffa\|swordffa`), кит выдаёт сервер, умер — снова на арене | `modules/duels/config.yml → free-arenas.types` |
 | `xp` | Валюта «Опыт»: за сыгранную игру и победу (суммы по режимам), скорборд лобби `{xp}`, `%miharu_xp%`, `/xp`, `/xp give\|take\|set` (OP), голограмма топа `/xptop place\|remove\|refresh` (OP) | `modules/xp/config.yml` |
 | `xp` (экипировка) | Косметика → «Украшения для брони» (`/trims`): сеты отделок брони Дюна (300xp), Дебри (500xp), Поток (1000xp); перо — купить, потом применить; в играх отделка сама накладывается на любую надетую броню игрока | `modules/xp/config.yml → armor-trims` |
+| `duels` (рывок копьём) | Подкинуло зарядом ветра → в воздухе жмёшь копьём с «Рывком» (ПКМ/ЛКМ) → сильный рывок туда, куда смотришь; сила от уровня Рывка | `modules/duels/config.yml → spear-dash` |
 | `party` | Пати до 5 человек: `/party invite·accept·kick·leave·list·promote·delete·help·chat` (сокращения `/p i·a·k·l·list·p·d·h`), `/pc <текст>` — чат пати (работает и в игре) | `modules/party/config.yml` |
 | `lobby` | Предметы лобби (каменный меч — дуэли 1.8, золотой — 1.9, огненный заряд — мини-игры, звезда Незера (5-й слот) — косметика: украшения брони, палки (сумо), теги; книга — статистика, шалкер — митапы, глаз Эндера — наблюдение, краситель — выйти из очереди), своё табло и таб, защита, `/lobby`, `/setlobby` | `modules/lobby/config.yml` |
 
@@ -28,7 +29,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.49.jar
+mvn package                         # → target/Miharu-0.2.51.jar
 ```
 
 ## Как это работает
@@ -63,6 +64,7 @@ mvn package                         # → target/Miharu-0.2.49.jar
 | `/miharu adm-items` — все предметы из всех китов, только просмотр | только OP |
 | `/miharu adm-mode` — режим строителя: свой сохраняемый инвентарь, креатив, полёт, защиты лобби выключены | только OP |
 | `/pvp [1.8\|1.9\|off] [игрок]` | показать — всем, менять — `miharu.pvp.admin` |
+| `/miharu combat-mode [ник]` — тест-режим проверки механик: пустой инвентарь, можно брать/выбрасывать вещи, урон проходит (повтор — выход) | только OP |
 | `/miharu reload\|modules\|games\|start\|stop` | `miharu.admin` |
 
 ## Плейсхолдеры (PlaceholderAPI)

@@ -45,6 +45,13 @@ public final class LobbyModule extends MiharuModule {
     private BukkitTask task;
     private final AdminMode adminMode = new AdminMode(this);
 
+    private final CombatMode combatMode = new CombatMode(this);
+
+    /** Тест-режим проверки механик (/miharu combat-mode). */
+    public CombatMode combatMode() {
+        return combatMode;
+    }
+
     public AdminMode adminMode() {
         return adminMode;
     }
@@ -122,6 +129,7 @@ public final class LobbyModule extends MiharuModule {
         listen(new LobbyListener(this));
         GameModule games = plugin.module(GameModule.class);
         games.games().onJoin(p -> adminMode.exit(p, false));
+        games.games().onJoin(p -> combatMode.exit(p, false));
         games.games().onReturn(p -> Bukkit.getScheduler().runTask(plugin, () -> {
             if (p.isOnline() && isLobby(p)) {
                 apply(p, config().getBoolean("teleport-on-return", false));
@@ -184,6 +192,7 @@ public final class LobbyModule extends MiharuModule {
     @Override
     protected void onDisable() {
         adminMode.exitAll();
+        combatMode.exitAll();
         if (task != null) {
             task.cancel();
         }
@@ -247,7 +256,7 @@ public final class LobbyModule extends MiharuModule {
 
     /** Готовит игрока к лобби: режим, здоровье, предметы, табло. */
     public void apply(Player p, boolean teleport) {
-        if (adminMode.active(p)) {
+        if (adminMode.active(p) || combatMode.active(p)) {
             return;
         }
         if (teleport) {
@@ -299,7 +308,7 @@ public final class LobbyModule extends MiharuModule {
 
     public void giveItems(Player p) {
         DuelsModule dm = plugin.module(DuelsModule.class);
-        if (adminMode.active(p) || (dm != null && dm.builder().active(p))) {
+        if (adminMode.active(p) || combatMode.active(p) || (dm != null && dm.builder().active(p))) {
             return;
         }
         String state = state(p);
@@ -491,6 +500,10 @@ public final class LobbyModule extends MiharuModule {
             }
             if (adminMode.active(p)) {
                 plugin.messages().actionBar(p, "lobby.adm-actionbar");
+                continue;
+            }
+            if (combatMode.active(p)) {
+                plugin.messages().actionBar(p, "lobby.combat-actionbar");
                 continue;
             }
             if (!state(p).equals(itemState.get(p.getUniqueId()))) {
