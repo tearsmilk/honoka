@@ -11,6 +11,9 @@ player-not-found: '{prefix}<red>Игрок <white>{player}</white> не найд
 bad-number: '{prefix}<red>Ожидалось число.'
 
 admin:
+  attribute-on: '{prefix}<green>Атрибут {attribute} включён.'
+  attribute-off: '{prefix}<gray>Атрибут {attribute} выключен.'
+  attribute-usage: '{prefix}<gray>/miharu attribute enable|disable <атрибут> · атрибуты: <white>{list}'
   attribute-swap-on: '{prefix}<green>Свап атрибутов включён</green> <gray>(ванильный: меч → булава/топор в момент удара).'
   attribute-swap-off: '{prefix}<gray>Свап атрибутов выключен (блокировка Paper).'
   help:
@@ -239,7 +242,7 @@ duels:
     actionbar: '<gray>Поиск соперника · {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> в очереди {size}'
 
 lobby:
-  combat-on: '{prefix}<green>Тест-режим включён:</green> <gray>пустой инвентарь, можно брать и выбрасывать вещи, урон проходит. Выйти — <white>/miharu combat-mode</white>.'
+  combat-on: '{prefix}<green>Тест-режим включён:</green> <gray>пустой инвентарь, можно строить, брать и выбрасывать вещи, урон проходит. Выйти — <white>/miharu combat-mode</white>.'
   combat-off: '{prefix}<gray>Тест-режим выключен.'
   combat-on-other: '{prefix}<gray>Тест-режим включён игроку <white>{player}</white>.'
   combat-off-other: '{prefix}<gray>Тест-режим выключен игроку <white>{player}</white>.'

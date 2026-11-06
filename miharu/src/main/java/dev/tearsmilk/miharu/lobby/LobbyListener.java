@@ -37,8 +37,8 @@ final class LobbyListener implements Listener {
     }
 
     private boolean protect(Player p, String key) {
-        if (module.combatMode().active(p) && (key.equals("inventory") || key.equals("drop") || key.equals("pickup"))) {
-            return false; // тест-режим: вещи можно брать, выбрасывать и перекладывать
+        if (module.combatMode().active(p)) {
+            return false; // тест-режим (только OP): можно строить, брать/выбрасывать вещи и взаимодействовать с чем угодно
         }
         return module.isLobby(p) && module.config().getBoolean("protect." + key, true) && !p.hasPermission("miharu.lobby.bypass")
                 && !module.adminMode().active(p) && !building(p);

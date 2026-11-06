@@ -780,3 +780,9 @@ spear-dash:
   boost-radius: 3.5             # кого «подкинул» взрыв заряда (блоков)
   boost-seconds: 2.5            # сколько после взрыва можно сделать рывок
   cooldown-ticks: 20
+
+# Атрибуты механик (вкл/выкл: /miharu attribute enable|disable <атрибут>, только OP)
+attributes:
+  # swapmover: копьё в руке + заряд ветра во второй руке — ПКМ бросает заряд (в ванилле ПКМ занят копьём),
+  # а ЛКМ копьём после подброса — рывок вперёд (spear-dash)
+  swapmover: false

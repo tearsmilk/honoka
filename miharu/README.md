@@ -29,7 +29,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.52.jar
+mvn package                         # → target/Miharu-0.2.53.jar
 ```
 
 ## Как это работает
@@ -65,7 +65,8 @@ mvn package                         # → target/Miharu-0.2.52.jar
 | `/miharu adm-mode` — режим строителя: свой сохраняемый инвентарь, креатив, полёт, защиты лобби выключены | только OP |
 | `/pvp [1.8\|1.9\|off] [игрок]` | показать — всем, менять — `miharu.pvp.admin` |
 | `/miharu attribute-swap on\|off` — ванильный свап атрибутов (меч → булава/топор в момент удара; Paper его блокирует), по умолчанию включён | `miharu.admin` |
-| `/miharu combat-mode [ник]` — тест-режим проверки механик: пустой инвентарь, можно брать/выбрасывать вещи, урон проходит (повтор — выход) | только OP |
+| `/miharu attribute enable\|disable swapmover` — копьё в руке + заряд ветра во второй: ПКМ бросает заряд, ЛКМ копьём после подброса — рывок | только OP |
+| `/miharu combat-mode [ник]` — тест-режим проверки механик: пустой инвентарь, можно строить, брать/выбрасывать вещи и взаимодействовать с предметами, урон проходит (повтор — выход) | только OP |
 | `/miharu reload\|modules\|games\|start\|stop` | `miharu.admin` |
 
 ## Плейсхолдеры (PlaceholderAPI)
