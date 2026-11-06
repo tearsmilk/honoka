@@ -1,0 +1,96 @@
+# Кит SpearMace (1.9): незеритовая броня, меч, копьё (Рывок III), булава, топор, тотемы, перлы, заряды ветра.
+display: '<#7fd4ff>SpearMace'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet:
+    material: NETHERITE_HELMET
+    enchants:
+      protection: 4
+      unbreaking: 3
+      mending: 1
+  chestplate:
+    material: NETHERITE_CHESTPLATE
+    enchants:
+      protection: 4
+      unbreaking: 3
+      mending: 1
+  leggings:
+    material: NETHERITE_LEGGINGS
+    enchants:
+      protection: 4
+      unbreaking: 3
+      mending: 1
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+      unbreaking: 3
+      mending: 1
+  offhand:
+    material: TOTEM_OF_UNDYING
+items:
+  # хотбар
+  0:
+    material: NETHERITE_SWORD
+    enchants:
+      sharpness: 5
+      unbreaking: 3
+      mending: 1
+  1:
+    material: GOLDEN_APPLE
+    amount: 32
+  2:
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 5
+  3:
+    material: ENDER_PEARL
+    amount: 16
+  4:
+    material: SHIELD
+  5:
+    material: NETHERITE_SPEAR
+    enchants:
+      lunge: 3
+      unbreaking: 3
+      mending: 1
+  6:
+    material: MACE
+    enchants:
+      wind_burst: 3
+      breach: 4
+      mending: 1
+  7:
+    material: TOTEM_OF_UNDYING
+  8:
+    material: NETHERITE_AXE
+    enchants:
+      sharpness: 5
+      unbreaking: 3
+      mending: 1
+  # инвентарь
+  13:
+    material: TOTEM_OF_UNDYING
+  22:
+    material: TOTEM_OF_UNDYING
+  28:
+    material: GOLDEN_APPLE
+    amount: 64
+  30:
+    material: ENDER_PEARL
+    amount: 16
+  31:
+    material: COOKED_BEEF
+    amount: 32
+  33:
+    material: WIND_CHARGE
+    amount: 64
+  34:
+    material: BREEZE_ROD
+    amount: 16
+  35:
+    material: WIND_CHARGE
+    amount: 64
+bot:
+  enabled: false

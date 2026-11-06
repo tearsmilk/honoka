@@ -35,7 +35,7 @@ public final class DuelKits {
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
             "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal",
-            "elytramace", "tntminecart", "anchor", "web");
+            "elytramace", "tntminecart", "anchor", "web", "spearmace");
 
     private final DuelsModule module;
     /** Папка в modules/duels (kits — 1.8, kits-1.9 — медленное PvP). */

@@ -337,4 +337,18 @@ kits:
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  spearmace:
+    enabled: true
+    slot: 34
+    icon:
+      material: NETHERITE_SPEAR
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Незерит, копьё, булава, топор, тотемы'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
 locked-migrated: true
