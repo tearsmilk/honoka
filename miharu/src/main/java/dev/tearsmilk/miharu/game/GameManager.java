@@ -206,6 +206,7 @@ public final class GameManager {
         }
         byPlayer.put(p.getUniqueId(), game);
         game.players.add(p);
+        game.peakPlayers = Math.max(game.peakPlayers, game.players.size());
 
         p.teleport(game.spawnFor(p));
         resetState(p);

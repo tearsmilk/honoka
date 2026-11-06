@@ -76,6 +76,18 @@ public abstract class Game {
     }
 
     /** Зритель вошёл (показать ботов и т.п.). */
+    /** Сколько живых игроков было в игре одновременно (максимум) — для наград. */
+    int peakPlayers;
+
+    public int peakPlayers() {
+        return peakPlayers;
+    }
+
+    /** Игра против ботов — без наград (опыта). */
+    public boolean vsBots() {
+        return false;
+    }
+
     /** Постоянная игра (свободные арены): не закрывается, когда все вышли. */
     public boolean keepAlive() {
         return false;

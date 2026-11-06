@@ -137,6 +137,10 @@ public final class XpModule extends MiharuModule implements Listener {
         if (m == null || p == null || !p.isOnline() || (games != null && games.games().leaving(p))) {
             return;
         }
+        var game = games == null ? null : games.games().of(p);
+        if (game != null && (game.vsBots() || game.peakPlayers() < m.config().getInt("min-players", 2))) {
+            return; // с ботами и в одиночку (соперник не дошёл) — без опыта
+        }
         m.give(p, kit, win);
     }
 

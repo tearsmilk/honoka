@@ -13,6 +13,12 @@ public final class PvpModule extends MiharuModule {
     private final CombatService combat = new CombatService();
     private PvpListener listener;
     private BukkitTask regenTask;
+    private AttributeSwap attributeSwap;
+
+    /** Ванильный свап атрибутов (меч → булава/топор в момент удара). */
+    public AttributeSwap attributeSwap() {
+        return attributeSwap;
+    }
 
     public PvpModule(Miharu plugin) {
         super(plugin, "pvp");
@@ -28,6 +34,9 @@ public final class PvpModule extends MiharuModule {
         listener = new PvpListener(this);
         listen(listener);
         regenTask = Bukkit.getScheduler().runTaskTimer(plugin, listener::tickRegen, 20L, 10L);
+        attributeSwap = new AttributeSwap(plugin, combat);
+        listen(attributeSwap);
+        attributeSwap.start(config().getBoolean("attribute-swap.enabled", true));
         plugin.registerCommand("pvp", "Версия боя: 1.8 / 1.9", List.of("combat"), new PvpCommand(plugin, this));
         plugin.hooks().placeholder("pvp_version", (player, rest) -> {
             if (player == null || !player.isOnline()) {
@@ -47,6 +56,9 @@ public final class PvpModule extends MiharuModule {
     protected void onDisable() {
         if (regenTask != null) {
             regenTask.cancel();
+        }
+        if (attributeSwap != null) {
+            attributeSwap.stop();
         }
         Bukkit.getOnlinePlayers().forEach(combat::reset);
     }

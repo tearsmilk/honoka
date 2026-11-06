@@ -39,6 +39,11 @@ import java.util.concurrent.ThreadLocalRandom;
 /** Общая часть игр против пакетного бота: физика, ИИ, удары в обе стороны. */
 public abstract class BotGame extends Game implements dev.tearsmilk.miharu.core.kit.KitGame {
 
+    @Override
+    public boolean vsBots() {
+        return true;
+    }
+
     protected final BotsModule bots;
     protected final Player player;
     protected final CombatVersion version;

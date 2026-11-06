@@ -11,6 +11,8 @@ player-not-found: '{prefix}<red>Игрок <white>{player}</white> не найд
 bad-number: '{prefix}<red>Ожидалось число.'
 
 admin:
+  attribute-swap-on: '{prefix}<green>Свап атрибутов включён</green> <gray>(ванильный: меч → булава/топор в момент удара).'
+  attribute-swap-off: '{prefix}<gray>Свап атрибутов выключен (блокировка Paper).'
   help:
     - '<gradient:#ff9ecf:#c9a7ff><b>Miharu</b></gradient> <gray>v{version} · tearsmilk'
     - '<white>/miharu reload</white> <gray>— перечитать все конфиги'

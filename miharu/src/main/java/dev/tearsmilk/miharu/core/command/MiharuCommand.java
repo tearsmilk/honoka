@@ -52,6 +52,20 @@ public final class MiharuCommand extends SubCommands {
             }
             lobby.adminMode().toggle(p);
         });
+        sub("attribute-swap", perm, false, (s, a) -> {
+            dev.tearsmilk.miharu.pvp.PvpModule pvp = plugin.module(dev.tearsmilk.miharu.pvp.PvpModule.class);
+            if (pvp == null || pvp.attributeSwap() == null) {
+                return;
+            }
+            boolean on = a.length > 0 ? a[0].equalsIgnoreCase("on") : !pvp.attributeSwap().enabled();
+            pvp.attributeSwap().set(on);
+            pvp.config().set("attribute-swap.enabled", on);
+            try {
+                pvp.config().save(new java.io.File(pvp.folder(), "config.yml"));
+            } catch (java.io.IOException ignored) {
+            }
+            plugin.messages().send(s, on ? "admin.attribute-swap-on" : "admin.attribute-swap-off");
+        }, (s, a) -> List.of("on", "off"));
         sub("combat-mode", null, false, (s, a) -> {
             if (!s.isOp()) {
                 plugin.messages().send(s, "no-permission");
