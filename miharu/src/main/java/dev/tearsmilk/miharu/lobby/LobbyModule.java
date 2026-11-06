@@ -82,6 +82,11 @@ public final class LobbyModule extends MiharuModule {
             y.set("scoreboard.lines", sbNew);
             changed = true;
         }
+        // 0.2.45: кнопка «Украшения для брони» открывает «Экипировку»
+        if ("soon".equals(y.getString("cosmetics-menu.buttons.armor.action"))) {
+            y.set("cosmetics-menu.buttons.armor.action", "command:trims");
+            changed = true;
+        }
         // 0.2.42: строка «Опыт» в скорборде лобби
         java.util.List<String> sbx = new java.util.ArrayList<>(y.getStringList("scoreboard.lines"));
         if (!sbx.isEmpty() && sbx.stream().noneMatch(l -> l.contains("{xp}"))) {

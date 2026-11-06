@@ -26,3 +26,69 @@ hologram:
   footer:
     - ''
     - '<gray>Опыт — за игры и победы'
+
+# Косметика → «Экипировка»: сеты отделок брони. Купить за опыт (перо), потом «Применить».
+# В играх на надетую броню игрока накладывается его отделка (любая броня, видят все).
+# pieces: «узор:материал». Узоры: sentry, dune, coast, wild (дебри), ward, eye, vex, tide, snout, rib, spire,
+#   wayfinder, shaper, silence, raiser, host, flow (поток), bolt. Материалы: quartz, iron, netherite, redstone,
+#   copper, gold, emerald, diamond, lapis, amethyst, resin.
+# column — колонка меню (0–8): 4 части сверху вниз, перо — в 6-м ряду.
+armor-trims:
+  title: '<dark_gray>Экипировка'
+  sets:
+    dune:
+      name: '<#b48cff>Дюна'
+      price: 300
+      column: 2
+      pieces:
+        helmet: dune:amethyst
+        chestplate: dune:emerald
+        leggings: dune:amethyst
+        boots: dune:emerald
+    wild:
+      name: '<#7fd4ff>Дебри'
+      price: 500
+      column: 4
+      pieces:
+        helmet: wild:diamond
+        chestplate: wild:diamond
+        leggings: wild:diamond
+        boots: wild:diamond
+    flow:
+      name: '<#ffd36b>Поток'
+      price: 1000
+      column: 6
+      pieces:
+        helmet: flow:gold
+        chestplate: flow:gold
+        leggings: flow:gold
+        boots: flow:gold
+  piece-lore:
+    - '<gray>Отделка на любую твою броню в играх'
+  button:
+    buy:
+      material: FEATHER
+      name: '{set} <gray>· <#7fd4ff>{price}xp'
+      lore:
+        - '<gray>Полный сет отделки брони'
+        - '<gray>Твой опыт: <white>{xp}xp'
+        - ''
+        - '<yellow>▶ Купить'
+    owned:
+      material: FEATHER
+      name: '{set} <gray>· куплено'
+      lore:
+        - '<gray>Полный сет отделки брони'
+        - ''
+        - '<yellow>▶ Применить'
+    active:
+      material: FEATHER
+      name: '{set} <green>· выбрано'
+      lore:
+        - '<gray>Накладывается на твою броню в играх'
+        - ''
+        - '<gray>▶ Нажми ещё раз, чтобы снять'
+  filler:
+    enabled: false
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '

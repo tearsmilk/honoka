@@ -115,7 +115,7 @@ cosmetics-menu:
   buttons:
     armor:
       slot: 11
-      action: soon
+      action: command:trims
       material: DIAMOND_CHESTPLATE
       hide-attributes: true
       glow: true

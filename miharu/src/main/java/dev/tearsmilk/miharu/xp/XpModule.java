@@ -51,6 +51,13 @@ public final class XpModule extends MiharuModule implements Listener {
     private volatile List<Entry> top = List.of();
     private final List<Location> holograms = new ArrayList<>();
     private BukkitTask task;
+    private BukkitTask trimTask;
+    private final ArmorTrims trims = new ArmorTrims(this);
+
+    /** Меню «Экипировка» (отделки брони). */
+    public void openTrims(Player p) {
+        trims.open(p);
+    }
 
     public XpModule(Miharu plugin) {
         super(plugin, "xp");
@@ -65,7 +72,17 @@ public final class XpModule extends MiharuModule implements Listener {
         config();
         db().schema("CREATE TABLE IF NOT EXISTS miharu_xp (uuid VARCHAR(36) NOT NULL PRIMARY KEY, name VARCHAR(16) NOT NULL, xp BIGINT NOT NULL DEFAULT 0)");
         listen(this);
-        Bukkit.getOnlinePlayers().forEach(p -> load(p.getUniqueId()));
+        trims.load();
+        Bukkit.getOnlinePlayers().forEach(p -> {
+            load(p.getUniqueId());
+            trims.loadPlayer(p.getUniqueId());
+        });
+        trimTask = Bukkit.getScheduler().runTaskTimer(plugin, trims::tick, 20L, 20L);
+        plugin.registerCommand("trims", "Экипировка: отделки брони", List.of("armortrims"), (source, args) -> {
+            if (source.getSender() instanceof Player p) {
+                trims.open(p);
+            }
+        });
         plugin.hooks().placeholder("xp", (p, rest) -> p == null ? "0" : String.valueOf(xp(p.getUniqueId())));
         plugin.registerCommand("xp", "Опыт игрока", List.of("exp"), new XpCommand());
         plugin.registerCommand("xptop", "Голограмма топа по опыту", List.of(), new TopCommand());
@@ -78,6 +95,9 @@ public final class XpModule extends MiharuModule implements Listener {
     protected void onDisable() {
         if (task != null) {
             task.cancel();
+        }
+        if (trimTask != null) {
+            trimTask.cancel();
         }
         removeHologramEntities();
         cache.clear();
@@ -148,6 +168,7 @@ public final class XpModule extends MiharuModule implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         load(e.getPlayer().getUniqueId());
+        trims.loadPlayer(e.getPlayer().getUniqueId());
         // имя в базе — для топа
         UUID id = e.getPlayer().getUniqueId();
         String name = e.getPlayer().getName();
@@ -157,6 +178,7 @@ public final class XpModule extends MiharuModule implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         cache.remove(e.getPlayer().getUniqueId());
+        trims.unload(e.getPlayer().getUniqueId());
     }
 
     // --- топ и голограммы ---

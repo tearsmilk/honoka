@@ -460,6 +460,12 @@ xp:
   holo-refreshed: '{prefix}<gray>Топ обновлён.'
   holo-usage: '{prefix}<gray>/xptop place — поставить здесь · /xptop remove — убрать ближайшую · /xptop refresh — обновить'
 
+trims:
+  bought: '{prefix}<green>Куплено:</green> {set} <gray>за <#7fd4ff>{price}xp</#7fd4ff>. Нажми ещё раз, чтобы применить.'
+  applied: '{prefix}<gray>Отделка {set}<gray> применена — будет на твоей броне в играх.'
+  removed: '{prefix}<gray>Отделка {set}<gray> снята.'
+  no-xp: '{prefix}<red>Не хватает опыта:</red> <gray>{set}<gray> стоит <#7fd4ff>{price}xp</#7fd4ff>, у тебя <white>{xp}xp'
+
 party:
   help:
     - '<dark_gray>──────── <#c9a7ff><b>Пати</b></#c9a7ff> ────────'
