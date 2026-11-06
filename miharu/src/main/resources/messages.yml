@@ -235,6 +235,7 @@ duels:
     actionbar: '<gray>Поиск соперника · {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> в очереди {size}'
 
 lobby:
+  cosmetics-soon: '{prefix}<gray>{name}<gray> — скоро будет доступно.'
   spawn-set: '{prefix}<green>Спавн лобби сохранён.'
   adm-on: '{prefix}<gold>Режим строителя включён.</gold> <gray>Свой инвентарь, креатив, защиты лобби выключены. Выйти — <white>/miharu adm-mode'
   adm-off: '{prefix}<gray>Режим строителя выключен, инвентарь строителя сохранён.'

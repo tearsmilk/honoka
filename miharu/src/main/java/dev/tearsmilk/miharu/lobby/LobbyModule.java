@@ -349,6 +349,7 @@ public final class LobbyModule extends MiharuModule {
             }
             case "spectate" -> games.spectateMenu().open(p);
             case "meetups" -> openMeetups(p);
+            case "cosmetics" -> openCosmetics(p);
             case "bots" -> {
                 if (bots != null) {
                     bots.menu().openModes(p);
@@ -365,6 +366,39 @@ public final class LobbyModule extends MiharuModule {
                 }
             }
         }
+    }
+
+    /** Меню косметики (5-й слот): украшения брони, украшения палки (сумо), теги. Пока витрина. */
+    private void openCosmetics(Player p) {
+        ConfigurationSection m = config().getConfigurationSection("cosmetics-menu");
+        if (m == null) {
+            return;
+        }
+        dev.tearsmilk.miharu.core.menu.Menu menu = new dev.tearsmilk.miharu.core.menu.Menu(m.getInt("rows", 3), Text.mm(m.getString("title", "Косметика")));
+        ConfigurationSection buttons = m.getConfigurationSection("buttons");
+        if (buttons != null) {
+            for (String id : buttons.getKeys(false)) {
+                ConfigurationSection b = buttons.getConfigurationSection(id);
+                if (b == null || !b.getBoolean("enabled", true)) {
+                    continue;
+                }
+                String action = b.getString("action", "soon");
+                menu.set(b.getInt("slot"), Items.parse(b, Map.of()), pl -> {
+                    pl.playSound(pl.getLocation(), org.bukkit.Sound.UI_BUTTON_CLICK, 0.6f, 1.2f);
+                    if (action.startsWith("command:")) {
+                        pl.closeInventory();
+                        pl.performCommand(action.substring(8).trim());
+                    } else {
+                        plugin.messages().send(pl, "lobby.cosmetics-soon", "name", Text.plain(Text.mm(b.getString("name", id))));
+                    }
+                });
+            }
+        }
+        ConfigurationSection f = m.getConfigurationSection("filler");
+        if (f != null && f.getBoolean("enabled", true)) {
+            menu.fill(Items.parse(f, Map.of()));
+        }
+        menu.open(p);
     }
 
     /** Меню митапов (1x4 … 2x8). Пока только витрина — режимы появятся позже. */

@@ -28,7 +28,7 @@ protect:
   inventory: true
   void-y: -64
 
-# Предметы. action: duels (1.8) | minigames | duels-1.9 | stats | meetups | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# Предметы. action: duels (1.8) | minigames | duels-1.9 | stats | cosmetics | meetups | spectate | leave-queue | bots | clicktest | command:<команда> | none
 # show: always | in-queue | not-in-queue
 items:
   duels:
@@ -60,6 +60,14 @@ items:
     lore:
       - '<gray>Медленное PvP: щиты, топоры,'
       - '<gray>булава, трезубец, копья.'
+  cosmetics:
+    slot: 4
+    show: not-in-queue
+    action: cosmetics
+    material: NETHER_STAR
+    name: '<#ffd6f5><b>Косметика</b> <gray>(ПКМ)'
+    lore:
+      - '<gray>Украшения для брони, палки и теги.'
   leave-queue:
     slot: 4
     show: in-queue
@@ -96,6 +104,46 @@ items:
 
 # Меню митапов (шалкер в 8-м слоте). queue — режим митапа (modules/duels/config.yml → meetups.modes).
 # Ключи режимов без точек; display — как показать в сообщении.
+# Меню косметики (предмет в 5-м слоте). action кнопки: soon (сообщение «скоро») или command:<команда>
+cosmetics-menu:
+  title: '<dark_gray>Косметика'
+  rows: 3
+  filler:
+    enabled: true
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '
+  buttons:
+    armor:
+      slot: 11
+      action: soon
+      material: DIAMOND_CHESTPLATE
+      hide-attributes: true
+      glow: true
+      name: '<#7fd4ff><b>Украшения для брони</b>'
+      lore:
+        - '<gray>Узоры и отделка на броню в играх.'
+        - ''
+        - '<yellow>▶ Открыть'
+    stick:
+      slot: 13
+      action: soon
+      material: STICK
+      glow: true
+      name: '<#ffd36b><b>Украшения для палки</b> <gray>(сумо)'
+      lore:
+        - '<gray>Вид палки с отдачей в сумо.'
+        - ''
+        - '<yellow>▶ Открыть'
+    tags:
+      slot: 15
+      action: soon
+      material: NAME_TAG
+      name: '<#ff9ecf><b>Теги</b>'
+      lore:
+        - '<gray>Тег рядом с ником в чате и табе.'
+        - ''
+        - '<yellow>▶ Открыть'
+
 meetups-menu:
   title: '<dark_gray>Митапы'
   rows: 3
