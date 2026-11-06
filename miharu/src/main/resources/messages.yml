@@ -299,13 +299,12 @@ kit-editor:
 
 custom-kits:
   in-game: '{prefix}<red>Свои киты собираются только в лобби.'
-  started: '{prefix}<gray>Сборка кита {slot} <gray>(PvP {version}). Бери предметы в <white>«Каталоге»</white>, раскладывай и жми <green>«Сохранить»</green>.'
-  saved: '{prefix}<green>Кит {slot} сохранён (PvP {version}). Играть: меню дуэлей → нижний ряд.'
+  build-started: '{prefix}<gray>Сборка кита {slot}. Бери предметы в <white>«Каталоге»</white>, раскладывай и жми <green>«Сохранить»</green>.'
+  build-saved: '{prefix}<green>Кит {slot} сохранён.</green> <gray>Играть: меню дуэлей 1.8 или 1.9 → нижний ряд (PvP — по меню).'
   exited: '{prefix}<gray>Сборка кита закрыта без сохранения.'
   empty: '{prefix}<red>Кит пустой — положи хоть один предмет.'
   deleted: '{prefix}<gray>Кит {slot} удалён.'
   inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
-  wrong-version: '{prefix}<red>Этот кит для PvP {version} — выбери его в меню дуэлей {version}.'
 
 boxpvp:
   class-select-started: '{prefix}<gray>Выбери класс за <white>{seconds} с</white>! Сундук в руке — открыть меню снова.'

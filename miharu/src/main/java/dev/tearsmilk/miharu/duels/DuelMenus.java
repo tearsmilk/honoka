@@ -81,21 +81,19 @@ public final class DuelMenus {
             CustomKits.CustomKit kit = module.customKits().get(p.getUniqueId(), n);
             Map<String, Object> ph = new HashMap<>();
             ph.put("slot", n);
-            ph.put("version", kit == null ? version.id() : kit.version().id());
+            ph.put("version", version.id()); // свой кит играется в версии меню, из которого запущен
             ph.put("name", kit == null ? "" : kit.name());
             ph.put("items", kit == null ? 0 : kit.size());
             ph.put("queue", module.queue().size("custom-" + version.id().replace(".", "")));
-            String key = kit == null ? "empty" : kit.version() == version ? "ready" : "other-version";
+            String key = kit == null ? "empty" : "ready";
             menu.set(slots.get(i - 1), Items.parse(c.getConfigurationSection(key), ph), pl -> {
                 click(pl);
                 if (kit == null) {
                     pl.closeInventory();
                     module.builder().openSlots(pl);
-                } else if (kit.version() == version) {
-                    pl.closeInventory();
-                    module.queueCustom(pl, n);
                 } else {
-                    module.plugin().messages().send(pl, "custom-kits.wrong-version", "version", kit.version().id());
+                    pl.closeInventory();
+                    module.queueCustom(pl, n, version);
                 }
             });
         }

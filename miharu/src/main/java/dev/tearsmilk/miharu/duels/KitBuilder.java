@@ -112,7 +112,7 @@ public final class KitBuilder implements Listener {
             menu.set(slots.get(i - 1), icon, pl -> {
                 click(pl);
                 if (kit == null) {
-                    openVersion(pl, n);
+                    start(pl, n, CombatVersion.LEGACY, null); // версия не выбирается: кит общий для 1.8 и 1.9
                 }
             });
             // ПКМ по готовому — удалить: Menu не различает кнопки, поэтому удаление — отдельной кнопкой под слотом
@@ -125,30 +125,12 @@ public final class KitBuilder implements Listener {
                 });
                 menu.set(slots.get(i - 1), icon, pl -> {
                     click(pl);
-                    start(pl, n, kit.version(), kit);
+                    start(pl, n, CombatVersion.LEGACY, kit);
                 });
             }
         }
         ConfigurationSection f = m.getConfigurationSection("filler");
         if (f != null && f.getBoolean("enabled", true)) {
-            menu.fill(Items.parse(f, Map.of()));
-        }
-        menu.open(p);
-    }
-
-    private void openVersion(Player p, int slot) {
-        ConfigurationSection m = cfg().getConfigurationSection("version-menu");
-        Menu menu = new Menu(3, Text.mm(m.getString("title", "Версия"), Map.of("slot", slot)));
-        menu.set(m.getInt("legacy.slot", 11), Items.parse(m.getConfigurationSection("legacy"), Map.of()), pl -> {
-            click(pl);
-            start(pl, slot, CombatVersion.LEGACY, null);
-        });
-        menu.set(m.getInt("modern.slot", 15), Items.parse(m.getConfigurationSection("modern"), Map.of()), pl -> {
-            click(pl);
-            start(pl, slot, CombatVersion.MODERN, null);
-        });
-        ConfigurationSection f = cfg().getConfigurationSection("slots-menu.filler");
-        if (f != null) {
             menu.fill(Items.parse(f, Map.of()));
         }
         menu.open(p);
@@ -176,7 +158,7 @@ public final class KitBuilder implements Listener {
         p.getInventory().clear();
         BuilderHolder h = new BuilderHolder();
         ConfigurationSection b = cfg().getConfigurationSection("builder");
-        Inventory inv = Bukkit.createInventory(h, 54, Text.mm(b.getString("title", "Свой кит"), Map.of("slot", slot, "version", version.id())));
+        Inventory inv = Bukkit.createInventory(h, 54, Text.mm(b.getString("title", "Свой кит"), Map.of("slot", slot, "version", "")));
         h.inv = inv;
         s.builder = inv;
         if (existing != null) {
@@ -194,7 +176,7 @@ public final class KitBuilder implements Listener {
         }
         decorate(inv);
         p.openInventory(inv);
-        module.plugin().messages().send(p, "custom-kits.started", "slot", slot, "version", version.id());
+        module.plugin().messages().send(p, "custom-kits.build-started", "slot", slot);
     }
 
     private void decorate(Inventory inv) {
@@ -250,7 +232,7 @@ public final class KitBuilder implements Listener {
         p.closeInventory();
         end(p, false);
         p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.6f, 1.6f);
-        module.plugin().messages().send(p, "custom-kits.saved", "slot", s.slot, "version", s.version.id());
+        module.plugin().messages().send(p, "custom-kits.build-saved", "slot", s.slot);
     }
 
     // --- каталог ---

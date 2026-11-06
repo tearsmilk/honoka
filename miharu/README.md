@@ -24,7 +24,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.33.jar
+mvn package                         # → target/Miharu-0.2.34.jar
 ```
 
 ## Как это работает
@@ -52,7 +52,7 @@ mvn package                         # → target/Miharu-0.2.33.jar
 | `/duel 1.8`, `/duel 1.9` — меню категории; киты 1.9 в очереди с id `m-<кит>` | `miharu.duel` |
 | `/stats [игрок]` | всем |
 | `/kit edit` — своя раскладка предметов в любом ките (сохранить и выйти) | всем |
-| `/kit create` — свой кит (до 5) из предметов всех китов; играть — нижний ряд меню дуэлей 1.8/1.9 | всем |
+| `/kit create` — свой кит (до 5) из предметов всех китов, общий для 1.8 и 1.9; играть — нижний ряд меню дуэлей 1.8 или 1.9 (PvP — по меню) | всем |
 | `/spectate [игрок]`, `/lobby` | `miharu.spectate` (всем) |
 | `/setlobby` | `miharu.admin` |
 | `/force-start [режим]` — митап: старт с теми, кто в очереди (от 2), или пропуск подготовки | только OP |

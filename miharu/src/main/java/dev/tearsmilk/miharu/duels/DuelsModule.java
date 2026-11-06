@@ -219,13 +219,13 @@ public final class DuelsModule extends MiharuModule implements Listener {
     }
 
     /** Встать в очередь «Свой кит» со своим китом из слота. */
-    public void queueCustom(Player p, int slot) {
+    public void queueCustom(Player p, int slot, dev.tearsmilk.miharu.pvp.CombatVersion version) {
         CustomKits.CustomKit kit = customKits.get(p.getUniqueId(), slot);
         if (kit == null) {
             return;
         }
         customSelection.put(p.getUniqueId(), kit.toKit(p.getUniqueId()));
-        queue.join(p, customSpecs.get(kit.version()));
+        queue.join(p, customSpecs.get(version)); // общий кит — PvP по меню, из которого запущен
     }
 
     @Override
@@ -573,6 +573,17 @@ public final class DuelsModule extends MiharuModule implements Listener {
         List<String> lore = new ArrayList<>(y.getStringList("stats-menu.head.lore"));
         if (lore.removeIf(l -> l.contains("{ranked_") || l.contains("{tier") || l.contains("{elo"))) {
             y.set("stats-menu.head.lore", lore);
+            changed = true;
+        }
+        // 0.2.34: свои киты без версии — убрать «Версия: …» из подписей
+        List<String> filled = new ArrayList<>(y.getStringList("custom-kits.slots-menu.filled.lore"));
+        if (filled.removeIf(l -> l.contains("{version}"))) {
+            y.set("custom-kits.slots-menu.filled.lore", filled);
+            changed = true;
+        }
+        String bt = y.getString("custom-kits.builder.title", "");
+        if (bt.contains("{version}")) {
+            y.set("custom-kits.builder.title", bt.replace(" <gray>· {version}", "").replace("{version}", ""));
             changed = true;
         }
         if (y.getIntegerList("custom-kits.slots-menu.slots").size() < CustomKits.SLOTS) {
