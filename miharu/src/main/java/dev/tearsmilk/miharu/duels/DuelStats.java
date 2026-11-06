@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DuelStats {
 
     private final Database db;
+    /** Итог игры (игрок, режим, победа) — опыт и т.п. */
+    java.util.function.BiConsumer<Player, Object[]> onResult;
     /** uuid → кит → {победы, поражения}. */
     private final Map<UUID, Map<String, int[]>> cache = new ConcurrentHashMap<>();
 
@@ -65,6 +67,9 @@ public final class DuelStats {
     void add(Player p, String kit, boolean win) {
         int[] v = cache.computeIfAbsent(p.getUniqueId(), k -> new ConcurrentHashMap<>()).computeIfAbsent(kit, k -> new int[2]);
         v[win ? 0 : 1]++;
+        if (onResult != null) {
+            onResult.accept(p, new Object[]{kit, win});
+        }
         String col = win ? "wins" : "losses";
         db.upsert("UPDATE miharu_duel_stats SET " + col + " = " + col + " + 1, name = ? WHERE uuid = ? AND kit = ?",
                 new Object[]{p.getName(), p.getUniqueId().toString(), kit},

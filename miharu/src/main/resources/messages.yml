@@ -448,6 +448,18 @@ gungame:
     - ' <gray>Время: <white>{time}'
     - '<dark_gray>───────────────────────'
 
+xp:
+  got: '{prefix}<#7fd4ff>+{xp}xp</#7fd4ff> <gray>за игру <dark_gray>(всего {total}xp)'
+  got-win: '{prefix}<#7fd4ff>+{xp}xp</#7fd4ff> <gray>за игру и победу <dark_gray>(всего {total}xp)'
+  balance: '{prefix}<white>{player}</white><gray>: <#7fd4ff>{xp}xp'
+  changed: '{prefix}<gray>Опыт <white>{player}</white><gray>: <#7fd4ff>{xp}xp'
+  usage: '{prefix}<gray>/xp [игрок] · /xp give|take|set <игрок> <число>'
+  holo-placed: '{prefix}<green>Голограмма топа по опыту поставлена.</green> <gray>Убрать — /xptop remove рядом с ней.'
+  holo-removed: '{prefix}<gray>Голограмма убрана.'
+  holo-none: '{prefix}<red>Рядом нет голограммы топа (6 блоков).'
+  holo-refreshed: '{prefix}<gray>Топ обновлён.'
+  holo-usage: '{prefix}<gray>/xptop place — поставить здесь · /xptop remove — убрать ближайшую · /xptop refresh — обновить'
+
 party:
   help:
     - '<dark_gray>──────── <#c9a7ff><b>Пати</b></#c9a7ff> ────────'

@@ -246,6 +246,13 @@ public final class GameManager {
         }
     }
 
+    private final java.util.Set<java.util.UUID> leaving = new java.util.HashSet<>();
+
+    /** Игрок сейчас выходит из игры (/leave, выход) — итоги без наград. */
+    public boolean leaving(Player p) {
+        return leaving.contains(p.getUniqueId());
+    }
+
     /** Игрок покидает игру (/leave или выход). */
     public void leave(Player p, boolean quit) {
         Game watched = spectating.get(p.getUniqueId());
@@ -258,10 +265,13 @@ public final class GameManager {
             return;
         }
         if (game.state() == Game.State.COUNTDOWN || game.state() == Game.State.RUNNING || game.state() == Game.State.STARTING) {
+            leaving.add(p.getUniqueId());
             try {
                 game.onPlayerLeave(p, quit);
             } catch (Throwable t) {
                 plugin.getLogger().log(Level.WARNING, "Ошибка onPlayerLeave", t);
+            } finally {
+                leaving.remove(p.getUniqueId());
             }
         }
         remove(game, p);

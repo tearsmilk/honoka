@@ -1,0 +1,28 @@
+# Валюта «Опыт» (для косметики и режима в целом). Хранится в data.db → miharu_xp.
+# Даётся в конце игры: play — каждому, кто доиграл, win — сверху победителю. Кто вышел из игры (/leave, выход) — без опыта.
+# Скорборд лобби — {xp}, PlaceholderAPI — %miharu_xp%.
+# Команды: /xp [игрок] · /xp give|take|set <игрок> <число> (OP) · /xptop place|remove|refresh (OP) — голограмма топа.
+play: 5
+win: 15
+# свои суммы по режимам: ключ — начало id режима (самое длинное совпадение)
+#   mg-<мини-игра> (mg-bedwars, mg-skycontrol…), m-<кит 1.9>, <кит 1.8>, custom-18 / custom-19, mup- (митапы)
+modes:
+  mg-:
+    play: 10
+    win: 25
+  mup-:
+    play: 10
+    win: 40
+hologram:
+  height: 2.0                   # на сколько выше игрока ставить при /xptop place
+  size: 10                      # мест в топе
+  refresh-seconds: 60
+  background-alpha: 90          # фон 0–255 (0 — без фона)
+  header:
+    - '<gradient:#7fd4ff:#c9a7ff><b>ТОП ПО ОПЫТУ</b></gradient>'
+    - ''
+  line: '<gray>#{place} <white>{player} <dark_gray>— <#7fd4ff>{xp}xp'
+  empty-line: '<dark_gray>#{place} —'
+  footer:
+    - ''
+    - '<gray>Опыт — за игры и победы'

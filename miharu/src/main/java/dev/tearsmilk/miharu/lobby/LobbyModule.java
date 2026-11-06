@@ -82,6 +82,19 @@ public final class LobbyModule extends MiharuModule {
             y.set("scoreboard.lines", sbNew);
             changed = true;
         }
+        // 0.2.42: строка «Опыт» в скорборде лобби
+        java.util.List<String> sbx = new java.util.ArrayList<>(y.getStringList("scoreboard.lines"));
+        if (!sbx.isEmpty() && sbx.stream().noneMatch(l -> l.contains("{xp}"))) {
+            int at = -1;
+            for (int i = 0; i < sbx.size(); i++) {
+                if (sbx.get(i).contains("{duel_wins}")) {
+                    at = i;
+                }
+            }
+            sbx.add(at >= 0 ? at + 1 : Math.min(sbx.size(), 6), "<white>Опыт: <#7fd4ff>{xp}xp");
+            y.set("scoreboard.lines", sbx);
+            changed = true;
+        }
         // книга статистики: без тиров и ELO
         java.util.List<String> lore = new java.util.ArrayList<>(y.getStringList("items.stats.lore"));
         if (lore.removeIf(l -> l.contains("{tier_") || l.contains("{elo_") || l.contains("ELO"))) {
@@ -513,6 +526,8 @@ public final class LobbyModule extends MiharuModule {
         ph.put("queue_time", e == null ? "-" : Text.time((System.currentTimeMillis() - e.since()) / 1000));
         ph.put("queue_mode", "");
         ph.put("duel_wins", duels == null ? 0 : duels.stats().wins(p.getUniqueId(), null));
+        dev.tearsmilk.miharu.xp.XpModule xpm = plugin.module(dev.tearsmilk.miharu.xp.XpModule.class);
+        ph.put("xp", xpm == null ? 0 : xpm.xp(p.getUniqueId()));
         ph.put("duel_losses", duels == null ? 0 : duels.stats().losses(p.getUniqueId(), null));
         ph.put("bot_wins", bots == null ? 0 : bots.stats().summary(p.getUniqueId()).wins(null));
         ph.put("clicktest_best", bots == null ? 0 : bots.stats().summary(p.getUniqueId()).bestClickTest);

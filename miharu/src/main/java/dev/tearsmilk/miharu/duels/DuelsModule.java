@@ -62,6 +62,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
         modernKits.load(plugin.module(PvpModule.class).combat());
         minigameKits.load(plugin.module(PvpModule.class).combat());
         stats = new DuelStats(plugin.database());
+        stats.onResult = (p, r) -> dev.tearsmilk.miharu.xp.XpModule.award(plugin, p, (String) r[0], (Boolean) r[1]);
         stats.createTables();
         layouts = new KitLayouts(plugin.database());
         layouts.createTables();

@@ -241,6 +241,7 @@ scoreboard:
     - '<white>В играх: <aqua>{in_game}'
     - ''
     - '<white>Дуэли: <green>{duel_wins}<gray> / <red>{duel_losses}'
+    - '<white>Опыт: <#7fd4ff>{xp}xp'
     - '<white>Боты: <green>{bot_wins}</green> побед'
     - '<white>Клик-тест: <#c9a7ff>{clicktest_best}'
     - ''

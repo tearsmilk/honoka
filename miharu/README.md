@@ -17,6 +17,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 | `duels` (быстрый старт) | Во всех групповых режимах (мини-игры 1x3/1x4, BoxPvP, митапы): в очереди половина участников — таймер 30 с, потом старт с теми, кто есть; зелёный краситель «Быстрый старт» — голосование за старт сразу | `modules/duels/config.yml → quick-start` |
 | `duels` (свободные арены) | Sword, SpearMace, ElytraMace (ванильное PvP 1.21.11; в ките на Sword нельзя элитры, заряды ветра, булаву, копья, на SpearMace — элитры): одна точка `spawn`, игра не начинается и не кончается, вход только со своим китом через NPC (`/ffa npc <тип>`, OP) или `/ffa <тип>`, умер — обратно в лобби, ломаются только блоки игроков, выйти `/lobby` — не раньше 10 с после урона (боссбар), мир не удаляется и не чистится | `modules/duels/config.yml → free-arenas` |
 | `duels` (FFA-арены 1.8) | KnockbackFFA (палка Отбрасывание I + удочка, без урона — только в пустоту), BowFFA (лук Откидывание I + Бесконечность, стрела, палка Отбрасывание I), SwordFFA (железный меч Острота I, 4 золотых яблока, удочка, железная броня Защита I): одна точка `spawn`, вход через NPC (`/ffa npc knockbackffa\|bowffa\|swordffa`), кит выдаёт сервер, умер — снова на арене | `modules/duels/config.yml → free-arenas.types` |
+| `xp` | Валюта «Опыт»: за сыгранную игру и победу (суммы по режимам), скорборд лобби `{xp}`, `%miharu_xp%`, `/xp`, `/xp give\|take\|set` (OP), голограмма топа `/xptop place\|remove\|refresh` (OP) | `modules/xp/config.yml` |
 | `party` | Пати до 5 человек: `/party invite·accept·kick·leave·list·promote·delete·help·chat` (сокращения `/p i·a·k·l·list·p·d·h`), `/pc <текст>` — чат пати (работает и в игре) | `modules/party/config.yml` |
 | `lobby` | Предметы лобби (каменный меч — дуэли 1.8, золотой — 1.9, огненный заряд — мини-игры, звезда Незера (5-й слот) — косметика: украшения брони, палки (сумо), теги; книга — статистика, шалкер — митапы, глаз Эндера — наблюдение, краситель — выйти из очереди), своё табло и таб, защита, `/lobby`, `/setlobby` | `modules/lobby/config.yml` |
 
@@ -26,7 +27,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.41.jar
+mvn package                         # → target/Miharu-0.2.42.jar
 ```
 
 ## Как это работает
