@@ -66,27 +66,6 @@ public final class MiharuCommand extends SubCommands {
             }
             plugin.messages().send(s, on ? "admin.attribute-swap-on" : "admin.attribute-swap-off");
         }, (s, a) -> List.of("on", "off"));
-        sub("attribute", null, false, (s, a) -> {
-            if (!s.isOp()) {
-                plugin.messages().send(s, "no-permission");
-                return;
-            }
-            dev.tearsmilk.miharu.duels.DuelsModule duels = plugin.module(dev.tearsmilk.miharu.duels.DuelsModule.class);
-            java.util.List<String> known = java.util.List.of("swapmover");
-            if (duels == null || a.length < 2 || !(a[0].equalsIgnoreCase("enable") || a[0].equalsIgnoreCase("disable"))
-                    || !known.contains(a[1].toLowerCase(java.util.Locale.ROOT))) {
-                plugin.messages().send(s, "admin.attribute-usage", "list", String.join(", ", known));
-                return;
-            }
-            boolean on = a[0].equalsIgnoreCase("enable");
-            String key = a[1].toLowerCase(java.util.Locale.ROOT);
-            duels.config().set("attributes." + key, on);
-            try {
-                duels.config().save(new java.io.File(duels.folder(), "config.yml"));
-            } catch (java.io.IOException ignored) {
-            }
-            plugin.messages().send(s, on ? "admin.attribute-on" : "admin.attribute-off", "attribute", key);
-        }, (s, a) -> a.length <= 1 ? List.of("enable", "disable") : List.of("swapmover"));
         sub("combat-mode", null, false, (s, a) -> {
             if (!s.isOp()) {
                 plugin.messages().send(s, "no-permission");

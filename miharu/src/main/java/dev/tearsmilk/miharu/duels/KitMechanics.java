@@ -243,42 +243,9 @@ final class KitMechanics implements Listener {
         }
     }
 
-    /** Атрибут swapmover (/miharu attribute enable swapmover): копьё в руке + заряд ветра во второй — ПКМ бросает заряд. */
-    private boolean swapMover() {
-        return module.config().getBoolean("attributes.swapmover", false);
-    }
-
     private boolean mechanicsAllowed(Player p) {
         dev.tearsmilk.miharu.lobby.LobbyModule lobby = module.plugin().module(dev.tearsmilk.miharu.lobby.LobbyModule.class);
         return rules(p) != null || (lobby != null && lobby.combatMode().active(p));
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onSwapMover(PlayerInteractEvent e) {
-        if (!swapMover() || e.getHand() != EquipmentSlot.HAND
-                || (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK)) {
-            return;
-        }
-        Player p = e.getPlayer();
-        ItemStack main = p.getInventory().getItemInMainHand();
-        ItemStack off = p.getInventory().getItemInOffHand();
-        if (!main.getType().name().endsWith("_SPEAR") || off.getType() != Material.WIND_CHARGE || !mechanicsAllowed(p)) {
-            return;
-        }
-        // в ванилле ПКМ занят копьём — бросаем заряд из второй руки сами
-        e.setCancelled(true);
-        e.setUseItemInHand(org.bukkit.event.Event.Result.DENY);
-        if (p.hasCooldown(Material.WIND_CHARGE)) {
-            return;
-        }
-        p.launchProjectile(org.bukkit.entity.WindCharge.class, p.getLocation().getDirection().multiply(1.5));
-        p.setCooldown(Material.WIND_CHARGE, 10);
-        if (p.getGameMode() != org.bukkit.GameMode.CREATIVE) {
-            off.setAmount(off.getAmount() - 1);
-            p.getInventory().setItemInOffHand(off.getAmount() <= 0 ? null : off);
-        }
-        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WIND_CHARGE_THROW, 0.6f, 1f);
-        p.swingOffHand();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
