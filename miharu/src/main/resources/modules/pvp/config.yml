@@ -84,6 +84,7 @@ versions:
       use-victim-velocity: false
 
   "1.9":
+    vanilla: true               # ванильный бой 1.21.11: плагин не меняет урон, отдачу, реген, яблоки (ниже — только для ботов)
     attack-speed: 4.0
     max-no-damage-ticks: 20
     cooldown-damage: true       # урон зависит от зарядки удара

@@ -26,6 +26,8 @@ public final class CombatProfile {
     }
 
     public final CombatVersion version;
+    /** Ванильный бой 1.21.11: плагин не меняет урон, отдачу, реген, яблоки и т.д. (значения ниже — только для ботов). */
+    public final boolean vanilla;
     public final double attackSpeed;
     public final int maxNoDamageTicks;
     public final boolean cooldownDamage;
@@ -56,12 +58,13 @@ public final class CombatProfile {
 
     public CombatProfile(CombatVersion version, ConfigurationSection s) {
         this.version = version;
-        attackSpeed = s.getDouble("attack-speed", version == CombatVersion.LEGACY ? 1024.0 : 4.0);
-        maxNoDamageTicks = s.getInt("max-no-damage-ticks", 20);
-        cooldownDamage = s.getBoolean("cooldown-damage", version == CombatVersion.MODERN);
-        disableSweep = s.getBoolean("disable-sweep", version == CombatVersion.LEGACY);
-        disableOffhand = s.getBoolean("disable-offhand", version == CombatVersion.LEGACY);
-        legacyDamage = s.getBoolean("legacy-damage", version == CombatVersion.LEGACY);
+        vanilla = s.getBoolean("vanilla", false);
+        attackSpeed = vanilla ? 4.0 : s.getDouble("attack-speed", version == CombatVersion.LEGACY ? 1024.0 : 4.0);
+        maxNoDamageTicks = vanilla ? 20 : s.getInt("max-no-damage-ticks", 20);
+        cooldownDamage = vanilla || s.getBoolean("cooldown-damage", version == CombatVersion.MODERN);
+        disableSweep = !vanilla && s.getBoolean("disable-sweep", version == CombatVersion.LEGACY);
+        disableOffhand = !vanilla && s.getBoolean("disable-offhand", version == CombatVersion.LEGACY);
+        legacyDamage = !vanilla && s.getBoolean("legacy-damage", version == CombatVersion.LEGACY);
 
         ConfigurationSection dmg = s.getConfigurationSection("weapon-damage");
         if (dmg != null) {
@@ -89,12 +92,12 @@ public final class CombatProfile {
         weaknessPerLevel = s.getDouble("weakness-per-level", 4.0);
         critMultiplier = s.getDouble("critical.multiplier", 1.5);
         critWhileSprinting = s.getBoolean("critical.while-sprinting", version == CombatVersion.LEGACY);
-        swordBlocking = s.getBoolean("sword-blocking.enabled", version == CombatVersion.LEGACY);
+        swordBlocking = !vanilla && s.getBoolean("sword-blocking.enabled", version == CombatVersion.LEGACY);
         blockReduction = s.getDouble("sword-blocking.reduction", 0.5);
-        legacyGoldenApple = s.getBoolean("golden-apple.legacy", version == CombatVersion.LEGACY);
+        legacyGoldenApple = !vanilla && s.getBoolean("golden-apple.legacy", version == CombatVersion.LEGACY);
         goldenAppleEffects = Items.effects(s.getStringList("golden-apple.effects"));
         enchantedAppleEffects = Items.effects(s.getStringList("golden-apple.enchanted-effects"));
-        legacyRegen = s.getBoolean("regen.legacy", version == CombatVersion.LEGACY);
+        legacyRegen = !vanilla && s.getBoolean("regen.legacy", version == CombatVersion.LEGACY);
         regenInterval = s.getInt("regen.interval-ticks", 80);
         regenMinFood = s.getInt("regen.min-food", 18);
         regenExhaustion = (float) s.getDouble("regen.exhaustion", 3.0);
@@ -105,7 +108,7 @@ public final class CombatProfile {
             kb = s.createSection("knockback");
         }
         knockback = new Knockback(
-                kb.getBoolean("custom", version == CombatVersion.LEGACY),
+                !vanilla && kb.getBoolean("custom", version == CombatVersion.LEGACY),
                 Math.max(0.0001, kb.getDouble("friction", 2.0)),
                 kb.getDouble("horizontal", 0.4),
                 kb.getDouble("vertical", 0.4),

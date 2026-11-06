@@ -103,6 +103,10 @@ public final class CombatService {
         if (overrides == null || overrides.getKeys(true).isEmpty()) {
             return profiles.get(version);
         }
+        CombatProfile base0 = profiles.get(version);
+        if (base0 != null && base0.vanilla) {
+            return base0; // ванильная версия: переопределения боя из китов не применяются
+        }
         org.bukkit.configuration.MemoryConfiguration merged = new org.bukkit.configuration.MemoryConfiguration();
         ConfigurationSection base = sections.get(version);
         if (base != null) {
