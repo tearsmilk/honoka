@@ -6,7 +6,7 @@
 
     <groupId>dev.tearsmilk</groupId>
     <artifactId>miharu</artifactId>
-    <version>0.2.42</version>
+    <version>0.2.43</version>
     <packaging>jar</packaging>
 
     <name>Miharu</name>

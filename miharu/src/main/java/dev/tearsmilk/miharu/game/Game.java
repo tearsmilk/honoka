@@ -86,6 +86,15 @@ public abstract class Game {
         return 0;
     }
 
+    /** Настоящая смерть: вещи выпадают, экран смерти, после «Возродиться» — выход из игры (свободные арены). */
+    public boolean realDeath(Player p) {
+        return false;
+    }
+
+    /** Игрок по-настоящему умер (только если realDeath). Вещи выпадут сами. */
+    protected void onRealDeath(Player p, org.bukkit.event.entity.PlayerDeathEvent e) {
+    }
+
     /** Можно ли сейчас зайти в игру из очереди (по умолчанию — нет). */
     public boolean canLateJoin() {
         return false;

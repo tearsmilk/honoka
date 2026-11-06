@@ -110,6 +110,10 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
     protected void onSetup() {
         instance.world().setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, true);
         instance.world().setGameRule(GameRules.FALL_DAMAGE, true);
+        if (!arenas.respawn(type)) {
+            instance.world().setGameRule(GameRules.KEEP_INVENTORY, false); // настоящая смерть — вещи выпадают
+            instance.world().setGameRule(GameRules.IMMEDIATE_RESPAWN, false);
+        }
         for (Player p : List.copyOf(players)) {
             enter(p);
         }
@@ -203,6 +207,37 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
     @Override
     protected void onVoid(Player p) {
         died(p);
+    }
+
+    @Override
+    public boolean realDeath(Player p) {
+        return !arenas.respawn(type); // Sword / SpearMace / ElytraMace: настоящая смерть, потом лобби
+    }
+
+    @Override
+    protected void onRealDeath(Player p, org.bukkit.event.entity.PlayerDeathEvent e) {
+        if (p.getKiller() != null && players.contains(p.getKiller()) && !lastHit.containsKey(p.getUniqueId())) {
+            lastHit.put(p.getUniqueId(), p.getKiller().getUniqueId());
+            lastHitAt.put(p.getUniqueId(), System.currentTimeMillis());
+        }
+        UUID kid = lastHit.remove(p.getUniqueId());
+        long at = lastHitAt.getOrDefault(p.getUniqueId(), 0L);
+        Player killer = kid == null || System.currentTimeMillis() - at > 15_000 ? null : Bukkit.getPlayer(kid);
+        deaths.merge(p.getUniqueId(), 1, Integer::sum);
+        streak.put(p.getUniqueId(), 0);
+        if (killer != null && players.contains(killer) && killer != p) {
+            kills.merge(killer.getUniqueId(), 1, Integer::sum);
+            int s = streak.merge(killer.getUniqueId(), 1, Integer::sum);
+            broadcast("free-arena.killed", "player", p.getName(), "killer", killer.getName(), "streak", s);
+            killer.playSound(killer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.8f, 1.3f);
+        } else {
+            broadcast("free-arena.died", "player", p.getName());
+        }
+        combatUntil.remove(p.getUniqueId());
+        BossBar bar = bars.remove(p.getUniqueId());
+        if (bar != null) {
+            p.hideBossBar(bar);
+        }
     }
 
     private void died(Player p) {

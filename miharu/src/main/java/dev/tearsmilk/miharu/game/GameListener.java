@@ -49,12 +49,18 @@ final class GameListener implements Listener {
             return;
         }
         if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            if (game.realDeath(p)) {
+                return; // ванильная смерть в пустоте
+            }
             e.setCancelled(true);
             game.onVoid(p);
             return;
         }
         if (game.onDamage(p, e)) {
             return;
+        }
+        if (game.realDeath(p)) {
+            return; // смертельный урон не перехватываем — игрок умирает по-настоящему
         }
         if (e.getFinalDamage() >= p.getHealth() + p.getAbsorptionAmount()) {
             // тотем бессмертия срабатывает как в ванили
@@ -69,6 +75,16 @@ final class GameListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent e) {
+        Game rg = games.of(e.getPlayer());
+        if (rg != null && rg.realDeath(e.getPlayer())) {
+            // настоящая смерть: вещи выпадают, опыт уровня не теряется, сообщение — от игры
+            e.setKeepInventory(false);
+            e.setKeepLevel(true);
+            e.setDroppedExp(0);
+            e.deathMessage(null);
+            rg.onRealDeath(e.getPlayer(), e);
+            return;
+        }
         // страховка: если смерть всё же случилась внутри игры — ничего не выпадает
         if (games.inGame(e.getPlayer())) {
             e.setKeepInventory(true);
@@ -77,6 +93,22 @@ final class GameListener implements Listener {
             e.setDroppedExp(0);
             e.deathMessage(null);
         }
+    }
+
+    /** После «Возродиться» — из игры (в лобби). */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onRespawn(org.bukkit.event.player.PlayerRespawnEvent e) {
+        Player p = e.getPlayer();
+        Game game = games.of(p);
+        if (game == null || !game.realDeath(p)) {
+            return;
+        }
+        e.setRespawnLocation(game.spawnFor(p));
+        org.bukkit.Bukkit.getScheduler().runTask(module.plugin(), () -> {
+            if (games.of(p) == game) {
+                games.leave(p, false);
+            }
+        });
     }
 
     @EventHandler(ignoreCancelled = true)
