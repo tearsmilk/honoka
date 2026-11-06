@@ -1,0 +1,71 @@
+# Кит «Паутина PvP» (1.9): алмазная броня Защита I, меч Острота II, лук Сила I + Огонь, кирка Эффективность II,
+# паутина и песок (ставить), хилки II, золотые яблоки, удочка.
+display: '<#e8e8e8>Паутина PvP'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet:
+    material: DIAMOND_HELMET
+    enchants:
+      protection: 1
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      protection: 1
+  leggings:
+    material: DIAMOND_LEGGINGS
+    enchants:
+      protection: 1
+  boots:
+    material: DIAMOND_BOOTS
+    enchants:
+      protection: 1
+items:
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 2
+  1:
+    material: BOW
+    enchants:
+      power: 1
+      flame: 1
+  2:
+    material: DIAMOND_PICKAXE
+    enchants:
+      efficiency: 2
+  3:
+    material: FISHING_ROD
+  4:
+    material: GOLDEN_APPLE
+    amount: 2
+  5:
+    material: POTION
+    potion: strong_healing
+  6:
+    material: COBWEB
+    amount: 8
+  7:
+    material: SAND
+    amount: 64
+  8:
+    material: SAND
+    amount: 64
+  9:
+    material: ARROW
+    amount: 8
+  14:
+    material: POTION
+    potion: strong_healing
+  23:
+    material: POTION
+    potion: strong_healing
+  32:
+    material: POTION
+    potion: strong_healing
+rules:
+  build: true
+  break-placed-only: true      # ломаются только блоки игроков (паутина, песок)
+bot:
+  enabled: false               # паутина и песок — только против игроков

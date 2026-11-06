@@ -1,5 +1,5 @@
 # Меню китов медленного PvP (1.9) — золотой меч в лобби / команда /duel 1.9.
-# kits.<файл>: enabled, slot, icon. Сам кит — <файл>.yml рядом (id в очереди и статистике: m-<файл>).
+# kits.<файл>: enabled, locked (виден барьером, запуск выключен), slot, icon. Сам кит — <файл>.yml рядом (id в очереди и статистике: m-<файл>).
 # Плейсхолдеры иконки: {kit} {version} {queue} {playing} {wins} {losses} {bot}
 menu:
   title: '<dark_gray>Дуэли 1.9 <gray>· выбери кит'
@@ -8,6 +8,12 @@ menu:
     enabled: true
     material: YELLOW_STAINED_GLASS_PANE
     name: ' '
+  # заблокированный кит (kits.<файл>.locked: true): виден барьером, запустить нельзя
+  locked-icon:
+    material: BARRIER
+    name: '{kit} <gray>· <red>недоступно'
+    lore:
+      - '<gray>Режим временно закрыт'
   default-icon:
     material: PAPER
     name: '{kit}'
@@ -17,6 +23,7 @@ menu:
 kits:
   swordshield:
     enabled: true
+    locked: true
     slot: 10
     icon:
       material: SHIELD
@@ -32,6 +39,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   diamond:
     enabled: true
+    locked: true
     slot: 11
     icon:
       material: DIAMOND_SWORD
@@ -47,6 +55,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   opdiamond:
     enabled: true
+    locked: true
     slot: 12
     icon:
       material: DIAMOND_CHESTPLATE
@@ -62,6 +71,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   heavy:
     enabled: true
+    locked: true
     slot: 13
     icon:
       material: NETHERITE_CHESTPLATE
@@ -77,6 +87,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   axeshield:
     enabled: true
+    locked: true
     slot: 14
     icon:
       material: DIAMOND_AXE
@@ -92,6 +103,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   mace:
     enabled: true
+    locked: true
     slot: 15
     icon:
       material: MACE
@@ -122,6 +134,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   trident:
     enabled: true
+    locked: true
     slot: 19
     icon:
       material: TRIDENT
@@ -137,6 +150,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   spear:
     enabled: true
+    locked: true
     slot: 20
     icon:
       material: IRON_SPEAR
@@ -152,6 +166,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   netheritespear:
     enabled: true
+    locked: true
     slot: 21
     icon:
       material: NETHERITE_SPEAR
@@ -167,6 +182,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   lungespear:
     enabled: true
+    locked: true
     slot: 22
     icon:
       material: DIAMOND_SPEAR
@@ -182,6 +198,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   crossbow:
     enabled: true
+    locked: true
     slot: 23
     icon:
       material: CROSSBOW
@@ -197,6 +214,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   archer:
     enabled: true
+    locked: true
     slot: 24
     icon:
       material: BOW
@@ -212,6 +230,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   spearshield:
     enabled: true
+    locked: true
     slot: 25
     icon:
       material: STONE_SPEAR
@@ -227,6 +246,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   survival:
     enabled: true
+    locked: true
     slot: 28
     icon:
       material: WATER_BUCKET
@@ -242,6 +262,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   crystal:
     enabled: true
+    locked: true
     slot: 29
     icon:
       material: END_CRYSTAL
@@ -257,6 +278,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   elytramace:
     enabled: true
+    locked: true
     slot: 30
     icon:
       material: ELYTRA
@@ -272,6 +294,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   tntminecart:
     enabled: true
+    locked: true
     slot: 31
     icon:
       material: TNT_MINECART
@@ -287,6 +310,7 @@ kits:
         - '<yellow>▶ Нажми, чтобы играть'
   anchor:
     enabled: true
+    locked: true
     slot: 32
     icon:
       material: RESPAWN_ANCHOR
@@ -300,3 +324,18 @@ kits:
         - '<gray>С ботом: {bot}'
         - ''
         - '<yellow>▶ Нажми, чтобы играть'
+  web:
+    enabled: true
+    slot: 33
+    icon:
+      material: COBWEB
+      name: '{kit}'
+      lore:
+        - '<gray>Алмазная броня, меч, лук, паутина и песок'
+        - '<gray>Хилки II, золотые яблоки, удочка'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+locked-migrated: true

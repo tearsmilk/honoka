@@ -179,6 +179,7 @@ bots:
     line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{score}</white> <gray>({cps} CPS)'
 
 duels:
+  kit-locked: '{prefix}<red>Кит {kit}<red> сейчас недоступен.'
   quick-start:
     started: '{prefix}<green>Быстрый старт!</green> <gray>В очереди <white>{waiting}/{players}</white> — игра начнётся через <white>{seconds} с</white> с теми, кто есть. Зелёный краситель — начать сразу.'
     countdown: '{prefix}<gray>Быстрый старт через <white>{seconds} с</white> <dark_gray>(</dark_gray>{waiting}/{players}<dark_gray>)'

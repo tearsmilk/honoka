@@ -25,7 +25,7 @@ import java.util.Map;
 public final class DuelKits {
 
     /** Кит + как он выглядит в меню. variants — варианты матча (Bridge до 3/5/7 голов), пусто — без выбора. */
-    public record Entry(KitSpec spec, boolean enabled, int slot, ConfigurationSection icon, List<KitSpec> variants) {
+    public record Entry(KitSpec spec, boolean enabled, int slot, ConfigurationSection icon, List<KitSpec> variants, boolean locked) {
     }
 
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
@@ -35,7 +35,7 @@ public final class DuelKits {
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
             "trident", "spear", "netheritespear", "lungespear", "crossbow", "archer", "spearshield", "survival", "crystal",
-            "elytramace", "tntminecart", "anchor");
+            "elytramace", "tntminecart", "anchor", "web");
 
     private final DuelsModule module;
     /** Папка в modules/duels (kits — 1.8, kits-1.9 — медленное PvP). */
@@ -237,6 +237,25 @@ public final class DuelKits {
                 }
             }
         }
+        if (folder.equals("kits-1.9")) {
+            // 0.2.46: все киты 1.9, кроме OP Mace и «Паутины», — заблокированы (барьер, запуск выключен)
+            File mc = new File(dir, "config.yml");
+            if (mc.exists()) {
+                YamlConfiguration my = YamlConfiguration.loadConfiguration(mc);
+                if (!my.getBoolean("locked-migrated", false)) {
+                    for (String k : MODERN_DEFAULTS) {
+                        if (!k.equals("opmace") && !k.equals("web")) {
+                            my.set("kits." + k + ".locked", true);
+                        }
+                    }
+                    my.set("locked-migrated", true);
+                    try {
+                        my.save(mc);
+                    } catch (java.io.IOException ignored) {
+                    }
+                }
+            }
+        }
         menuConfig = module.loadFile(folder + "/config.yml");
         kits.clear();
         variantSpecs.clear();
@@ -360,7 +379,8 @@ public final class DuelKits {
                         }
                     }
                 }
-                kits.put(id, new Entry(spec, enabled, slot, icon, variants));
+                boolean locked = m != null && m.getBoolean("locked", false);
+                kits.put(id, new Entry(spec, enabled, slot, icon, variants, locked));
                 autoSlot++;
                 if (autoSlot % 9 == 8) {
                     autoSlot += 2;
@@ -387,13 +407,13 @@ public final class DuelKits {
     public KitSpec spec(String id) {
         Entry e = get(id);
         if (e != null) {
-            return e.enabled() ? e.spec() : null;
+            return e.enabled() && !e.locked() ? e.spec() : null;
         }
         KitSpec v = id == null ? null : variantSpecs.get(id.toLowerCase(Locale.ROOT));
         if (v != null) {
             for (Entry base : kits.values()) {
                 if (base.variants().contains(v)) {
-                    return base.enabled() ? v : null;
+                    return base.enabled() && !base.locked() ? v : null;
                 }
             }
         }
@@ -407,7 +427,7 @@ public final class DuelKits {
     public List<String> enabledIds() {
         List<String> out = new ArrayList<>();
         for (Entry e : kits.values()) {
-            if (!e.enabled()) {
+            if (!e.enabled() || e.locked()) {
                 continue;
             }
             if (e.variants().isEmpty()) {

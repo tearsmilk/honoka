@@ -112,7 +112,7 @@ public final class BoxPvpGame extends Game implements KitGame {
             // классов нет — как раньше: случайные киты дуэлей 1.9
             List<KitSpec> pool = new ArrayList<>();
             for (DuelKits.Entry e : duels.modernKits().all()) {
-                if (e.enabled()) {
+                if (e.enabled() && !e.locked()) {
                     pool.add(e.spec());
                 }
             }

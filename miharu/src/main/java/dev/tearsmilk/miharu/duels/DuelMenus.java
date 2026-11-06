@@ -49,6 +49,16 @@ public final class DuelMenus {
             }
             KitSpec spec = e.spec();
             Map<String, Object> ph = placeholders(p, spec);
+            if (e.locked()) {
+                // заблокированный кит: барьер, запуск выключен
+                ConfigurationSection li = m.getConfigurationSection("locked-icon");
+                ItemStack lockedIcon = li != null ? Items.parse(li, ph) : new ItemStack(org.bukkit.Material.BARRIER);
+                menu.set(e.slot(), lockedIcon, pl -> {
+                    pl.playSound(pl.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
+                    module.plugin().messages().send(pl, "duels.kit-locked", "kit", spec.display());
+                });
+                continue;
+            }
             ConfigurationSection icon = e.icon();
             if (icon == null) {
                 icon = m.getConfigurationSection("default-icon");
