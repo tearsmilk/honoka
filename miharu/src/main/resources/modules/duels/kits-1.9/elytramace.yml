@@ -1,5 +1,5 @@
 # Кит Elytra Mace (1.9). Раскладка: элитры надеты, незеритовый нагрудник — в инвентаре (переодеться), тотем во второй руке.
-revision: 2
+revision: 3
 display: '<#c9a7ff>Elytra Mace'
 version: "1.9"
 arena-mode: duel          # точки p1/p2 можно ставить в воздухе или на платформах
@@ -67,6 +67,17 @@ items:
     material: WIND_CHARGE
     amount: 64
   # инвентарь
+  27:
+    material: GOLDEN_APPLE
+    amount: 64                # с хотбаром — полтора стака
+  29:
+    material: FIREWORK_ROCKET
+    amount: 64
+    flight: 1
+  30:
+    material: FIREWORK_ROCKET
+    amount: 64                # всего 3 стака фейерверков
+    flight: 1
   12:
     material: TOTEM_OF_UNDYING
   13:
