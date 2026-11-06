@@ -180,12 +180,22 @@ final class GameListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player p = e.getPlayer();
-        if (!games.busy(p) || p.hasPermission("miharu.bypass.commands")) {
+        if (!games.busy(p)) {
             return;
         }
         String label = e.getMessage().substring(1).split(" ")[0].toLowerCase(Locale.ROOT);
         if (label.contains(":")) {
             label = label.substring(label.indexOf(':') + 1);
+        }
+        // в бою выйти нельзя (свободные арены): не получай урон N секунд
+        Game cg = games.of(p);
+        if (cg != null && List.of("lobby", "spawn", "leave", "l", "hub", "quit-game").contains(label) && cg.combatSeconds(p) > 0) {
+            e.setCancelled(true);
+            module.plugin().messages().send(p, "game.leave-in-combat", "seconds", cg.combatSeconds(p));
+            return;
+        }
+        if (p.hasPermission("miharu.bypass.commands")) {
+            return;
         }
         List<String> allowed = module.config().getStringList("allowed-commands");
         // команды пати работают и в игре (чат с напарниками)

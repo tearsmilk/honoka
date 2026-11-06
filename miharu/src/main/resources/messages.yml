@@ -103,6 +103,7 @@ arena:
   disabled: '{prefix}<yellow>Арена {arena} выключена.'
 
 game:
+  leave-in-combat: '{prefix}<red>Ты в бою!</red> <gray>Не получай урон ещё <white>{seconds} с</white> — тогда можно выйти.'
   countdown:
     title: '<gradient:#ff9ecf:#c9a7ff><b>{seconds}</b></gradient>'
     subtitle: '<gray>приготовься'
@@ -306,6 +307,22 @@ custom-kits:
   empty: '{prefix}<red>Кит пустой — положи хоть один предмет.'
   deleted: '{prefix}<gray>Кит {slot} удалён.'
   inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
+
+free-arena:
+  joined: '{prefix}<gray>Ты на арене {arena}<gray>. Выйти — <white>/lobby</white> (не раньше чем через <white>{seconds} с</white> после урона).'
+  player-joined: '{prefix}<white>{player}</white> <gray>зашёл на арену'
+  player-left: '{prefix}<white>{player}</white> <gray>ушёл с арены'
+  killed: '{prefix}<red>{player}</red> <gray>убит игроком <white>{killer}</white> <dark_gray>(серия {streak})'
+  died: '{prefix}<red>{player}</red> <gray>погиб'
+  bossbar: '<red><b>⚔ Ты в PvP</b></red> <gray>— не получай урон <white>{seconds} с</white>, тогда можно /lobby'
+  out-of-combat: '<green>Ты вне боя — можно выйти: /lobby'
+  status-combat: '<red>в бою ({seconds} с)'
+  status-free: '<green>вне боя'
+  no-kits: '{prefix}<red>У тебя нет своих китов.</red> <gray>Собери кит: <white>/kit create</white> — на эти арены только со своими китами.'
+  npc-placed: '{prefix}<green>NPC арены {arena}<green> поставлен.</green> <gray>Убрать — встань рядом и /ffa npc remove'
+  npc-removed: '{prefix}<gray>NPC убран.'
+  npc-none: '{prefix}<red>Рядом нет NPC арены (3 блока).'
+  usage: '{prefix}<gray>/ffa <тип> — на арену · /ffa npc <тип> | remove — NPC. Типы: <white>{types}'
 
 boxpvp:
   class-select-started: '{prefix}<gray>Выбери класс за <white>{seconds} с</white>! Сундук в руке — открыть меню снова.'

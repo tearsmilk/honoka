@@ -73,6 +73,18 @@ scoreboard:
       - ''
       - '<white>Время <aqua>{time}'
       - '<white>Пинг <gray>{ping} мс'
+    freearena:
+      - '<dark_gray>{arena}'
+      - ''
+      - '<white>Арена: {kit}'
+      - '<white>Статус: {combat}'
+      - ''
+      - '<white>Убийства <green>{kills}'
+      - '<white>Смерти <red>{deaths}'
+      - '<white>Серия <yellow>{streak}'
+      - ''
+      - '<white>На арене <aqua>{players}'
+      - '<white>Твоё ❤ <red>{player_hp}'
     skycontrol:
       - '<dark_gray>#{game_id} · {arena}'
       - ''

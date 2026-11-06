@@ -265,7 +265,7 @@ public final class GameManager {
             }
         }
         remove(game, p);
-        if (game.players.isEmpty() && game.state() != Game.State.CLOSED) {
+        if (game.players.isEmpty() && game.state() != Game.State.CLOSED && !game.keepAlive()) {
             if (game.state() != Game.State.ENDING) {
                 game.state = Game.State.ENDING;
                 safe(game::onEnd);

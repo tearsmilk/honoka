@@ -124,6 +124,10 @@ public final class DuelsModule extends MiharuModule implements Listener {
         arenas.registerMode(new ArenaMode("meetup", "Митап", List.of("p1", "p2")));
         listen(this);
         listen(new KitMechanics(this));
+        freeArenas = new FreeArenas(this);
+        freeArenas.load();
+        listen(freeArenas);
+        plugin.registerCommand("ffa", "Свободные арены: Sword, SpearMace, ElytraMace", List.of("freearena"), freeArenas.command());
         task = Bukkit.getScheduler().runTaskTimer(plugin, queue::tick, 20L, 20L);
         plugin.registerCommand("duel", "Дуэли по китам", List.of("duels", "kits"), new DuelCommand(plugin, this));
         Bukkit.getOnlinePlayers().forEach(p -> {
@@ -397,6 +401,12 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private final java.util.Map<String, Integer> teamSizes = new java.util.concurrent.ConcurrentHashMap<>();
 
     /** Свой минимум для быстрого старта (quick-start-min в yml мини-игры, например BowSpleef — от 2). */
+    private FreeArenas freeArenas;
+
+    public FreeArenas freeArenas() {
+        return freeArenas;
+    }
+
     private final java.util.Map<String, Integer> quickMins = new java.util.concurrent.ConcurrentHashMap<>();
 
     void setQuickMin(String kitId, int min) {

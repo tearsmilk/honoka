@@ -76,6 +76,16 @@ public abstract class Game {
     }
 
     /** Зритель вошёл (показать ботов и т.п.). */
+    /** Постоянная игра (свободные арены): не закрывается, когда все вышли. */
+    public boolean keepAlive() {
+        return false;
+    }
+
+    /** Сколько секунд игрок ещё «в бою» (0 — может выйти через /lobby, /leave). */
+    public int combatSeconds(Player p) {
+        return 0;
+    }
+
     /** Можно ли сейчас зайти в игру из очереди (по умолчанию — нет). */
     public boolean canLateJoin() {
         return false;

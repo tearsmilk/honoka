@@ -602,3 +602,64 @@ bowspleef:
   double-jump:                  # перо: дважды пробел в воздухе
     power: 0.75                 # вверх
     forward: 0.35               # вперёд по взгляду
+
+# ═══ Свободные арены: Sword / SpearMace / ElytraMace ═══
+# Арена: /arena create … → режим sword | spearmace | elytramace, одна точка spawn.
+# Игра не начинается и не кончается: заходят через NPC (/ffa npc <тип>) или /ffa <тип>, только со своим китом (/kit create).
+# Умер — сразу снова на spawn со своим китом. Ломаются только блоки, поставленные игроками. Лимита игроков нет.
+# Мир создаётся при первом входе и не удаляется и не чистится, пока сервер работает.
+# Выйти — /lobby, но не в бою: после любого урона combat-seconds секунд выйти нельзя (боссбар сверху).
+free-arenas:
+  combat-seconds: 10
+  spawn-protection: 2           # у точки spawn в этом радиусе ставить блоки нельзя (0 — можно)
+  types:
+    sword:
+      display: '<#ff6b6b>Sword'
+      npc-name: '<#ff6b6b><b>Sword</b> <gray>(ПКМ)'
+      version: "1.8"            # версия PvP на арене
+      rules:
+        build: true
+        break-placed-only: true
+        hunger: false
+        natural-regen: true
+    spearmace:
+      display: '<#7fd4ff>SpearMace'
+      npc-name: '<#7fd4ff><b>SpearMace</b> <gray>(ПКМ)'
+      version: "1.9"
+      rules:
+        build: true
+        break-placed-only: true
+        hunger: false
+        natural-regen: true
+    elytramace:
+      display: '<#c9a7ff>ElytraMace'
+      npc-name: '<#c9a7ff><b>ElytraMace</b> <gray>(ПКМ)'
+      version: "1.9"
+      rules:
+        build: true
+        break-placed-only: true
+        hunger: false
+        natural-regen: true
+  kit-menu:
+    title: '<dark_gray>{arena} <gray>· выбери свой кит'
+    slots:
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+    kit:
+      material: CHEST
+      name: '<#c9a7ff>{name}'
+      lore:
+        - '<gray>Предметов: <white>{items}'
+        - ''
+        - '<yellow>▶ На арену с этим китом'
+    empty:
+      material: LIGHT_GRAY_STAINED_GLASS
+      name: '<gray>Слот {slot} · пусто'
+      lore:
+        - '<yellow>▶ Собрать кит (/kit create)'
+    filler:
+      material: GRAY_STAINED_GLASS_PANE
+      name: ' '
