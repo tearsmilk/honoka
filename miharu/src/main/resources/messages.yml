@@ -244,31 +244,6 @@ lobby:
   not-in-queue: '<gray>—'
   meetups-soon: '{prefix}<#b48cff>Митапы {mode}</#b48cff> <gray>скоро появятся.'
 
-ranked:
-  label: '<#ff5c8a>[Рейтинг]'
-  joined: '{prefix}<gray>Рейтинговый поиск: {kit} <gray>· твой ELO <white>{elo}<gray>. Выйти — <white>/duel leave'
-  found: '{prefix}<green>Соперник: <white>{opponent}</white> <gray>({elo} ELO · {kit}<gray>)'
-  actionbar: '<#ff5c8a>Рейтинг</#ff5c8a> <gray>· {kit} <dark_gray>·</dark_gray> <white>{time}</white> <dark_gray>·</dark_gray> ELO {elo} ±{range}'
-  result: '{prefix}<gray>ELO: <white>{elo_before}</white> → <white>{elo}</white> (<yellow>{elo_change}</yellow>)'
-  unknown-kit: '{prefix}<red>Рейтинговые киты: <white>{kits}'
-  elo-header: '{prefix}<gray>Рейтинг <white>{player}</white>:'
-  elo-line: ' <dark_gray>•</dark_gray> {kit} <gray>({version}): <white>{elo}</white> ELO · <green>{wins}</green> / <red>{losses}'
-  top-header: '{prefix}<gray>Топ ELO · {kit}<gray>:'
-  top-empty: ' <gray>Пока пусто.'
-  top-line: ' <white>{place}.</white> <gray>{player}</gray> <dark_gray>—</dark_gray> <white>{elo}</white> <gray>({wins}/{losses})'
-  tier-changed: '{prefix}<gray>Новый тир в {kit}<gray>: {tier} <dark_gray>({tier_name})'
-
-tiers:
-  header: '{prefix}<gray>Тиры <white>{player}</white>:'
-  line: ' <dark_gray>•</dark_gray> {kit} <gray>({version}): {tier} <gray>· {elo} ELO {manual}'
-  manual: '<dark_gray>[вручную]'
-  no-tier-name: 'мало игр'
-  list-header: '{prefix}<gray>Шкала тиров:'
-  list-line: ' <dark_gray>•</dark_gray> {tier} <gray>{name} · от <white>{elo}</white> ELO'
-  usage: '{prefix}<red>/tier set <игрок> <кит> <HT1..LT5|auto>'
-  set: '{prefix}<green>{player}: тир в {kit} — {tier}'
-  reset: '{prefix}<green>{player}: тир в {kit} снова считается из ELO'
-
 minigames:
   bed-yes: '<green>✔'
   bed-no: '<red>✘'

@@ -56,17 +56,12 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
     private int round = 1;
     private boolean finished;
     private Player winner;
-    private final boolean ranked;
-    private int eloDeltaA;
-    private int eloDeltaB;
-    private boolean eloApplied;
     private final java.util.Map<java.util.UUID, Kit> kitOverrides = new java.util.HashMap<>();
     private boolean bedA = true;
     private boolean bedB = true;
 
-    DuelGame(DuelsModule duels, GameModule games, Arena arena, KitSpec spec, CombatService combat, Player a, Player b, boolean ranked) {
-        super(games, ranked ? "ranked" : spec.id().startsWith("mg-") ? "minigame" : MODE, arena);
-        this.ranked = ranked;
+    DuelGame(DuelsModule duels, GameModule games, Arena arena, KitSpec spec, CombatService combat, Player a, Player b) {
+        super(games, spec.id().startsWith("mg-") ? "minigame" : MODE, arena);
         this.duels = duels;
         this.spec = spec;
         this.rules = spec.rules();
@@ -424,16 +419,6 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
         }
         finished = true;
         winner = w;
-        if (ranked && !eloApplied) {
-            eloApplied = true;
-            Tiers.Tier ta = duels.tiers().of(a.getUniqueId(), spec.id());
-            Tiers.Tier tb = duels.tiers().of(b.getUniqueId(), spec.id());
-            int[] d = duels.elo().apply(a, b, spec.id(), w);
-            eloDeltaA = d[0];
-            eloDeltaB = d[1];
-            tierChanged(a, ta);
-            tierChanged(b, tb);
-        }
         if (w != null) {
             Player loser = opponent(w);
             duels.stats().record(w, loser, spec.id());
@@ -444,9 +429,6 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
                 Object[] kv = kv(p);
                 plugin.messages().title(p, p == w ? "duels.win" : "duels.loss", kv);
                 plugin.messages().sendList(p, "duels.summary", kv);
-                if (ranked) {
-                    plugin.messages().send(p, "ranked.result", kv);
-                }
                 p.playSound(p.getLocation(), p == w ? Sound.UI_TOAST_CHALLENGE_COMPLETE : Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             }
             if (loser.isOnline() && players.contains(loser) && duels.config().getBoolean("spectate-on-loss", true)) {
@@ -456,9 +438,6 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
             for (Player p : List.of(a, b)) {
                 if (p.isOnline() && players.contains(p)) {
                     plugin.messages().title(p, "duels.draw", kv(p));
-                    if (ranked) {
-                        plugin.messages().send(p, "ranked.result", kv(p));
-                    }
                 }
             }
         }
@@ -470,17 +449,6 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
             }
         }
         end();
-    }
-
-    private void tierChanged(Player p, Tiers.Tier before) {
-        Tiers.Tier now = duels.tiers().of(p.getUniqueId(), spec.id());
-        if (now != null && (before == null || !before.id().equals(now.id())) && p.isOnline()) {
-            org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (p.isOnline()) {
-                    plugin.messages().send(p, "ranked.tier-changed", "tier", now.display(), "tier_name", now.name(), "kit", spec.display());
-                }
-            }, 20L);
-        }
     }
 
     private Object[] kv(Player viewer) {
@@ -527,14 +495,6 @@ public final class DuelGame extends Game implements KitGame, BuildGame {
         String no = plugin.messages().raw("minigames.bed-no");
         map.put("bed", (me == a ? bedA : bedB) ? yes : no);
         map.put("opponent_bed", (me == a ? bedB : bedA) ? yes : no);
-        int myDelta = me == a ? eloDeltaA : eloDeltaB;
-        map.put("ranked", ranked ? plugin.messages().raw("ranked.label") : "");
-        map.put("elo", duels.elo().elo(me.getUniqueId(), spec.id()));
-        map.put("opponent_elo", duels.elo().elo(op.getUniqueId(), spec.id()));
-        map.put("tier", duels.tiers().display(me.getUniqueId(), spec.id()));
-        map.put("opponent_tier", duels.tiers().display(op.getUniqueId(), spec.id()));
-        map.put("elo_change", (myDelta >= 0 ? "+" : "") + myDelta);
-        map.put("elo_before", duels.elo().elo(me.getUniqueId(), spec.id()) - (eloApplied ? myDelta : 0));
         return map;
     }
 }

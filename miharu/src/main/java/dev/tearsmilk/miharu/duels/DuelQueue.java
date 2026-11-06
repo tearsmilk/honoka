@@ -22,9 +22,9 @@ import java.util.UUID;
  */
 public final class DuelQueue {
 
-    public record Entry(UUID id, String kit, boolean ranked, long since) {
+    public record Entry(UUID id, String kit, long since) {
         String key() {
-            return (ranked ? "ranked:" : "") + kit;
+            return kit;
         }
     }
 
@@ -50,43 +50,29 @@ public final class DuelQueue {
         return q == null ? 0 : q.size();
     }
 
-    /** Сколько ждут в рейтинговой очереди кита. */
-    public int rankedSize(String kit) {
-        Deque<UUID> q = byKey.get("ranked:" + kit);
-        return q == null ? 0 : q.size();
-    }
-
     public int total() {
         return entries.size();
     }
 
     public void join(Player p, KitSpec spec) {
-        join(p, spec, false);
-    }
-
-    public void join(Player p, KitSpec spec, boolean ranked) {
         GameModule games = module.plugin().module(GameModule.class);
         if (games.games().busy(p)) {
             module.plugin().messages().send(p, "game.already-in-game");
             return;
         }
         Entry cur = entries.get(p.getUniqueId());
-        if (cur != null && cur.kit().equals(spec.id()) && cur.ranked() == ranked) {
+        if (cur != null && cur.kit().equals(spec.id())) {
             module.plugin().messages().send(p, "duels.queue.already", "kit", spec.display());
             return;
         }
         leave(p, true);
-        if (!ranked && module.lateJoin(p, spec)) {
+        if (module.lateJoin(p, spec)) {
             return; // зашёл в игру, которая ждёт игроков (SkyControl)
         }
-        Entry e = new Entry(p.getUniqueId(), spec.id(), ranked, System.currentTimeMillis());
+        Entry e = new Entry(p.getUniqueId(), spec.id(), System.currentTimeMillis());
         byKey.computeIfAbsent(e.key(), k -> new ArrayDeque<>()).addLast(p.getUniqueId());
         entries.put(p.getUniqueId(), e);
-        if (ranked) {
-            module.plugin().messages().send(p, "ranked.joined", "kit", spec.display(), "elo", module.elo().elo(p.getUniqueId(), spec.id()));
-        } else {
-            module.plugin().messages().send(p, "duels.queue.joined", "kit", spec.display());
-        }
+        module.plugin().messages().send(p, "duels.queue.joined", "kit", spec.display());
         module.changed(p);
         tryMatch(e.key());
     }
@@ -200,7 +186,7 @@ public final class DuelQueue {
         }
         Entry first = entries.get(q.peekFirst());
         KitSpec fs = first == null ? null : module.spec(first.kit());
-        if (fs != null && (fs.rules().players() > 2 || module.meetups().mode(fs.id()) != null) && !first.ranked()) {
+        if (fs != null && (fs.rules().players() > 2 || module.meetups().mode(fs.id()) != null)) {
             if (q.size() >= fs.rules().players()) {
                 List<Entry> group = new java.util.ArrayList<>();
                 for (UUID id : List.copyOf(q)) {
@@ -221,9 +207,6 @@ public final class DuelQueue {
                 Entry a = entries.get(list.get(i));
                 Entry b = entries.get(list.get(j));
                 if (a == null || b == null) {
-                    continue;
-                }
-                if (a.ranked() && !module.ranked().canMatch(a, b)) {
                     continue;
                 }
                 match(a, b);
@@ -248,16 +231,11 @@ public final class DuelQueue {
         }
         for (Player p : List.of(a, b)) {
             Player op = p == a ? b : a;
-            if (ea.ranked()) {
-                module.plugin().messages().send(p, "ranked.found", "opponent", op.getName(), "kit", spec.display(),
-                        "elo", module.elo().elo(op.getUniqueId(), spec.id()));
-            } else {
-                module.plugin().messages().send(p, "duels.queue.found", "opponent", op.getName(), "kit", spec.display());
-            }
+            module.plugin().messages().send(p, "duels.queue.found", "opponent", op.getName(), "kit", spec.display());
             p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
             module.changed(p);
         }
-        module.startDuel(a, b, spec, ea.ranked());
+        module.startDuel(a, b, spec);
     }
 
     /** Кто ждёт в очереди key. */
@@ -334,10 +312,7 @@ public final class DuelQueue {
             }
             KitSpec spec = module.spec(e.kit());
             String time = Text.time((System.currentTimeMillis() - e.since()) / 1000);
-            if (e.ranked()) {
-                module.plugin().messages().actionBar(p, "ranked.actionbar", "kit", spec == null ? e.kit() : spec.display(), "time", time,
-                        "size", rankedSize(e.kit()), "range", module.ranked().range(e), "elo", module.elo().elo(p.getUniqueId(), e.kit()));
-            } else {
+            {
                 boolean group = spec != null && (spec.rules().players() > 2 || module.meetups().mode(spec.id()) != null);
                 int full = module.meetups().groupSize(e.kit());
                 String size = group ? size(e.kit()) + "/" + (full > 0 ? full : spec.rules().players()) : String.valueOf(size(e.kit()));

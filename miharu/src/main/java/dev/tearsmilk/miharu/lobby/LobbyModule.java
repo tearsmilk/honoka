@@ -58,8 +58,49 @@ public final class LobbyModule extends MiharuModule {
         return List.of(GameModule.class);
     }
 
+    /** 0.2.33: рейтинг убран — предмет «Рейтинговые дуэли» и строки ELO/тиров из лобби. */
+    private void migrateNoRanked() {
+        java.io.File f = new java.io.File(folder(), "config.yml");
+        if (!f.exists()) {
+            return;
+        }
+        org.bukkit.configuration.file.YamlConfiguration y = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(f);
+        boolean changed = false;
+        if (y.contains("items.ranked")) {
+            y.set("items.ranked", null);
+            changed = true;
+        }
+        // скорборд: строки с ELO/тирами убираем, {queue_mode} больше нет
+        java.util.List<String> sb = new java.util.ArrayList<>(y.getStringList("scoreboard.lines"));
+        java.util.List<String> sbNew = new java.util.ArrayList<>();
+        for (String l : sb) {
+            if (!l.contains("{elo_") && !l.contains("{tier_")) {
+                sbNew.add(l.replace(" {queue_mode}", ""));
+            }
+        }
+        if (!sbNew.equals(sb)) {
+            y.set("scoreboard.lines", sbNew);
+            changed = true;
+        }
+        // книга статистики: без тиров и ELO
+        java.util.List<String> lore = new java.util.ArrayList<>(y.getStringList("items.stats.lore"));
+        if (lore.removeIf(l -> l.contains("{tier_") || l.contains("{elo_") || l.contains("ELO"))) {
+            lore.add(0, "<gray>Победы и поражения по режимам.");
+            y.set("items.stats.lore", lore);
+            changed = true;
+        }
+        if (changed) {
+            try {
+                y.save(f);
+            } catch (java.io.IOException e) {
+                plugin.getLogger().warning("Не удалось обновить modules/lobby/config.yml: " + e.getMessage());
+            }
+        }
+    }
+
     @Override
     protected void onEnable() {
+        migrateNoRanked();
         listen(new LobbyListener(this));
         GameModule games = plugin.module(GameModule.class);
         games.games().onJoin(p -> adminMode.exit(p, false));
@@ -301,11 +342,6 @@ public final class LobbyModule extends MiharuModule {
                     duels.statsMenu().open(p, p);
                 }
             }
-            case "ranked" -> {
-                if (duels != null) {
-                    duels.ranked().open(p);
-                }
-            }
             case "leave-queue" -> {
                 if (duels != null) {
                     duels.queue().leave(p, false);
@@ -441,20 +477,7 @@ public final class LobbyModule extends MiharuModule {
         KitSpec spec = e == null ? null : duels.spec(e.kit());
         ph.put("queue_kit", spec == null ? plugin.messages().raw("lobby.not-in-queue") : spec.display());
         ph.put("queue_time", e == null ? "-" : Text.time((System.currentTimeMillis() - e.since()) / 1000));
-        if (duels != null) {
-            java.util.List<KitSpec> fast = duels.ranked().kits(dev.tearsmilk.miharu.pvp.CombatVersion.LEGACY);
-            java.util.List<KitSpec> slow = duels.ranked().kits(dev.tearsmilk.miharu.pvp.CombatVersion.MODERN);
-            ph.put("elo_fast", fast.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), fast.getFirst().id()));
-            ph.put("elo_slow", slow.isEmpty() ? 0 : duels.elo().elo(p.getUniqueId(), slow.getFirst().id()));
-            ph.put("tier_fast", fast.isEmpty() ? "" : duels.tiers().display(p.getUniqueId(), fast.getFirst().id()));
-            ph.put("tier_slow", slow.isEmpty() ? "" : duels.tiers().display(p.getUniqueId(), slow.getFirst().id()));
-        } else {
-            ph.put("elo_fast", 0);
-            ph.put("elo_slow", 0);
-            ph.put("tier_fast", "");
-            ph.put("tier_slow", "");
-        }
-        ph.put("queue_mode", e != null && e.ranked() ? plugin.messages().raw("ranked.label") : "");
+        ph.put("queue_mode", "");
         ph.put("duel_wins", duels == null ? 0 : duels.stats().wins(p.getUniqueId(), null));
         ph.put("duel_losses", duels == null ? 0 : duels.stats().losses(p.getUniqueId(), null));
         ph.put("bot_wins", bots == null ? 0 : bots.stats().summary(p.getUniqueId()).wins(null));

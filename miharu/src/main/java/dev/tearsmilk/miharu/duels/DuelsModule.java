@@ -35,9 +35,6 @@ public final class DuelsModule extends MiharuModule implements Listener {
     private DuelQueue queue;
     private DuelStats stats;
     private DuelMenus menus;
-    private EloStore elo;
-    private Ranked ranked;
-    private Tiers tiers;
     private KitLayouts layouts;
     private KitEditor editor;
     private CustomKits customKits;
@@ -60,14 +57,12 @@ public final class DuelsModule extends MiharuModule implements Listener {
 
     @Override
     protected void onEnable() {
+        migrateNoRanked();
         kits.load(plugin.module(PvpModule.class).combat());
         modernKits.load(plugin.module(PvpModule.class).combat());
         minigameKits.load(plugin.module(PvpModule.class).combat());
         stats = new DuelStats(plugin.database());
         stats.createTables();
-        elo = new EloStore(this, plugin.database());
-        elo.createTables();
-        ranked = new Ranked(this);
         layouts = new KitLayouts(plugin.database());
         layouts.createTables();
         editor = new KitEditor(this);
@@ -114,9 +109,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
                 return List.of("edit", "create");
             }
         });
-        tiers = new Tiers(this);
         statsMenu = new StatsMenu(this);
-        plugin.registerCommand("tier", "PvP-тиры по режимам", List.of("tiers"), new TierCommand(plugin, this));
         plugin.registerCommand("stats", "Статистика игрока", List.of("stat"), new StatsMenu.Command(this));
         queue = new DuelQueue(this);
         menus = new DuelMenus(this);
@@ -133,30 +126,11 @@ public final class DuelsModule extends MiharuModule implements Listener {
         listen(new KitMechanics(this));
         task = Bukkit.getScheduler().runTaskTimer(plugin, queue::tick, 20L, 20L);
         plugin.registerCommand("duel", "Дуэли по китам", List.of("duels", "kits"), new DuelCommand(plugin, this));
-        plugin.registerCommand("ranked", "Рейтинговые дуэли", List.of("rank"), new RankedCommand(plugin, this));
-        plugin.registerCommand("elo", "Рейтинг игрока", List.of(), new RankedCommand.EloCommand(plugin, this));
         Bukkit.getOnlinePlayers().forEach(p -> {
             stats.load(p.getUniqueId());
-            elo.load(p.getUniqueId());
             layouts.load(p.getUniqueId());
             customKits.load(p.getUniqueId());
         });
-        plugin.hooks().placeholder("tier", (p, rest) -> {
-            if (p == null) {
-                return "";
-            }
-            String kit = rest.isEmpty() ? (ranked.allIds().isEmpty() ? "diamond" : ranked.allIds().getFirst()) : rest;
-            Tiers.Tier t = tiers.of(p.getUniqueId(), kit);
-            return t == null ? "" : t.id();
-        });
-        plugin.hooks().placeholder("elo", (p, rest) -> {
-            if (p == null) {
-                return "0";
-            }
-            String kit = rest.isEmpty() ? (ranked.allIds().isEmpty() ? "diamond" : ranked.allIds().getFirst()) : rest;
-            return String.valueOf(elo.elo(p.getUniqueId(), kit));
-        });
-
         plugin.hooks().placeholder("duel_wins", (p, rest) -> p == null ? "0" : String.valueOf(stats.wins(p.getUniqueId(), rest)));
         plugin.hooks().placeholder("duel_losses", (p, rest) -> p == null ? "0" : String.valueOf(stats.losses(p.getUniqueId(), rest)));
         plugin.hooks().placeholder("queue_kit", (p, rest) -> {
@@ -251,7 +225,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
             return;
         }
         customSelection.put(p.getUniqueId(), kit.toKit(p.getUniqueId()));
-        queue.join(p, customSpecs.get(kit.version()), false);
+        queue.join(p, customSpecs.get(kit.version()));
     }
 
     @Override
@@ -348,17 +322,6 @@ public final class DuelsModule extends MiharuModule implements Listener {
         return menus;
     }
 
-    public EloStore elo() {
-        return elo;
-    }
-
-    public Ranked ranked() {
-        return ranked;
-    }
-
-    public Tiers tiers() {
-        return tiers;
-    }
 
     public StatsMenu statsMenu() {
         return statsMenu;
@@ -589,11 +552,47 @@ public final class DuelsModule extends MiharuModule implements Listener {
         return list.isEmpty() ? null : list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 
-    boolean startDuel(Player a, Player b, KitSpec spec) {
-        return startDuel(a, b, spec, false);
+    /** 0.2.33: рейтинг убран — чистим старые строки статистики; своих китов 5 вместо 3. */
+    private void migrateNoRanked() {
+        java.io.File f = new java.io.File(folder(), "config.yml");
+        if (!f.exists()) {
+            return;
+        }
+        org.bukkit.configuration.file.YamlConfiguration y = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(f);
+        boolean changed = false;
+        if (y.contains("ranked")) {
+            y.set("ranked", null);
+            changed = true;
+        }
+        for (String key : List.of("stats-menu.ranked-slots", "stats-menu.ranked-icon", "stats-menu.ranked-icons")) {
+            if (y.contains(key)) {
+                y.set(key, null);
+                changed = true;
+            }
+        }
+        List<String> lore = new ArrayList<>(y.getStringList("stats-menu.head.lore"));
+        if (lore.removeIf(l -> l.contains("{ranked_") || l.contains("{tier") || l.contains("{elo"))) {
+            y.set("stats-menu.head.lore", lore);
+            changed = true;
+        }
+        if (y.getIntegerList("custom-kits.slots-menu.slots").size() < CustomKits.SLOTS) {
+            y.set("custom-kits.slots-menu.slots", List.of(11, 12, 13, 14, 15));
+            changed = true;
+        }
+        if (y.getIntegerList("custom-kits.duels-menu.slots").size() < CustomKits.SLOTS) {
+            y.set("custom-kits.duels-menu.slots", List.of(38, 39, 40, 41, 42));
+            changed = true;
+        }
+        if (changed) {
+            try {
+                y.save(f);
+            } catch (java.io.IOException e) {
+                plugin.getLogger().warning("Не удалось обновить modules/duels/config.yml: " + e.getMessage());
+            }
+        }
     }
 
-    boolean startDuel(Player a, Player b, KitSpec spec, boolean rankedMatch) {
+    boolean startDuel(Player a, Player b, KitSpec spec) {
         Arena arena = arenaFor(spec);
         if (arena == null) {
             plugin.messages().send(a, "duels.no-arena", "kit", spec.display());
@@ -601,7 +600,7 @@ public final class DuelsModule extends MiharuModule implements Listener {
             return false;
         }
         GameModule games = plugin.module(GameModule.class);
-        DuelGame game = new DuelGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), a, b, rankedMatch);
+        DuelGame game = new DuelGame(this, games, arena, spec, plugin.module(PvpModule.class).combat(), a, b);
         if (spec.id().startsWith("custom-")) {
             game.overrideKit(a, customSelection.get(a.getUniqueId()));
             game.overrideKit(b, customSelection.get(b.getUniqueId()));
@@ -635,7 +634,6 @@ public final class DuelsModule extends MiharuModule implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         stats.load(e.getPlayer().getUniqueId());
-        elo.load(e.getPlayer().getUniqueId());
         layouts.load(e.getPlayer().getUniqueId());
         customKits.load(e.getPlayer().getUniqueId());
     }
@@ -644,7 +642,6 @@ public final class DuelsModule extends MiharuModule implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         queue.leave(e.getPlayer(), true);
         stats.unload(e.getPlayer().getUniqueId());
-        elo.unload(e.getPlayer().getUniqueId());
         layouts.unload(e.getPlayer().getUniqueId());
         customKits.unload(e.getPlayer().getUniqueId());
         customSelection.remove(e.getPlayer().getUniqueId());

@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Свои киты игроков (до 3 штук) — data.db → miharu_custom_kits. Предметы хранятся как YAML. */
+/** Свои киты игроков (до 5 штук) — data.db → miharu_custom_kits. Предметы хранятся как YAML. */
 public final class CustomKits {
 
-    public static final int SLOTS = 3;
+    public static final int SLOTS = 5;
 
     public record CustomKit(int slot, String name, CombatVersion version, Map<EquipmentSlot, ItemStack> armor, Map<Integer, ItemStack> items) {
         public Kit toKit(UUID owner) {

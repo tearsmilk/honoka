@@ -200,153 +200,7 @@ menus:
       material: ARROW
       name: '<gray>← Назад'
 
-# ═══ Рейтинговые дуэли (незеритовый меч в лобби, /ranked) ═══
-# Только игроки. ELO отдельно на каждый кит, старт start-elo, может уходить в минус.
-ranked:
-  start-elo: 0
-  k-factor: 32               # сколько максимум можно получить/потерять за матч
-  # подбор соперника: разница ELO не больше окна, окно растёт пока ждёшь
-  match-range:
-    start: 100
-    grow-per-10s: 50
-    max: 1000
-  # PvP-тиры: отдельно для каждого кита (режима). Сверху вниз; тир = первый, чей min-elo <= ELO игрока.
-  # Ручной тир: /tier set <игрок> <кит> <тир> (auto — снова из ELO). Пока игр меньше min-games — «без тира».
-  tiers:
-    min-games: 3
-    unranked: '<gray>Без тира'
-    list:
-      - id: HT1
-        name: Высший уровень
-        display: '<#ff3b3b><b>HT1</b>'
-        min-elo: 1000
-      - id: LT1
-        name: Очень высокий
-        display: '<#ff6a3b><b>LT1</b>'
-        min-elo: 800
-      - id: HT2
-        name: Сильный
-        display: '<#ffa23b>HT2'
-        min-elo: 600
-      - id: LT2
-        name: Выше среднего
-        display: '<#ffd23b>LT2'
-        min-elo: 450
-      - id: HT3
-        name: Средний
-        display: '<#b6e34a>HT3'
-        min-elo: 300
-      - id: LT3
-        name: Ниже среднего
-        display: '<#5fd68a>LT3'
-        min-elo: 200
-      - id: HT4
-        name: Слабый
-        display: '<#4ac7e3>HT4'
-        min-elo: 100
-      - id: LT4
-        name: Очень слабый
-        display: '<#6a8cff>LT4'
-        min-elo: 0
-      - id: HT5
-        name: Начальный
-        display: '<#a07bff>HT5'
-        min-elo: -100
-      - id: LT5
-        name: Самый низкий
-        display: '<#9a9a9a>LT5'
-        min-elo: -1000000
-  # какие киты рейтинговые (id из kits/ и kits-1.9/; у китов 1.9 приставка m-)
-  kits-1.8:
-    - diamond
-  kits-1.9:
-    - m-diamond
-  menu:
-    title: '<dark_gray>Рейтинг <gray>· PvP {version}'
-    rows: 4
-    filler:
-      enabled: true
-      material: BLACK_STAINED_GLASS_PANE
-      name: ' '
-    # переключатель сверху
-    tab-1.8:
-      slot: 3
-      normal:
-        material: STONE_SWORD
-        hide-attributes: true
-        name: '<gray>1.8 · быстрое'
-        lore:
-          - '<yellow>▶ Показать киты 1.8'
-      selected:
-        material: STONE_SWORD
-        hide-attributes: true
-        glow: true
-        name: '<#ff9ecf><b>1.8 · быстрое</b>'
-        lore:
-          - '<green>✔ Выбрано'
-    tab-1.9:
-      slot: 5
-      normal:
-        material: GOLDEN_SWORD
-        hide-attributes: true
-        name: '<gray>1.9 · медленное'
-        lore:
-          - '<yellow>▶ Показать киты 1.9'
-      selected:
-        material: GOLDEN_SWORD
-        hide-attributes: true
-        glow: true
-        name: '<gold><b>1.9 · медленное</b>'
-        lore:
-          - '<green>✔ Выбрано'
-    # слоты под киты выбранной версии (по порядку из kits-1.8 / kits-1.9)
-    kit-slots:
-      - 22
-      - 21
-      - 23
-      - 20
-      - 24
-      - 19
-      - 25
-    kit-icon:
-      material: NETHERITE_SWORD
-      hide-attributes: true
-      name: '{kit} <gray>· рейтинг'
-      lore:
-        - '<gray>Тир: {tier} <gray>· ELO <white>{elo}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
-        - ''
-        - '<yellow>▶ Искать соперника'
-    # своя иконка кита: kit-icons.<id> (у китов 1.9 — m_<кит>, например m_diamond)
-    kit-icons:
-      diamond:
-        material: DIAMOND_SWORD
-        hide-attributes: true
-        name: '{kit} <gray>· 1.8 рейтинг'
-        lore:
-          - '<gray>Тир: {tier} <gray>· ELO <white>{elo}'
-          - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-          - '<gray>В очереди: <white>{queue}'
-          - ''
-          - '<yellow>▶ Искать соперника'
-      m_diamond:
-        material: DIAMOND_SWORD
-        hide-attributes: true
-        glow: true
-        name: '{kit} <gray>· 1.9 рейтинг'
-        lore:
-          - '<gray>Тир: {tier} <gray>· ELO <white>{elo}'
-          - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-          - '<gray>В очереди: <white>{queue}'
-          - ''
-          - '<yellow>▶ Искать соперника'
-    empty:
-      slot: 22
-      material: BARRIER
-      name: '<gray>Нет рейтинговых китов'
-
-# ═══ Статистика (предмет в 7-м слоте лобби, /stats [игрок]) ═══
+# ═══ Статистика (книга в лобби, /stats) ═══
 stats-menu:
   title: '<dark_gray>Статистика <gray>· {player}'
   rows: 5
@@ -359,47 +213,8 @@ stats-menu:
     material: PLAYER_HEAD
     name: '<#ff9ecf><b>{player}</b>'
     lore:
-      - '<gray>Рейтинг: <green>{ranked_wins}</green> / <red>{ranked_losses}'
       - '<gray>Дуэли: <green>{duel_wins}</green> / <red>{duel_losses}'
       - '<gray>Боты: <green>{bot_wins}</green> / <red>{bot_losses}'
-  # тиры по рейтинговым режимам (по порядку ranked.kits-1.8, потом kits-1.9)
-  ranked-slots:
-    - 20
-    - 21
-    - 22
-    - 23
-    - 24
-    - 29
-    - 30
-    - 31
-    - 32
-    - 33
-  ranked-icon:
-    material: NETHERITE_SWORD
-    hide-attributes: true
-    name: '{kit} <gray>· {version}'
-    lore:
-      - '<gray>Тир: {tier} <dark_gray>({tier_name})'
-      - '<gray>ELO: <white>{elo}'
-      - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-  ranked-icons:
-    diamond:
-      material: DIAMOND_SWORD
-      hide-attributes: true
-      name: '{kit} <gray>· 1.8'
-      lore:
-        - '<gray>Тир: {tier} <dark_gray>({tier_name})'
-        - '<gray>ELO: <white>{elo}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
-    m_diamond:
-      material: DIAMOND_SWORD
-      glow: true
-      hide-attributes: true
-      name: '{kit} <gray>· 1.9'
-      lore:
-        - '<gray>Тир: {tier} <dark_gray>({tier_name})'
-        - '<gray>ELO: <white>{elo}'
-        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
   summary:
     duels-fast:
       slot: 38
@@ -537,7 +352,9 @@ custom-kits:
     rows: 3
     slots:
       - 11
+      - 12
       - 13
+      - 14
       - 15
     filler:
       enabled: true
@@ -621,9 +438,11 @@ custom-kits:
   duels-menu:
     enabled: true
     slots:
+      - 38
       - 39
       - 40
       - 41
+      - 42
     empty:
       material: GRAY_DYE
       name: '<gray>Свой кит {slot}'

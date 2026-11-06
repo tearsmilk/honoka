@@ -167,7 +167,7 @@ public final class Meetups implements Listener {
 
     /** Сколько игроков нужно для полного матча; 0 — режим не групповой (дуэль 1x1, рейтинг). */
     int groupSize(String key) {
-        if (key == null || key.startsWith("ranked:")) {
+        if (key == null) {
             return 0;
         }
         Mode m = modes.get(key);
@@ -234,7 +234,7 @@ public final class Meetups implements Listener {
         e.setCancelled(true);
         Player p = e.getPlayer();
         DuelQueue.Entry entry = module.queue().entry(p);
-        if (entry == null || entry.ranked() || groupSize(entry.kit()) == 0) {
+        if (entry == null || groupSize(entry.kit()) == 0) {
             return;
         }
         String mode = entry.kit();

@@ -50,13 +50,6 @@ public final class StatsMenu {
         ph.put("bot_losses", bots == null ? 0 : bots.stats().summary(t.getUniqueId()).losses(null));
         ph.put("clicktest_best", bots == null ? 0 : bots.stats().summary(t.getUniqueId()).bestClickTest);
         ph.put("clicktest_cps", bots == null ? 0 : bots.stats().summary(t.getUniqueId()).bestCps);
-        int rw = 0, rl = 0;
-        for (String id : module.ranked().allIds()) {
-            rw += module.elo().wins(t.getUniqueId(), id);
-            rl += module.elo().losses(t.getUniqueId(), id);
-        }
-        ph.put("ranked_wins", rw);
-        ph.put("ranked_losses", rl);
         return ph;
     }
 
@@ -75,28 +68,6 @@ public final class StatsMenu {
                 item.setItemMeta(sm);
             }
             menu.set(head.getInt("slot", 4), item, null);
-        }
-        List<Integer> slots = m.getIntegerList("ranked-slots");
-        List<String> ids = module.ranked().allIds();
-        for (int i = 0; i < ids.size() && i < slots.size(); i++) {
-            KitSpec spec = module.spec(ids.get(i));
-            if (spec == null) {
-                continue;
-            }
-            Map<String, Object> kph = new HashMap<>(ph);
-            kph.put("kit", spec.display());
-            kph.put("version", spec.version().id());
-            kph.put("tier", module.tiers().display(target.getUniqueId(), spec.id()));
-            Tiers.Tier t = module.tiers().of(target.getUniqueId(), spec.id());
-            kph.put("tier_name", t == null ? module.plugin().messages().raw("tiers.no-tier-name") : t.name());
-            kph.put("elo", module.elo().elo(target.getUniqueId(), spec.id()));
-            kph.put("wins", module.elo().wins(target.getUniqueId(), spec.id()));
-            kph.put("losses", module.elo().losses(target.getUniqueId(), spec.id()));
-            ConfigurationSection icon = m.getConfigurationSection("ranked-icons." + spec.id().replace("m-", "m_"));
-            if (icon == null) {
-                icon = m.getConfigurationSection("ranked-icon");
-            }
-            menu.set(slots.get(i), Items.parse(icon, kph), null);
         }
         ConfigurationSection summary = m.getConfigurationSection("summary");
         if (summary != null) {

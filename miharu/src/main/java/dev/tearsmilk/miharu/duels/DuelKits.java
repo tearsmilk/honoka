@@ -30,7 +30,7 @@ public final class DuelKits {
 
     static final List<String> LEGACY_DEFAULTS = List.of("nodebuff", "debuff", "gapple", "builduhc", "combo", "boxing", "classic",
             "archer", "soup", "leather", "opdiamond", "diamond", "uhc");
-    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "meetup", "boxpvp", "bowspleef", "gungame", "skycontrol", "hfa", "thefight");
+    static final List<String> MINIGAME_DEFAULTS = List.of("bedwars", "skywars", "bridge", "fireball", "sumo", "mlgrush", "boxpvp", "bowspleef", "gungame", "skycontrol", "hfa", "thefight");
     /** Режимы, которые переехали из дуэлей 1.8 в мини-игры. */
     static final List<String> MOVED_TO_MINIGAMES = List.of("sumo", "bridge", "mlgrush");
     static final List<String> MODERN_DEFAULTS = List.of("swordshield", "diamond", "opdiamond", "heavy", "axeshield", "mace", "opmace",
@@ -267,6 +267,9 @@ public final class DuelKits {
             String id = prefix + file;
             if (folder.equals("kits") && MOVED_TO_MINIGAMES.contains(file)) {
                 continue; // теперь в мини-играх (modules/duels/minigames)
+            }
+            if (minigames && file.equals("meetup")) {
+                continue; // тестовый митап убран из мини-игр (митапы — отдельное меню)
             }
             try {
                 YamlConfiguration y = YamlConfiguration.loadConfiguration(f);

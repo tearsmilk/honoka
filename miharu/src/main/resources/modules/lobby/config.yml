@@ -28,7 +28,7 @@ protect:
   inventory: true
   void-y: -64
 
-# Предметы. action: duels (1.8) | minigames | duels-1.9 | ranked | stats | meetups | spectate | leave-queue | bots | clicktest | command:<команда> | none
+# Предметы. action: duels (1.8) | minigames | duels-1.9 | stats | meetups | spectate | leave-queue | bots | clicktest | command:<команда> | none
 # show: always | in-queue | not-in-queue
 items:
   duels:
@@ -60,16 +60,6 @@ items:
     lore:
       - '<gray>Медленное PvP: щиты, топоры,'
       - '<gray>булава, трезубец, копья.'
-  ranked:
-    slot: 4
-    show: not-in-queue
-    action: ranked
-    material: NETHERITE_SWORD
-    hide-attributes: true
-    name: '<#ff5c8a><b>Рейтинговые дуэли</b> <gray>(ПКМ)'
-    lore:
-      - '<gray>Только против игроков.'
-      - '<gray>1.8: <white>{elo_fast}</white> ELO · 1.9: <white>{elo_slow}</white> ELO'
   leave-queue:
     slot: 4
     show: in-queue
@@ -85,8 +75,7 @@ items:
     material: BOOK
     name: '<#ffd23b><b>Статистика</b> <gray>(ПКМ)'
     lore:
-      - '<gray>Тиры по режимам, ELO, победы.'
-      - '<gray>1.8: {tier_fast} <gray>· 1.9: {tier_slow}'
+      - '<gray>Победы и поражения по режимам.'
   meetups:
     slot: 7
     show: not-in-queue
@@ -204,12 +193,10 @@ scoreboard:
     - '<white>В играх: <aqua>{in_game}'
     - ''
     - '<white>Дуэли: <green>{duel_wins}<gray> / <red>{duel_losses}'
-    - '<white>1.8: {tier_fast} <gray>· <#ff5c8a>{elo_fast} ELO'
-    - '<white>1.9: {tier_slow} <gray>· <gold>{elo_slow} ELO'
     - '<white>Боты: <green>{bot_wins}</green> побед'
     - '<white>Клик-тест: <#c9a7ff>{clicktest_best}'
     - ''
-    - '<white>Очередь: {queue_kit} {queue_mode}'
+    - '<white>Очередь: {queue_kit}'
     - '<white>Ищем: <gray>{queue_time}'
     - ''
     - '<gray>Пинг {ping} мс'
