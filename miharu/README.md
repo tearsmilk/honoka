@@ -27,7 +27,7 @@ PvP-ядро для Paper / Leaf **1.21.11** (Java 25). Автор — **tearsmi
 
 ```bash
 ./scripts/install-paper-server.sh   # один раз: Mojang-mapped сервер Paper 1.21.11 в ~/.m2 (для NMS ботов)
-mvn package                         # → target/Miharu-0.2.43.jar
+mvn package                         # → target/Miharu-0.2.44.jar
 ```
 
 ## Как это работает

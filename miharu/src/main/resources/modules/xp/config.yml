@@ -17,7 +17,7 @@ hologram:
   height: 2.0                   # на сколько выше игрока ставить при /xptop place
   size: 10                      # мест в топе
   refresh-seconds: 60
-  background-alpha: 90          # фон 0–255 (0 — без фона)
+  line-spacing: 0.27            # расстояние между строками (армор-стенды, как HolographicDisplays)
   header:
     - '<gradient:#7fd4ff:#c9a7ff><b>ТОП ПО ОПЫТУ</b></gradient>'
     - ''

@@ -233,12 +233,17 @@ public final class XpModule extends MiharuModule implements Listener {
 
     private void removeHologramEntities() {
         for (World w : Bukkit.getWorlds()) {
-            for (TextDisplay d : w.getEntitiesByClass(TextDisplay.class)) {
-                if (d.getPersistentDataContainer().has(HOLO)) {
+            for (Entity d : w.getEntities()) {
+                if ((d instanceof TextDisplay || d instanceof org.bukkit.entity.ArmorStand) && d.getPersistentDataContainer().has(HOLO)) {
                     d.remove();
                 }
             }
         }
+    }
+
+    /** Строки голограммы сверху вниз. */
+    private List<String> hologramLines() {
+        return java.util.Arrays.asList(hologramText().split("\n", -1));
     }
 
     private String hologramText() {
@@ -264,22 +269,40 @@ public final class XpModule extends MiharuModule implements Listener {
         return sb.toString().stripTrailing();
     }
 
+    /**
+     * Голограмма на армор-стендах (как HolographicDisplays): строка = невидимый маркер-стенд с видимым именем.
+     * Стоит на месте, текст поворачивается к игроку как ник. Верхняя строка — в точке установки.
+     */
     private void updateHolograms() {
         removeHologramEntities();
-        var text = Text.mm(hologramText());
-        for (Location l : holograms) {
-            if (l.getWorld() == null) {
+        List<String> lines = hologramLines();
+        double spacing = config().getDouble("hologram.line-spacing", 0.27);
+        for (Location base : holograms) {
+            if (base.getWorld() == null) {
                 continue;
             }
-            l.getWorld().spawn(l, TextDisplay.class, d -> {
-                d.text(text);
-                d.setBillboard(Display.Billboard.CENTER);
-                d.setPersistent(false);
-                d.setShadowed(true);
-                d.setLineWidth(400);
-                d.setBackgroundColor(org.bukkit.Color.fromARGB(config().getInt("hologram.background-alpha", 90), 0, 0, 0));
-                d.getPersistentDataContainer().set(HOLO, PersistentDataType.BYTE, (byte) 1);
-            });
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isBlank()) {
+                    continue; // пустая строка — просто отступ
+                }
+                Location at = base.clone().add(0, -i * spacing, 0);
+                net.kyori.adventure.text.Component text = Text.mm(line);
+                at.getWorld().spawn(at, org.bukkit.entity.ArmorStand.class, st -> {
+                    st.setInvisible(true);
+                    st.setMarker(true);
+                    st.setSmall(true);
+                    st.setGravity(false);
+                    st.setInvulnerable(true);
+                    st.setSilent(true);
+                    st.setPersistent(false);
+                    st.setCanPickupItems(false);
+                    st.setBasePlate(false);
+                    st.customName(text);
+                    st.setCustomNameVisible(true);
+                    st.getPersistentDataContainer().set(HOLO, PersistentDataType.BYTE, (byte) 1);
+                });
+            }
         }
     }
 
