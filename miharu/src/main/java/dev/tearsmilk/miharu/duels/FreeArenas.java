@@ -51,6 +51,18 @@ public final class FreeArenas implements Listener {
     private final Map<String, KitSpec> specs = new LinkedHashMap<>();
     private final Map<String, FreeArenaGame> running = new HashMap<>();
     private final Map<UUID, Kit> pendingKit = new HashMap<>();
+    /** Готовый кит арены (секция kit) — свои киты не нужны, после смерти возрождение на арене. */
+    private final Map<String, Kit> fixedKits = new HashMap<>();
+
+    Kit fixedKit(String type) {
+        return fixedKits.get(type);
+    }
+
+    /** Умер — снова на арене (respawn: true, по умолчанию у арен с готовым китом), иначе в лобби. */
+    boolean respawn(String type) {
+        return cfg().getBoolean("types." + type + ".respawn", fixedKits.containsKey(type));
+    }
+
     /** Типы с ванильным PvP 1.21.11 (version: vanilla) — плагин не трогает бой. */
     private final java.util.Set<String> vanilla = new java.util.HashSet<>();
 
@@ -79,6 +91,7 @@ public final class FreeArenas implements Listener {
     void load() {
         specs.clear();
         vanilla.clear();
+        fixedKits.clear();
         ArenaModule arenas = module.plugin().module(ArenaModule.class);
         ConfigurationSection types = cfg().getConfigurationSection("types");
         if (types == null) {
@@ -103,6 +116,9 @@ public final class FreeArenas implements Listener {
             KitSpec spec = new KitSpec("ffa-" + key, t.getString("display", id), v, pvp.profile(v),
                     new Kit("ffa-" + key, new HashMap<>(), new HashMap<>()), rules, key, List.of(), KitSpec.Bot.DISABLED);
             specs.put(key, spec);
+            if (t.isConfigurationSection("kit")) {
+                fixedKits.put(key, new Kit("ffa-" + key, t.getConfigurationSection("kit")));
+            }
             if (arenas != null) {
                 arenas.registerMode(new ArenaMode(key, Text.plain(Text.mm(spec.display())), List.of("spawn")));
             }
@@ -156,6 +172,10 @@ public final class FreeArenas implements Listener {
             module.plugin().messages().send(p, "game.already-in-game");
             return;
         }
+        if (fixedKits.containsKey(type)) {
+            join(p, type, fixedKits.get(type)); // у арены свой кит — сразу на арену
+            return;
+        }
         ConfigurationSection m = cfg().getConfigurationSection("kit-menu");
         Menu menu = new Menu(3, Text.mm(m.getString("title", "Выбери кит"), Map.of("arena", spec.display())));
         List<Integer> slots = m.getIntegerList("slots");
@@ -206,8 +226,21 @@ public final class FreeArenas implements Listener {
             module.plugin().messages().send(p, "free-arena.kit-banned", "arena", spec.display(), "items", String.join(", ", banned(type, kit)));
             return;
         }
+        join(p, type, kit.toKit(p.getUniqueId()));
+    }
+
+    void join(Player p, String type, Kit kit) {
+        KitSpec spec = specs.get(type);
+        GameModule games = module.plugin().module(GameModule.class);
+        if (spec == null || games == null) {
+            return;
+        }
+        if (games.games().busy(p)) {
+            module.plugin().messages().send(p, "game.already-in-game");
+            return;
+        }
         module.queue().leave(p, true);
-        pendingKit.put(p.getUniqueId(), kit.toKit(p.getUniqueId()));
+        pendingKit.put(p.getUniqueId(), kit);
         FreeArenaGame g = running.get(type);
         if (g != null && games.games().games().contains(g) && g.canLateJoin()) {
             if (!games.games().addPlayer(g, p)) {

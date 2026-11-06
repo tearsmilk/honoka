@@ -174,6 +174,14 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
     @Override
     protected boolean onDamage(Player p, EntityDamageEvent e) {
         tag(p); // любой урон — «в бою»
+        if (!spec.rules().damage() && e.getCause() != EntityDamageEvent.DamageCause.VOID) {
+            // без урона (KnockbackFFA): удары и стрелы только откидывают, остальной урон отменён
+            if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || e.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                e.setDamage(0);
+            } else {
+                e.setCancelled(true);
+            }
+        }
         if (e instanceof EntityDamageByEntityEvent ed) {
             Player attacker = ed.getDamager() instanceof Player dp ? dp
                     : ed.getDamager() instanceof Projectile pr && pr.getShooter() instanceof Player sp ? sp
@@ -212,6 +220,12 @@ public final class FreeArenaGame extends Game implements KitGame, BuildGame {
             broadcast("free-arena.died", "player", p.getName());
         }
         combatUntil.remove(p.getUniqueId());
+        if (arenas.respawn(type)) {
+            // арены с готовым китом (KnockbackFFA, BowFFA, SwordFFA): сразу снова на spawn
+            p.teleport(spawnFor(p));
+            equip(p);
+            return;
+        }
         // умер — обратно в лобби (арена живёт дальше); заново — через NPC
         var max = p.getAttribute(Attribute.MAX_HEALTH);
         p.setHealth(max == null ? 20 : max.getValue());

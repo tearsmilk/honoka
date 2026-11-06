@@ -603,9 +603,11 @@ bowspleef:
     power: 0.75                 # вверх
     forward: 0.35               # вперёд по взгляду
 
-# ═══ Свободные арены: Sword / SpearMace / ElytraMace ═══
+# ═══ Свободные арены: Sword / SpearMace / ElytraMace (свои киты) и KnockbackFFA / BowFFA / SwordFFA (кит арены, 1.8) ═══
 # Арена: /arena create … → режим sword | spearmace | elytramace, одна точка spawn.
-# Игра не начинается и не кончается: заходят через NPC (/ffa npc <тип>) или /ffa <тип>, только со своим китом (/kit create).
+# Игра не начинается и не кончается: заходят через NPC (/ffa npc <тип>) или /ffa <тип>.
+# Sword / SpearMace / ElytraMace — только со своим китом (/kit create), умер — в лобби.
+# Арены с секцией kit (KnockbackFFA, BowFFA, SwordFFA) — кит выдаёт сервер, умер — снова на арене (respawn).
 # Умер — обратно в лобби (арена живёт дальше). Ломаются только блоки, поставленные игроками. Лимита игроков нет.
 # Мир создаётся при первом входе и не удаляется и не чистится, пока сервер работает.
 # Выйти — /lobby, но не в бою: после любого урона combat-seconds секунд выйти нельзя (боссбар сверху).
@@ -648,6 +650,96 @@ free-arenas:
         break-placed-only: true
         hunger: false
         natural-regen: true
+    # ── арены PvP 1.8 со своим китом (kit): свои киты не нужны, умер — снова на арене (respawn) ──
+    knockbackffa:
+      display: '<#ffd36b>KnockbackFFA'
+      npc-name: '<#ffd36b><b>KnockbackFFA</b> <gray>(ПКМ)'
+      version: "1.8"
+      respawn: true
+      rules:
+        damage: false           # без урона: только отбрасывание, умирают от падения в пустоту
+        build: false
+        hunger: false
+        natural-regen: true
+      kit:
+        items:
+          0:
+            material: STICK
+            name: '<#ffd36b><b>Палка отбрасывания</b>'
+            enchants:
+              knockback: 1
+          1:
+            material: FISHING_ROD
+            unbreakable: true
+    bowffa:
+      display: '<#9be36b>BowFFA'
+      npc-name: '<#9be36b><b>BowFFA</b> <gray>(ПКМ)'
+      version: "1.8"
+      respawn: true
+      rules:
+        build: false
+        hunger: false
+        natural-regen: true
+      kit:
+        items:
+          0:
+            material: BOW
+            unbreakable: true
+            enchants:
+              punch: 1
+              infinity: 1
+          1:
+            material: STICK
+            name: '<#9be36b><b>Палка отбрасывания</b>'
+            enchants:
+              knockback: 1
+          9:
+            material: ARROW
+            amount: 1
+    swordffa:
+      display: '<#ff9ecf>SwordFFA'
+      npc-name: '<#ff9ecf><b>SwordFFA</b> <gray>(ПКМ)'
+      version: "1.8"
+      respawn: true
+      rules:
+        build: false
+        hunger: false
+        natural-regen: true
+      kit:
+        armor:
+          helmet:
+            material: IRON_HELMET
+            unbreakable: true
+            enchants:
+              protection: 1
+          chestplate:
+            material: IRON_CHESTPLATE
+            unbreakable: true
+            enchants:
+              protection: 1
+          leggings:
+            material: IRON_LEGGINGS
+            unbreakable: true
+            enchants:
+              protection: 1
+          boots:
+            material: IRON_BOOTS
+            unbreakable: true
+            enchants:
+              protection: 1
+        items:
+          0:
+            material: IRON_SWORD
+            unbreakable: true
+            enchants:
+              sharpness: 1
+          1:
+            material: FISHING_ROD
+            unbreakable: true
+          2:
+            material: GOLDEN_APPLE
+            amount: 4
+  vanilla-migrated: true
   kit-menu:
     title: '<dark_gray>{arena} <gray>· выбери свой кит'
     slots:
