@@ -1,0 +1,4 @@
+# Пати: /party (/p) — invite, accept, kick, leave, list, promote, delete, help, chat; /pc — чат пати.
+max-size: 5                 # лидер + до 4 приглашённых
+invite-seconds: 60          # сколько действует приглашение
+disband-when-alone: true    # остался один — пати распускается

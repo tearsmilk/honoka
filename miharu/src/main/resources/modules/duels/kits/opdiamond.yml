@@ -1,0 +1,70 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<aqua><b>OP Diamond</b>'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet:
+      material: DIAMOND_HELMET
+      enchants:
+        protection: 4
+        unbreaking: 3
+    chestplate:
+      material: DIAMOND_CHESTPLATE
+      enchants:
+        protection: 4
+        unbreaking: 3
+    leggings:
+      material: DIAMOND_LEGGINGS
+      enchants:
+        protection: 4
+        unbreaking: 3
+    boots:
+      material: DIAMOND_BOOTS
+      enchants:
+        protection: 4
+        unbreaking: 3
+        feather_falling: 4
+items:
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 5
+      unbreaking: 3
+  1:
+    material: ENDER_PEARL
+    amount: 16
+  2:
+    material: GOLDEN_APPLE
+    amount: 64
+  8:
+    material: COOKED_BEEF
+    amount: 64
+  9:
+    material: ENDER_PEARL
+    amount: 16
+  10:
+    material: ENDER_PEARL
+    amount: 16
+  11:
+    material: ENDER_PEARL
+    amount: 16
+  12:
+    material: ENDER_PEARL
+    amount: 16
+  13:
+    material: ENDER_PEARL
+    amount: 16
+  14:
+    material: ENDER_PEARL
+    amount: 16
+  15:
+    material: ENDER_PEARL
+    amount: 16
+bot:
+  enabled: true
+  heals: 10
+  heal-amount: 6
+  heal-below: 10

@@ -1,0 +1,33 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<gold>Axe & Shield'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet:
+    material: DIAMOND_HELMET
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+  leggings:
+    material: DIAMOND_LEGGINGS
+  boots:
+    material: DIAMOND_BOOTS
+  offhand:
+    material: SHIELD
+items:
+  0:
+    material: DIAMOND_AXE
+  1:
+    material: DIAMOND_SWORD
+  2:
+    material: GOLDEN_APPLE
+    amount: 8
+  8:
+    material: COOKED_BEEF
+    amount: 32
+bot:
+  enabled: true
+  heals: 4
+  heal-amount: 6
+  heal-below: 8

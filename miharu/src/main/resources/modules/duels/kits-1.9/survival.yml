@@ -1,0 +1,51 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<green>Survival'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet:
+    material: DIAMOND_HELMET
+    enchants:
+      protection: 2
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      protection: 2
+  leggings:
+    material: DIAMOND_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: DIAMOND_BOOTS
+    enchants:
+      protection: 2
+  offhand:
+    material: SHIELD
+items:
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 3
+  1:
+    material: BOW
+  2:
+    material: GOLDEN_APPLE
+    amount: 8
+  3:
+    material: WATER_BUCKET
+  9:
+    material: ARROW
+    amount: 32
+  8:
+    material: COOKED_BEEF
+    amount: 32
+rules:
+  build: true             # ведро воды
+  break-placed-only: true
+bot:
+  enabled: true
+  heals: 4
+  heal-amount: 6
+  heal-below: 8

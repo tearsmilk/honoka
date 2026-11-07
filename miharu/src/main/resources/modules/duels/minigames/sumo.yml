@@ -1,0 +1,21 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<yellow>Sumo'
+version: "1.8"
+arena-mode: sumo          # арена с режимом sumo: p1, p2 (для 1x3/1x4 ещё p3, p4)
+# 1x1, 1x3, 1x4 — каждый сам за себя на 2, 3 или 4 игрока
+# режимы арены по числу игроков: <имя>-duo / -trio / -quatro (см. arena-short в modules/duels/config.yml)
+players:
+  - 2
+  - 3
+  - 4
+players-suffix: '<gray>· {format}'
+rounds: 3                 # 1x1 — до трёх побед; 1x3/1x4 — один раунд, последний на платформе
+items: {}
+rules:
+  damage: false
+  hunger: false
+  liquid-lose: true       # вода = поражение раунда
+  void-lose: true
+  round-countdown: 3

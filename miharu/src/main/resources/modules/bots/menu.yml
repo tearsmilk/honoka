@@ -1,0 +1,92 @@
+# Меню /bot. Материал может быть "nexo:<id>", заголовок — MiniMessage
+# (для текстурных меню Nexo можно писать <shift:-8><glyph:имя> прямо в title).
+filler:
+  enabled: true
+  material: GRAY_STAINED_GLASS_PANE
+  name: ' '
+
+modes:
+  title: '<dark_gray>Боты <gray>· выбери режим'
+  rows: 3
+  items:
+    bot-duel:
+      slot: 11
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      name: '<#ff9ecf><b>Дуэль с ботом</b>'
+      lore:
+        - '<gray>Бой до смерти или падения.'
+        - '<gray>Выбор версии PvP и сложности.'
+        - ''
+        - '<yellow>▶ Нажми, чтобы выбрать'
+    clicktest:
+      slot: 15
+      material: SLIME_BALL
+      name: '<#c9a7ff><b>Клик-тест</b>'
+      lore:
+        - '<gray>Бесконечное сумо с ботом — 10 минут.'
+        - '<gray>Набери как можно больше кликов.'
+        - '<gray>Падения не заканчивают игру.'
+        - ''
+        - '<yellow>▶ Нажми, чтобы выбрать'
+
+versions:
+  title: '<dark_gray>{mode} <gray>· версия PvP'
+  rows: 3
+  items:
+    "1.8":
+      slot: 11
+      material: IRON_SWORD
+      hide-attributes: true
+      name: '<#ff9ecf><b>1.8</b> <gray>— быстрое'
+      lore:
+        - '<gray>Без кулдауна, спам кликов,'
+        - '<gray>блок мечом, отдача 1.8.'
+    "1.9":
+      slot: 15
+      material: SHIELD
+      name: '<#c9a7ff><b>1.9</b> <gray>— медленное'
+      lore:
+        - '<gray>Зарядка удара, криты в прыжке,'
+        - '<gray>топоры и щиты.'
+  back:
+    slot: 22
+    material: ARROW
+    name: '<gray>← Назад'
+
+difficulties:
+  title: '<dark_gray>{mode} · {version} <gray>· сложность'
+  rows: 3
+  items:
+    easy:
+      slot: 11
+      material: LIME_DYE
+      name: '{difficulty}'
+      lore:
+        - '<gray>CPS: <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Играть'
+    medium:
+      slot: 13
+      material: YELLOW_DYE
+      name: '{difficulty}'
+      lore:
+        - '<gray>CPS: <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Играть'
+    hard:
+      slot: 15
+      material: RED_DYE
+      name: '{difficulty}'
+      lore:
+        - '<gray>CPS: <white>{cps_min}-{cps_max}</white> · reach <white>{reach}'
+        - '<gray>Стрейфы, w-tap, криты, блок-хит.'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Играть'
+  back:
+    slot: 22
+    material: ARROW
+    name: '<gray>← Назад'

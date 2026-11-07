@@ -1,0 +1,37 @@
+name: Miharu
+version: '${project.version}'
+main: dev.tearsmilk.miharu.Miharu
+api-version: '1.21'
+author: tearsmilk
+description: 'PvP-ядро: бой 1.8/1.9, пакетные боты, арены из схематик'
+softdepend: [WorldEdit, FastAsyncWorldEdit, PlaceholderAPI, Nexo]
+
+permissions:
+  miharu.admin:
+    description: '/miharu — перезагрузка, запуск и остановка игр, /setlobby'
+    default: op
+    children:
+      miharu.arena: true
+      miharu.pvp.admin: true
+      miharu.bypass.commands: true
+  miharu.arena:
+    description: '/arena — настройка арен'
+    default: op
+  miharu.pvp.admin:
+    description: '/pvp <версия> [игрок] — смена версии боя вне игр'
+    default: op
+  miharu.bot:
+    description: '/bot — игры с ботами'
+    default: true
+  miharu.duel:
+    description: '/duel — дуэли по китам'
+    default: true
+  miharu.spectate:
+    description: '/spectate — наблюдение за играми'
+    default: true
+  miharu.lobby.bypass:
+    description: 'Не трогать инвентарь и режим в лобби (для строителей)'
+    default: false
+  miharu.bypass.commands:
+    description: 'Любые команды во время игры'
+    default: op

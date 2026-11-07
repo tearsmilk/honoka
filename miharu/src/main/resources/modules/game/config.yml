@@ -1,0 +1,258 @@
+# ═══ Модуль игр: табло, таб, вход/выход ═══
+
+countdown-seconds: 3
+freeze-on-countdown: true     # не двигаться во время отсчёта
+end-delay-seconds: 3          # пауза после конца игры перед возвратом
+gamemode: ADVENTURE           # режим игрока в игре (ADVENTURE не даёт «кликать» по блокам зажатой ЛКМ)
+
+# Куда возвращать игрока:
+#   previous — туда, где стоял до игры
+#   location — точка ниже
+#   velocity — как previous + отправить на сервер velocity-server через Velocity/BungeeCord
+return:
+  mode: previous
+  location:
+    world: world
+    x: 0.5
+    y: 100
+    z: 0.5
+    yaw: 0
+    pitch: 0
+  velocity-server: lobby
+
+# Игроки видят в мире и в табе только свою игру
+hide-other-players: true
+
+allow-drop: false
+allow-build: false
+allowed-commands:
+  - leave
+  - l
+  - hub
+  - lobby
+  - spawn
+  - msg
+  - tell
+  - w
+  - r
+  - reply
+  - pvp
+  - party
+  - p
+  - pc
+
+scoreboard:
+  enabled: true
+  update-ticks: 10
+  title: '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+  # строки по режимам; доступны {плейсхолдеры} игры и %papi%
+  modes:
+    duel:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Кит: {kit}'
+      - '<white>Соперник: <#c9a7ff>{opponent}'
+      - ''
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - '<white>Его ❤ <red>{opponent_hp}'
+      - '<white>Счёт <green>{score}<gray> : <red>{opponent_score} <gray>(до {score_to_win})'
+      - '<white>Удары <green>{hits}<gray> / <red>{opponent_hits}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} <dark_gray>/</dark_gray> {opponent_ping} мс'
+    ffa:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Статус: {status}'
+      - ''
+      - '<white>Живых <green>{alive}<gray>/{total}'
+      - '<white>Убийства <red>{kills}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} мс'
+    freearena:
+      - '<dark_gray>{arena}'
+      - ''
+      - '<white>Арена: {kit}'
+      - '<white>Статус: {combat}'
+      - ''
+      - '<white>Убийства <green>{kills}'
+      - '<white>Смерти <red>{deaths}'
+      - '<white>Серия <yellow>{streak}'
+      - ''
+      - '<white>На арене <aqua>{players}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+    skycontrol:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<red>Красные <white>{red_score}<gray>/{goal} <dark_gray>({red_points} т.)'
+      - '<blue>Синие <white>{blue_score}<gray>/{goal} <dark_gray>({blue_points} т.)'
+      - ''
+      - '<white>Точки: {points}'
+      - ''
+      - '<white>Команда {team}'
+      - '<white>Монеты <gold>{coins}'
+      - '<white>Убийства <red>{kills} <dark_gray>·</dark_gray> <white>захваты <green>{captures}'
+      - ''
+      - '<white>Осталось <aqua>{time_left}'
+    gungame:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Уровень <#ffb347>{level}<gray>/{max_level}'
+      - '<gray>{level_name}'
+      - ''
+      - '<white>Лидер <#ffb347>{leader} <gray>({leader_level})'
+      - '<white>До уровня <green>{level_kills}<gray>/{level_need}'
+      - '<white>Убийства <red>{kills} <dark_gray>·</dark_gray> <white>смерти <gray>{deaths}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Осталось <aqua>{time_left}'
+    boxpvp:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{format} <dark_gray>·</dark_gray> команда {team}'
+      - '<white>Класс: {kit}'
+      - '<white>Фаза: {phase}'
+      - ''
+      - '<white>Твои блоки <green>{own_blocks}<gray>/9'
+      - '<white>Держит <#5fd6c4>{holder} <gray>({hold_left})'
+      - ''
+      - '<white>Убийства <red>{kills}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Время <aqua>{time}'
+    meetup:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Фаза: {phase}'
+      - '<white>Подготовка: <aqua>{prep_left}'
+      - '<white>PvP: <#ff9ecf>{version} <gray>(1.8: {votes_18} · 1.9: {votes_19})'
+      - ''
+      - '<white>Живых <green>{alive}<gray>/{total} <dark_gray>·</dark_gray> команда {team}'
+      - '<white>Убийства <red>{kills}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Время <aqua>{time}'
+    ffa-beds:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Статус: {status}'
+      - '<white>Твоя кровать {bed}'
+      - ''
+      - '<white>Живых <green>{alive}<gray>/{total} <dark_gray>·</dark_gray> <white>кроватей <yellow>{beds_alive}'
+      - '<white>Убийства <red>{kills}'
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - ''
+      - '<white>Время <aqua>{time}'
+    ffa-goals:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Твои голы <green>{score}<gray>/{score_to_win}'
+      - '<white>Лучший счёт <yellow>{best_score}'
+      - ''
+      - '<white>Игроков {total} <dark_gray>·</dark_gray> раунд {round}'
+      - '<white>Убийства <red>{kills}'
+      - ''
+      - '<white>Время <aqua>{time}'
+    minigame:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>{kit}'
+      - '<white>Соперник: <#c9a7ff>{opponent}'
+      - ''
+      - '<white>Счёт <green>{score}<gray> : <red>{opponent_score} <gray>(до {score_to_win})'
+      - '<white>Твоя кровать {bed}'
+      - '<white>Его кровать {opponent_bed}'
+      - ''
+      - '<white>Твоё ❤ <red>{player_hp} <gray>· его <red>{opponent_hp}'
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} <dark_gray>/</dark_gray> {opponent_ping} мс'
+    bot-duel:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>Кит: {kit}'
+      - '<white>PvP: <#ff9ecf>{version}'
+      - '<white>Бот: {difficulty}'
+      - ''
+      - '<white>Твоё ❤ <red>{player_hp}'
+      - '<white>Бот ❤ <red>{bot_hp}'
+      - '<white>Удары <green>{hits}<gray> / <red>{bot_hits}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+      - ''
+      - '<white>Время <aqua>{time}'
+      - '<white>Пинг <gray>{ping} мс'
+    clicktest:
+      - '<dark_gray>#{game_id} · {arena}'
+      - ''
+      - '<white>PvP: <#ff9ecf>{version} <gray>· {difficulty}'
+      - '<white>Осталось <aqua>{time_left}'
+      - ''
+      - '<white>Клики <#ff9ecf>{clicks}'
+      - '<white>CPS <white>{cps} <gray>(макс {max_cps})'
+      - '<white>Средний <gray>{avg_cps}'
+      - '<white>Удары <green>{hits} <gray>· {accuracy}%'
+      - ''
+      - '<white>Скинул <green>{knockoffs} <gray>· упал <red>{falls}'
+      - '<white>Комбо <yellow>{combo} <gray>(макс {best_combo})'
+    default:
+      - '<white>{mode}'
+      - '<white>Время <aqua>{time}'
+
+tab:
+  enabled: true
+  header:
+    - ''
+    - '<gradient:#ff9ecf:#c9a7ff><b>MIHARU</b></gradient>'
+    - '<gray>{mode} · {arena}'
+    - ''
+  footer:
+    - ''
+    - '<gray>Пинг <white>{ping}</white> мс · /leave — выйти'
+    - ''
+
+# Наблюдение за играми (предмет в лобби, /spectate [игрок])
+spectate:
+  menu:
+    title: '<dark_gray>Активные игры'
+    rows: 6
+    game-icon:
+      material: ENDER_EYE
+      name: '<#ff9ecf>{mode}'
+      lore:
+        - '<gray>{players}'
+        - '<gray>Арена: <white>{arena}'
+        - '<gray>Время: <white>{time}</white> · зрителей: <white>{spectators}'
+        - ''
+        - '<yellow>▶ Смотреть'
+    game-icons:
+      bot-duel:
+        material: ZOMBIE_HEAD
+        name: '<#ff9ecf>{mode}'
+        lore:
+          - '<gray>{players} <gray>vs бот'
+          - '<gray>Арена: <white>{arena}'
+          - '<gray>Время: <white>{time}'
+          - ''
+          - '<yellow>▶ Смотреть'
+      clicktest:
+        material: SLIME_BALL
+        name: '<#c9a7ff>{mode}'
+        lore:
+          - '<gray>{players}'
+          - '<gray>Время: <white>{time}'
+          - ''
+          - '<yellow>▶ Смотреть'
+    empty:
+      slot: 22
+      material: BARRIER
+      name: '<gray>Сейчас никто не играет'
+    refresh:
+      slot: 49
+      material: SUNFLOWER
+      name: '<yellow>Обновить'

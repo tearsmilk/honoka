@@ -1,0 +1,64 @@
+# Кит дуэли на медленном PvP (1.9+). Формат как у китов 1.8 (modules/duels/kits/).
+# Щит/тотем — armor.offhand. rules — правила режима, combat — переопределения modules/pvp → versions."1.9", bot — игра с ботом.
+display: '<#7b2cbf>Respawn Anchor'
+version: "1.9"
+arena-mode: duel
+rounds: 1
+armor:
+  helmet:
+    material: NETHERITE_HELMET
+    enchants:
+      protection: 4
+  chestplate:
+    material: NETHERITE_CHESTPLATE
+    enchants:
+      protection: 4
+  leggings:
+    material: NETHERITE_LEGGINGS
+    enchants:
+      protection: 4
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+  offhand:
+    material: TOTEM_OF_UNDYING
+items:
+  0:
+    material: NETHERITE_SWORD
+    enchants:
+      sharpness: 5
+  1:
+    material: NETHERITE_AXE
+    enchants:
+      sharpness: 5
+  2:
+    material: RESPAWN_ANCHOR
+    amount: 64
+  3:
+    material: GLOWSTONE
+    amount: 64
+  4:
+    material: GOLDEN_APPLE
+    amount: 64
+  5:
+    material: ENCHANTED_GOLDEN_APPLE
+    amount: 16
+  8:
+    material: COOKED_BEEF
+    amount: 64
+  9:
+    material: RESPAWN_ANCHOR
+    amount: 64
+  10:
+    material: GLOWSTONE
+    amount: 64
+# тотемы не складываются — заполняют все пустые слоты (около 27 штук + левая рука)
+fill:
+  material: TOTEM_OF_UNDYING
+rules:
+  build: true                    # якоря и светокамень
+  break-placed-only: true
+  explosion-block-damage: false  # якорь взрывается, но арену не ломает
+bot:
+  enabled: false

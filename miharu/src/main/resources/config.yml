@@ -1,0 +1,38 @@
+# ╔══════════════════════════════════════════╗
+# ║  Miharu — PvP-ядро            by tearsmilk ║
+# ╚══════════════════════════════════════════╝
+# Конфиги модулей лежат в папках modules/<модуль>/:
+#   modules/pvp/config.yml    — версии боя 1.8 / 1.9
+#   modules/arena/config.yml  — схематики и временные миры
+#   modules/game/config.yml   — табло, таб, возврат игроков
+#   modules/bots/config.yml   — боты, сложности, режимы (+ kits.yml, menu.yml)
+#   modules/duels/config.yml  — дуэли, очередь, меню; киты — modules/duels/kits/
+#   modules/lobby/config.yml  — предметы, табло и таб лобби
+
+# Модули можно выключать (нужен перезапуск). bots зависит от pvp, arena, game.
+modules:
+  pvp: true
+  arena: true
+  game: true
+  bots: true
+  duels: true
+  lobby: true
+
+# Хранилище. sqlite — файл data.db в папке плагина (для теста/одного сервера).
+# Для сети под Velocity используйте mysql (MySQL/MariaDB), чтобы статистика была общей.
+database:
+  type: sqlite
+  sqlite-file: data.db
+  mysql:
+    host: localhost
+    port: 3306
+    database: miharu
+    user: root
+    password: ''
+    params: 'useSSL=false&characterEncoding=utf8&autoReconnect=true'
+
+hooks:
+  placeholderapi: true   # %miharu_...% и разбор чужих плейсхолдеров в табло
+  nexo: true             # предметы "nexo:<id>" в меню и китах
+
+debug: false

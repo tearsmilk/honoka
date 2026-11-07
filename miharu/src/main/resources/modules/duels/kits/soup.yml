@@ -1,0 +1,43 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<#c58b5a>Soup'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet:
+      material: IRON_HELMET
+      enchants:
+        protection: 1
+    chestplate:
+      material: IRON_CHESTPLATE
+      enchants:
+        protection: 1
+    leggings:
+      material: IRON_LEGGINGS
+      enchants:
+        protection: 1
+    boots:
+      material: IRON_BOOTS
+      enchants:
+        protection: 1
+items:
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 2
+fill:
+  material: MUSHROOM_STEW
+rules:
+  natural-regen: false
+  hunger: false
+  soup:
+    enabled: true          # ПКМ супом — мгновенно +3.5❤, остаётся миска
+    heal: 7.0
+bot:
+  enabled: true
+  heals: 12
+  heal-amount: 7
+  heal-below: 10
+  heal-cooldown-ticks: 15
