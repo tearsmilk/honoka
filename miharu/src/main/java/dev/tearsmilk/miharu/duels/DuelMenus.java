@@ -49,10 +49,15 @@ public final class DuelMenus {
             }
             KitSpec spec = e.spec();
             Map<String, Object> ph = placeholders(p, spec);
+            ConfigurationSection style = m.getConfigurationSection("icon-style");
+            boolean styled = style != null && style.getBoolean("enabled", true);
             if (e.locked()) {
                 // заблокированный кит: барьер, запуск выключен
                 ConfigurationSection li = m.getConfigurationSection("locked-icon");
                 ItemStack lockedIcon = li != null ? Items.parse(li, ph) : new ItemStack(org.bukkit.Material.BARRIER);
+                if (styled) {
+                    restyle(lockedIcon, style.getString("name", "{kit}"), style.getStringList("locked-lore"), ph);
+                }
                 menu.set(e.slot(), lockedIcon, pl -> {
                     pl.playSound(pl.getLocation(), org.bukkit.Sound.ENTITY_VILLAGER_NO, 0.6f, 1f);
                     module.plugin().messages().send(pl, "duels.kit-locked", "kit", spec.display());
@@ -63,7 +68,11 @@ public final class DuelMenus {
             if (icon == null) {
                 icon = m.getConfigurationSection("default-icon");
             }
-            menu.set(e.slot(), Items.parse(icon, ph), pl -> {
+            ItemStack kitIcon = Items.parse(icon, ph);
+            if (styled) {
+                restyle(kitIcon, style.getString("name", "{kit}"), style.getStringList("lore"), ph);
+            }
+            menu.set(e.slot(), kitIcon, pl -> {
                 click(pl);
                 if (!e.variants().isEmpty()) {
                     openVariants(pl, e, category);
@@ -194,6 +203,19 @@ public final class DuelMenus {
         ph.put("losses", module.stats().losses(p.getUniqueId(), spec.id()));
         ph.put("bot", spec.bot().enabled() && module.bots() != null ? module.plugin().messages().raw("duels.bot-yes") : module.plugin().messages().raw("duels.bot-no"));
         return ph;
+    }
+
+    /** Единый вид подсказки кита (menu.icon-style): своё имя и описание, без атрибутов и чар. */
+    private static void restyle(ItemStack item, String name, java.util.List<String> lore, Map<String, Object> ph) {
+        org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return;
+        }
+        meta.displayName(Text.item(name, ph));
+        meta.lore(Text.lore(lore, ph));
+        meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES, org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS,
+                org.bukkit.inventory.ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        item.setItemMeta(meta);
     }
 
     private void chooseKit(Player p, KitSpec spec) {

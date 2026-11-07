@@ -21,6 +21,8 @@ items:
   1:
     material: GOLDEN_APPLE
     amount: 8
+  2:
+    material: IRON_AXE
   8:
     material: COOKED_BEEF
     amount: 32

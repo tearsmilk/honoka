@@ -1,6 +1,8 @@
 # Меню китов медленного PvP (1.9) — золотой меч в лобби / команда /duel 1.9.
 # kits.<файл>: enabled, locked (виден барьером, запуск выключен), slot, icon. Сам кит — <файл>.yml рядом (id в очереди и статистике: m-<файл>).
 # Плейсхолдеры иконки: {kit} {version} {queue} {playing} {wins} {losses} {bot}
+# bots: false — в дуэлях 1.9 нет игры с ботом: клик по киту сразу ставит в очередь на игрока
+bots: true
 menu:
   title: '<dark_gray>Дуэли 1.9 <gray>· выбери кит'
   rows: 5
@@ -14,6 +16,19 @@ menu:
     name: '{kit} <gray>· <red>недоступно'
     lore:
       - '<gray>Режим временно закрыт'
+  # единый вид подсказки у всех китов меню (иконка — своя у каждого кита). enabled: false — подсказки из icon каждого кита
+  icon-style:
+    enabled: true
+    name: '<white>Набор <dark_gray>— {kit}'
+    lore:
+      - ''
+      - '<gray>▪ <white>В игре: <green>{playing}'
+      - '<gray>▪ <white>В очереди: <green>{queue}'
+      - ''
+      - '<green>▸ Нажмите, чтобы зайти'
+    locked-lore:
+      - ''
+      - '<red>✘ Сейчас недоступен'
   default-icon:
     material: PAPER
     name: '{kit}'
@@ -30,7 +45,7 @@ kits:
       hide-attributes: true
       name: '{kit}'
       lore:
-        - '<gray>Железо, меч и щит'
+        - '<gray>Железо, меч, топор и щит'
         - ''
         - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
         - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'

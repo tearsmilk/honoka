@@ -2,6 +2,8 @@
 # kits.<id>: enabled — показывать кит, slot — слот в меню, icon — предмет (material или "nexo:id", name, lore, glow...).
 # Сам кит (вещи и правила) — в файле <id>.yml рядом. Новый кит: создай <id>.yml и при желании добавь его сюда.
 # Плейсхолдеры иконки: {kit} {version} {queue} (в очереди) {playing} (играют) {wins} {losses} {bot} (можно ли с ботом)
+# bots: false — в дуэлях 1.8 нет игры с ботом: клик по киту сразу ставит в очередь на игрока
+bots: true
 menu:
   title: '<dark_gray>Дуэли <gray>· выбери кит'
   rows: 5
@@ -9,6 +11,19 @@ menu:
     enabled: true
     material: GRAY_STAINED_GLASS_PANE
     name: ' '
+  # единый вид подсказки у всех китов меню (иконка — своя у каждого кита). enabled: false — подсказки из icon каждого кита
+  icon-style:
+    enabled: true
+    name: '<white>Набор <dark_gray>— {kit}'
+    lore:
+      - ''
+      - '<gray>▪ <white>В игре: <green>{playing}'
+      - '<gray>▪ <white>В очереди: <green>{queue}'
+      - ''
+      - '<green>▸ Нажмите, чтобы зайти'
+    locked-lore:
+      - ''
+      - '<red>✘ Сейчас недоступен'
   default-icon:
     material: PAPER
     name: '{kit}'

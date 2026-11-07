@@ -257,6 +257,33 @@ public final class DuelKits {
             }
         }
         if (folder.equals("kits-1.9")) {
+            // 0.2.55: железный топор в кит Sword & Shield
+            File ss = new File(dir, "swordshield.yml");
+            if (ss.exists()) {
+                YamlConfiguration sy = YamlConfiguration.loadConfiguration(ss);
+                boolean has = false;
+                ConfigurationSection it = sy.getConfigurationSection("items");
+                if (it != null) {
+                    for (String k : it.getKeys(false)) {
+                        if ("IRON_AXE".equalsIgnoreCase(it.getString(k + ".material"))) {
+                            has = true;
+                        }
+                    }
+                }
+                if (!has) {
+                    int slot = 2;
+                    while (slot < 36 && sy.contains("items." + slot)) {
+                        slot++;
+                    }
+                    sy.set("items." + slot + ".material", "IRON_AXE");
+                    try {
+                        sy.save(ss);
+                    } catch (java.io.IOException ignored) {
+                    }
+                }
+            }
+        }
+        if (folder.equals("kits-1.9")) {
             // 0.2.47: новый кит ElytraMace (раскладка из редактора) и он открыт
             File em = new File(dir, "elytramace.yml");
             if (em.exists() && YamlConfiguration.loadConfiguration(em).getInt("revision", 1) < 3) {
@@ -311,7 +338,7 @@ public final class DuelKits {
                     version = defaultVersion;
                 }
                 KitRules rules = KitRules.load(y.getConfigurationSection("rules"), y.getInt("rounds", 1));
-                KitSpec.Bot bot = !minigames && y.getBoolean("bot.enabled", true)
+                KitSpec.Bot bot = !minigames && menuConfig.getBoolean("bots", true) && y.getBoolean("bot.enabled", true)
                         ? new KitSpec.Bot(true, y.getInt("bot.heals", 0), y.getDouble("bot.heal-amount", 8), y.getDouble("bot.heal-below", 8),
                         y.getInt("bot.heal-cooldown-ticks", 30))
                         : KitSpec.Bot.DISABLED;
