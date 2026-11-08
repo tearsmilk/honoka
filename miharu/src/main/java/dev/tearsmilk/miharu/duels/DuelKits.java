@@ -187,6 +187,17 @@ public final class DuelKits {
                         sy.save(sc);
                     }
                 }
+                // 0.2.57: GunGame без регенерации и без лечения за убийство
+                if (gg.exists()) {
+                    YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);
+                    if (!gy.getBoolean("gungame.no-regen-migrated", false)) {
+                        gy.set("gungame.heal-on-kill", false);
+                        gy.set("gungame.natural-regen", false);
+                        gy.set("rules.natural-regen", false);
+                        gy.set("gungame.no-regen-migrated", true);
+                        gy.save(gg);
+                    }
+                }
                 // 0.2.24: GunGame — быстрый старт от 2
                 if (gg.exists()) {
                     YamlConfiguration gy = YamlConfiguration.loadConfiguration(gg);

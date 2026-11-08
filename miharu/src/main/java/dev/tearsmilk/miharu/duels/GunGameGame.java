@@ -150,7 +150,7 @@ public final class GunGameGame extends Game implements KitGame {
 
     @Override
     protected void onSetup() {
-        instance.world().setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, cfg.getBoolean("natural-regen", true));
+        instance.world().setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, cfg.getBoolean("natural-regen", false));
         instance.world().setGameRule(GameRules.FALL_DAMAGE, true);
         for (Player p : order) {
             giveLevel(p, false);
@@ -238,7 +238,7 @@ public final class GunGameGame extends Game implements KitGame {
                 // уровень ещё не набран — только лечение и счётчик
                 plugin.messages().actionBar(killer, "gungame.progress", "done", done, "need", need, "level", lvl);
                 killer.playSound(killer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.7f, 1.3f);
-                if (cfg.getBoolean("heal-on-kill", true)) {
+                if (cfg.getBoolean("heal-on-kill", false)) {
                     heal(killer);
                 }
                 killer.setExp(Math.min(0.99f, done / (float) need));
@@ -251,7 +251,7 @@ public final class GunGameGame extends Game implements KitGame {
             level.put(kidU, lvl + 1);
             rollNeeded(kidU, lvl + 1);
             giveLevel(killer, true);
-            if (cfg.getBoolean("heal-on-kill", true)) {
+            if (cfg.getBoolean("heal-on-kill", false)) {
                 heal(killer);
             }
             if (lvl + 1 == maxLevel()) {

@@ -15,7 +15,7 @@ items: {}
 rules:
   damage: true
   hunger: false
-  natural-regen: true
+  natural-regen: false
   void-lose: false
   max-duration-seconds: 1800    # по истечении побеждает тот, у кого выше уровень (при равенстве — больше убийств)
 
@@ -25,8 +25,8 @@ gungame:
   final-kills: 1                # убийств на последнем уровне для победы
   kill-credit-seconds: 10       # убийство засчитывается, если последний удар был не раньше N секунд (в т.ч. скинул в пустоту)
   spawn-protection-seconds: 2   # неуязвимость после возрождения (снимается, если сам ударил)
-  heal-on-kill: true            # за убийство — полное здоровье
-  natural-regen: true
+  heal-on-kill: false           # за убийство здоровье не восстанавливается
+  natural-regen: false          # регенерации на режиме нет
 
 levels:
   '1':
