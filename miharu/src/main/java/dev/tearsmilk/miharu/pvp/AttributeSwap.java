@@ -27,6 +27,26 @@ public final class AttributeSwap implements Listener {
     private final Miharu plugin;
     private final CombatService combat;
     private final Map<UUID, Integer> lastTicker = new ConcurrentHashMap<>();
+    /** Предмет, который держали до смены слота, и тик смены — для свапа в 1.8 (урон считает плагин). */
+    private final Map<UUID, org.bukkit.Material> prevItem = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> swapTick = new ConcurrentHashMap<>();
+    private int windowTicks = 2;
+
+    void window(int ticks) {
+        windowTicks = Math.max(1, ticks);
+    }
+
+    /** База урона после свапа (для PvP 1.8): прежний предмет, если слот сменили за windowTicks до удара. */
+    public org.bukkit.Material baseFor(Player p) {
+        if (!enabled) {
+            return null;
+        }
+        Integer t = swapTick.get(p.getUniqueId());
+        if (t == null || Bukkit.getCurrentTick() - t > windowTicks) {
+            return null;
+        }
+        return prevItem.get(p.getUniqueId());
+    }
     private boolean enabled;
     private BukkitTask task;
 
@@ -187,6 +207,9 @@ public final class AttributeSwap implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onHeld(PlayerItemHeldEvent e) {
+        var old = e.getPlayer().getInventory().getItem(e.getPreviousSlot());
+        prevItem.put(e.getPlayer().getUniqueId(), old == null ? org.bukkit.Material.AIR : old.getType());
+        swapTick.put(e.getPlayer().getUniqueId(), Bukkit.getCurrentTick());
         keepCharge(e.getPlayer());
     }
 
@@ -198,5 +221,7 @@ public final class AttributeSwap implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         lastTicker.remove(e.getPlayer().getUniqueId());
+        prevItem.remove(e.getPlayer().getUniqueId());
+        swapTick.remove(e.getPlayer().getUniqueId());
     }
 }

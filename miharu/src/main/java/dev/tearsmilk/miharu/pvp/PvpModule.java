@@ -36,7 +36,9 @@ public final class PvpModule extends MiharuModule {
         regenTask = Bukkit.getScheduler().runTaskTimer(plugin, listener::tickRegen, 20L, 10L);
         attributeSwap = new AttributeSwap(plugin, combat);
         listen(attributeSwap);
+        attributeSwap.window(config().getInt("attribute-swap.window-ticks", 2));
         attributeSwap.start(config().getBoolean("attribute-swap.enabled", true));
+        CombatMath.swapBase = attributeSwap::baseFor;
         plugin.registerCommand("pvp", "Версия боя: 1.8 / 1.9", List.of("combat"), new PvpCommand(plugin, this));
         plugin.hooks().placeholder("pvp_version", (player, rest) -> {
             if (player == null || !player.isOnline()) {

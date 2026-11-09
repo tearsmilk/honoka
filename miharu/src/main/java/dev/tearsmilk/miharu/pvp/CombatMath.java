@@ -32,11 +32,15 @@ public final class CombatMath {
      * 1.8: таблица оружия + острота + сила, крит x1.5 (можно в спринте).
      * 1.9: атрибут урона (уже с силой) * зарядка, острота * зарядка, крит только при полном ударе.
      */
+    /** Свап атрибутов (1.8): сменил слот за 1–2 тика до удара — база урона от прежнего предмета. null — нет свапа. */
+    public static java.util.function.Function<Player, org.bukkit.Material> swapBase = p -> null;
+
     public static double playerDamage(Player attacker, CombatProfile profile, float cooldown, boolean crit) {
         ItemStack hand = attacker.getInventory().getItemInMainHand();
         int sharp = hand.getType().isAir() ? 0 : hand.getEnchantmentLevel(Enchantment.SHARPNESS);
         if (profile.legacyDamage) {
-            double dmg = profile.baseDamage(hand.getType());
+            org.bukkit.Material swapped = swapBase.apply(attacker);
+            double dmg = profile.baseDamage(swapped != null ? swapped : hand.getType());
             dmg += effectBonus(attacker, profile);
             if (crit) {
                 dmg *= profile.critMultiplier;

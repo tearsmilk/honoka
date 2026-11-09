@@ -318,14 +318,14 @@ custom-kits:
   inventory-full: '{prefix}<red>Инвентарь полон — разложи предметы в кит.'
 
 free-arena:
-  joined: '{prefix}<gray>Ты на арене {arena}<gray>. Выйти — <white>/lobby</white> (не раньше чем через <white>{seconds} с</white> после урона).'
+  joined: '{prefix}<gray>Ты на арене {arena}<gray>. Выйти — <white>/spawn</white> (не раньше чем через <white>{seconds} с</white> после урона).'
   player-joined: '{prefix}<white>{player}</white> <gray>зашёл на арену'
   player-left: '{prefix}<white>{player}</white> <gray>ушёл с арены'
   killed: '{prefix}<red>{player}</red> <gray>убит игроком <white>{killer}</white> <dark_gray>(серия {streak})'
   died: '{prefix}<red>{player}</red> <gray>погиб'
   you-died: '{prefix}<red>Ты погиб на арене {arena}<red>.</red> <gray>Вернуться — через NPC в лобби.'
-  bossbar: '<red><b>⚔ Ты в PvP</b></red> <gray>— не получай урон <white>{seconds} с</white>, тогда можно /lobby'
-  out-of-combat: '<green>Ты вне боя — можно выйти: /lobby'
+  bossbar: '<red><b>⚔ Ты в PvP</b></red> <gray>— не получай урон <white>{seconds} с</white>, тогда можно /spawn'
+  out-of-combat: '<green>Ты вне боя — можно выйти: /spawn'
   status-combat: '<red>в бою ({seconds} с)'
   status-free: '<green>вне боя'
   kit-banned: '{prefix}<red>Этот кит нельзя на арену {arena}<red>:</red> <gray>{items}. Убери их из кита (/kit create).'

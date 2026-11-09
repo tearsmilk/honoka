@@ -156,7 +156,9 @@ public final class LobbyModule extends MiharuModule {
                 apply(p, false);
             }
         };
-        plugin.registerCommand("lobby", "В лобби", List.of("spawn"), lobby);
+        plugin.registerCommand("lobby", "В лобби", List.of(), lobby);
+        // /spawn — отдельная копия /lobby (если /lobby перехватывает прокси, например хаб Velocity)
+        plugin.registerCommand("spawn", "В лобби (спавн)", List.of(), lobby);
         plugin.registerCommand("setlobby", "Поставить спавн лобби", List.of(), new BasicCommand() {
             @Override
             public void execute(io.papermc.paper.command.brigadier.CommandSourceStack source, String[] args) {
