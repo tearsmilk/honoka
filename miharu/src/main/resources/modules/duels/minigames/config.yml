@@ -1,0 +1,189 @@
+# Меню мини-игр (огненный заряд во 2-м слоте лобби). Только против игроков, PvP 1.8 (BoxPvP — 1.9).
+# Меню само добавляет ряды, если слоты не помещаются.
+# kits.<файл>: enabled, slot, icon. Сама игра — <файл>.yml рядом (id в очереди: mg-<файл>, с вариантом — mg-bridge-5).
+# Плейсхолдеры иконки: {kit} {queue} {playing} {wins} {losses}
+menu:
+  title: '<dark_gray>Мини-игры'
+  rows: 5
+  filler:
+    enabled: true
+    material: ORANGE_STAINED_GLASS_PANE
+    name: ' '
+  default-icon:
+    material: PAPER
+    name: '{kit}'
+    lore:
+      - '<gray>В очереди: <white>{queue}'
+kits:
+  bedwars:
+    enabled: true
+    slot: 10
+    icon:
+      material: RED_BED
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x1, 1x3, 1x4 · сломай кровати и добей соперников'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  skywars:
+    enabled: true
+    slot: 11
+    icon:
+      material: CHEST
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x1, 1x3, 1x4 · сундуки с лутом, последний живой побеждает'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  bridge:
+    enabled: true
+    slot: 12
+    icon:
+      material: BLUE_TERRACOTTA
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x1, 1x3, 1x4 · прыгни в чужие ворота 3, 5 или 7 раз'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  fireball:
+    enabled: true
+    slot: 13
+    icon:
+      material: FIRE_CHARGE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x1, 1x3, 1x4 · BedWars с фаерболами и TNT'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  sumo:
+    enabled: true
+    slot: 14
+    icon:
+      material: SLIME_BALL
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x1, 1x3, 1x4 · последний на платформе побеждает'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  mlgrush:
+    enabled: true
+    slot: 15
+    icon:
+      material: STICK
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>Палка, блоки и кровать: 5, 10 или 20 раз'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  skycontrol:
+    enabled: true
+    slot: 19
+    icon:
+      material: FEATHER
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>2x2 · красные против синих'
+        - '<gray>Захватывай точки 3x3 — до 1200 очков'
+        - '<gray>Монеты за убийства и захваты — улучшения у торговца'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  hfa:
+    enabled: true
+    slot: 20
+    icon:
+      material: IRON_AXE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>HFA'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  thefight:
+    enabled: true
+    slot: 21
+    icon:
+      material: NETHERITE_SWORD
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>TheFight'
+        - '<gray>Режим в разработке'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  gungame:
+    enabled: true
+    slot: 24
+    icon:
+      material: CROSSBOW
+      hide-attributes: true
+      name: '{kit} <gray>· 1x8'
+      lore:
+        - '<gray>30 уровней · 3–4 убийства — новый комплект'
+        - '<gray>Уровни 27–30 — только лук · PvP 1.8'
+        - '<gray>Убийство на 30-м уровне — победа'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  bowspleef:
+    enabled: true
+    slot: 23
+    icon:
+      material: BOW
+      hide-attributes: true
+      name: '{kit} <gray>· 1x8'
+      lore:
+        - '<gray>Арена из TNT, лук с огненными стрелами'
+        - '<gray>Подожжённый TNT падает вниз — скинь остальных'
+        - '<gray>Последний живой побеждает · старт от 2 игроков'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - '<gray>Победы: <green>{wins}</green> · поражения: <red>{losses}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'
+  boxpvp:
+    enabled: true
+    slot: 22
+    icon:
+      material: CYAN_CONCRETE
+      hide-attributes: true
+      name: '{kit}'
+      lore:
+        - '<gray>1x4 · 2x4 · 3x4 · 4x4 — выбор класса'
+        - '<gray>Захвати квадрат 3x3 своей шерстью и удержи'
+        - ''
+        - '<gray>В очереди: <white>{queue}</white> · играют: <white>{playing}'
+        - ''
+        - '<yellow>▶ Нажми, чтобы играть'

@@ -1,0 +1,36 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<#e0b96a>MLG Rush'
+version: "1.8"
+# варианты матча: игрок выбирает, до скольких очков играть
+variants:
+  - 5
+  - 10
+  - 20
+variant-suffix: '<gray>· до {count}'
+arena-mode: mlg           # арена с точками p1, p2, bed1, bed2 (кровати команд)
+rounds: 5                 # сломанных кроватей до победы
+items:
+  0:
+    material: STICK
+    enchants:
+      knockback: 1
+    name: '<yellow>Палка'
+  1:
+    material: WOODEN_PICKAXE
+    enchants:
+      efficiency: 1
+    unbreakable: true
+  2:
+    material: SANDSTONE
+    amount: 64
+rules:
+  damage: false
+  build: true
+  break-placed-only: true
+  infinite-blocks: true
+  objective: bed           # сломал кровать соперника = очко
+  goal-radius: 1.5
+  on-death: respawn
+  hunger: false

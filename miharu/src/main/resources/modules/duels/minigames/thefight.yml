@@ -1,0 +1,9 @@
+# TheFight — ПУСТЫШКА: геймплея пока нет (идёт как обычная дуэль 1x1 с пустым китом).
+# Когда будет ТЗ — сюда кит (armor, items), правила (rules) и число игроков (players).
+display: '<#ffd36b>TheFight'
+version: "1.8"
+arena-mode: thefight            # арена с режимом thefight: точки p1, p2
+rounds: 1
+armor: {}
+items: {}
+rules: {}

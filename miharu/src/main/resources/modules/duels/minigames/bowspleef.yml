@@ -1,0 +1,38 @@
+# BowSpleef: арена из TNT, у всех лук (Бесконечность + Огонь). Огненная стрела поджигает TNT — блок падает вниз
+# и исчезает без взрыва; заодно поджигаются 4–5 ближайших блоков TNT (bowspleef в modules/duels/config.yml).
+# Урона нет: удар (и луком) ничего не делает, стрела от игрока отскакивает — без отдачи и огня.
+# Перо в 5-м слоте — 3 двойных прыжка. Упал в пустоту — выбыл, последний живой побеждает.
+display: '<#ff8a3d>BowSpleef'
+version: "1.8"
+arena-mode: bowspleef     # режим арены bs-8: точки p1..p8
+rounds: 1
+players:
+  - 8
+players-suffix: '<gray>· {format}'
+quick-start-min: 2        # быстрый старт уже от 2 игроков (по умолчанию — от половины)
+items:
+  0:
+    material: BOW
+    unbreakable: true
+    enchants:
+      infinity: 1
+      flame: 1
+  4:
+    material: FEATHER
+    amount: 3
+    name: '<white><b>Двойной прыжок</b> <gray>(2× пробел)'
+    lore:
+      - '<gray>Дважды нажми пробел — подкинет вверх'
+      - '<gray>Перьев = оставшихся прыжков'
+  9:
+    material: ARROW
+    amount: 1
+rules:
+  damage: false
+  hunger: false
+  natural-regen: true
+  fall-damage: false
+  void-lose: true
+  build: false
+  explosion-block-damage: none
+  max-duration-seconds: 600

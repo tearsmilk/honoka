@@ -1,0 +1,72 @@
+# Кит дуэли. Формат предметов: material (или "nexo:id"), amount, name, lore, enchants, unbreakable,
+# potion (тип зелья: strong_healing, strong_swiftness, long_fire_resistance, poison, slowness...), color (кожа), golden-head.
+# rules — правила режима, combat — переопределения modules/pvp/config.yml (versions.<version>), bot — как играет бот.
+display: '<red>Build UHC'
+version: "1.8"
+arena-mode: duel
+rounds: 1
+armor:
+    helmet:
+      material: DIAMOND_HELMET
+      enchants:
+        protection: 2
+    chestplate:
+      material: DIAMOND_CHESTPLATE
+      enchants:
+        protection: 2
+    leggings:
+      material: DIAMOND_LEGGINGS
+      enchants:
+        protection: 2
+    boots:
+      material: DIAMOND_BOOTS
+      enchants:
+        protection: 2
+items:
+  0:
+    material: DIAMOND_SWORD
+    enchants:
+      sharpness: 3
+  1:
+    material: FISHING_ROD
+  2:
+    material: BOW
+    enchants:
+      power: 3
+  3:
+    material: LAVA_BUCKET
+  4:
+    material: WATER_BUCKET
+  5:
+    material: GOLDEN_APPLE
+    amount: 6
+  6:
+    material: GOLDEN_APPLE
+    amount: 3
+    golden-head: true
+  7:
+    material: COBBLESTONE
+    amount: 64
+  8:
+    material: OAK_PLANKS
+    amount: 64
+  9:
+    material: ARROW
+    amount: 48
+  10:
+    material: DIAMOND_AXE
+  11:
+    material: DIAMOND_PICKAXE
+  12:
+    material: COOKED_BEEF
+    amount: 64
+  13:
+    material: WATER_BUCKET
+  14:
+    material: LAVA_BUCKET
+rules:
+  natural-regen: false     # лечение только яблоками и головами
+  build: true
+  break-placed-only: true
+bot:
+  enabled: false           # лук, вёдра и стройка — только против игроков

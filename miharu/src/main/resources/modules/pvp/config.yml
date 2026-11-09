@@ -1,0 +1,159 @@
+# ═══ Модуль PvP: две версии боя ═══
+# 1.8 — «быстрое» PvP: без кулдауна, урон по таблице 1.8, блок мечом (ПКМ), крит в спринте, отдача 1.8.
+# 1.9 — «медленное» PvP: ванильная зарядка удара, щиты, ванильная отдача.
+# В играх версию выбирает игрок (меню /bot). Вне игр — по миру или default-version.
+
+# Версия вне игр: 1.8 | 1.9 | none (не трогать ваниль)
+default-version: none
+
+# Версия по мирам (вне игр). Пример:
+# worlds:
+#   pvp_world: "1.8"
+worlds: {}
+
+versions:
+  "1.8":
+    attack-speed: 1024.0        # база атрибута скорости атаки: 1024 = кулдауна нет
+    max-no-damage-ticks: 20     # неуязвимость после удара (ваниль 20 = удар раз в 10 тиков)
+    disable-sweep: true         # без удара по площади
+    disable-offhand: true       # без левой руки (и щита)
+    legacy-damage: true         # урон по таблице ниже, а не по атрибутам 1.9+
+    fist-damage: 1.0
+    weapon-damage:              # урон 1.8 (включая 1 от руки)
+      WOODEN_SWORD: 5
+      GOLDEN_SWORD: 5
+      STONE_SWORD: 6
+      IRON_SWORD: 7
+      DIAMOND_SWORD: 8
+      NETHERITE_SWORD: 9
+      WOODEN_AXE: 4
+      GOLDEN_AXE: 4
+      STONE_AXE: 5
+      IRON_AXE: 6
+      DIAMOND_AXE: 7
+      NETHERITE_AXE: 8
+      WOODEN_PICKAXE: 3
+      GOLDEN_PICKAXE: 3
+      STONE_PICKAXE: 4
+      IRON_PICKAXE: 5
+      DIAMOND_PICKAXE: 6
+      NETHERITE_PICKAXE: 7
+      WOODEN_SHOVEL: 2
+      GOLDEN_SHOVEL: 2
+      STONE_SHOVEL: 3
+      IRON_SHOVEL: 4
+      DIAMOND_SHOVEL: 5
+      NETHERITE_SHOVEL: 6
+    sharpness:
+      per-level: 1.25
+      base: 0.0
+    strength-per-level: 3.0
+    weakness-per-level: 4.0
+    critical:
+      multiplier: 1.5
+      while-sprinting: true     # в 1.8 крит работал и в спринте
+    sword-blocking:
+      enabled: true             # ПКМ мечом — блок, как в 1.8
+      reduction: 0.5            # доля поглощённого урона
+    golden-apple:
+      legacy: true
+      effects:
+        - regeneration:1:100
+        - absorption:0:2400
+      enchanted-effects:
+        - regeneration:4:600
+        - resistance:0:6000
+        - fire_resistance:0:6000
+        - absorption:0:2400
+    regen:
+      legacy: true              # 1 ❤/2 раз в 4 секунды при сытости >= 18, как в 1.8
+      interval-ticks: 80
+      min-food: 18
+      exhaustion: 3.0
+    bot-hit:
+      max-reach: 3.6            # макс. дистанция удара игрока по боту (3 + запас на пинг)
+    knockback:
+      custom: true              # своя отдача вместо ванильной
+      friction: 2.0             # делитель текущей скорости жертвы
+      horizontal: 0.4
+      vertical: 0.4
+      extra-horizontal: 0.5     # доп. отдача за спринт / чары «Отдача»
+      extra-vertical: 0.1
+      vertical-limit: 0.4
+      vertical-only-on-ground: false
+      use-victim-velocity: false
+
+  "1.9":
+    vanilla: true               # ванильный бой 1.21.11: плагин не меняет урон, отдачу, реген, яблоки (ниже — только для ботов)
+    attack-speed: 4.0
+    max-no-damage-ticks: 20
+    cooldown-damage: true       # урон зависит от зарядки удара
+    disable-sweep: false
+    disable-offhand: false
+    legacy-damage: false        # игроки бьют по ванильным атрибутам
+    fist-damage: 1.0
+    fist-speed: 4.0
+    weapon-damage:              # для ботов (у них нет атрибутов)
+      WOODEN_SWORD: 4
+      GOLDEN_SWORD: 4
+      STONE_SWORD: 5
+      IRON_SWORD: 6
+      DIAMOND_SWORD: 7
+      NETHERITE_SWORD: 8
+      WOODEN_AXE: 7
+      GOLDEN_AXE: 7
+      STONE_AXE: 9
+      IRON_AXE: 9
+      DIAMOND_AXE: 9
+      NETHERITE_AXE: 10
+      TRIDENT: 9
+    weapon-speed:               # ударов в секунду (кулдаун ботов)
+      WOODEN_SWORD: 1.6
+      GOLDEN_SWORD: 1.6
+      STONE_SWORD: 1.6
+      IRON_SWORD: 1.6
+      DIAMOND_SWORD: 1.6
+      NETHERITE_SWORD: 1.6
+      WOODEN_AXE: 0.8
+      GOLDEN_AXE: 1.0
+      STONE_AXE: 0.8
+      IRON_AXE: 0.9
+      DIAMOND_AXE: 1.0
+      NETHERITE_AXE: 1.0
+      TRIDENT: 1.1
+    sharpness:
+      per-level: 0.5
+      base: 0.5
+    critical:
+      multiplier: 1.5
+      while-sprinting: false
+    sword-blocking:
+      enabled: false
+      reduction: 0.5
+    golden-apple:
+      legacy: false
+      effects: []
+      enchanted-effects: []
+    regen:
+      legacy: false
+    bot-hit:
+      max-reach: 3.6
+    knockback:
+      custom: false             # false — у игроков ванильная отдача; значения ниже используются для ботов
+      friction: 2.0
+      horizontal: 0.4
+      vertical: 0.4
+      extra-horizontal: 0.5
+      extra-vertical: 0.1
+      vertical-limit: 0.4
+      vertical-only-on-ground: true
+      use-victim-velocity: false
+
+# Ванильный «свап атрибутов» (MC-28289): ударил и за 1–2 тика сменил предмет (меч → булава/топор) —
+# удар смешивает урон одного предмета и чары другого. Paper это блокирует; при enabled: true плагин снимает
+# блокировку (unsupported-settings.update-equipment-on-player-actions) на время своей работы и не сбрасывает
+# заряд удара при смене слота. В PvP 1.8 (урон считает плагин): ударил за window-ticks после смены слота —
+# база урона от прежнего оружия, чары (Острота) — от нового. Переключить на ходу: /miharu attribute-swap on|off
+attribute-swap:
+  enabled: true
+  window-ticks: 2                # PvP 1.8: удар за столько тиков после смены слота — база урона от прежнего предмета

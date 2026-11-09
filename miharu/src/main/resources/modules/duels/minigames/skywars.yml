@@ -1,0 +1,25 @@
+# Мини-игра 1x1 (только против игрока, всегда PvP 1.8). Формат как у китов дуэлей (modules/duels/kits/).
+# Слоты: 0–8 хотбар, 9–35 инвентарь. team-color: кожа и WHITE_* блоки красятся в цвет команды.
+display: '<aqua>SkyWars'
+version: "1.8"
+arena-mode: skywars       # арена: острова p1, p2 (для 1x3 — ещё p3, для 1x4 — p3 и p4). Сундуки заполнятся лутом при старте
+# режимы: 1x1 (2 игрока), 1x3 (3 игрока), 1x4 (4 игрока) — каждый сам за себя, последний живой побеждает
+variants-type: players
+variants:
+  - 2
+  - 3
+  - 4
+variant-suffix: '<gray>· {format}'      # {format}: 1x1 / 1x3 / 1x4
+rounds: 1
+items:
+  0:
+    material: WOODEN_PICKAXE
+    unbreakable: true
+  1:
+    material: WOODEN_AXE
+    unbreakable: true
+rules:
+  build: true
+  break-placed-only: false   # ломать можно всё
+  chest-loot: skywars        # таблица лута: modules/duels/config.yml → loot-tables.skywars
+  natural-regen: true

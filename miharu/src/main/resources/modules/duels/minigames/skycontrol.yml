@@ -1,0 +1,304 @@
+# SkyControl 2x2 — красные против синих, захват точек и набор очков. Голода нет.
+# Ожидание (точка wait): игрок сразу попадает в игру и ждёт там остальных. 15 с (team-select-seconds) на выбор
+# команды (шерсть) и версии PvP 1.8 / 1.9 (бумага). Если игроки есть в обеих командах — по таймеру старт,
+# а зелёный краситель — голосование за быстрый старт. Если все в одной команде (или игрок один) — ждём ещё игроков.
+# Точки арены (режим арены sc-2x2):
+#   wait            — зона ожидания (выбор команды и версии)
+#   red / blue      — спавн красных / синих (остров команды)
+#   red-shop / blue-shop — торговец (NPC) команды
+#   red-gen / blue-gen   — точка команды 3x3 (центр квадрата): стоишь на ней — бетон своей команды сразу в инвентарь;
+#                   захватить нельзя; чужим в радиусе base-damage.radius — урон каждую секунду
+#   cp1 … cp12      — точки захвата 3x3 из стекла с маяком (минимум 3, максимум 12): встань на ЦЕНТРАЛЬНЫЙ блок
+#                   квадрата и поставь точку (под центром плагин ставит маяк и железное основание 3x3, над точкой — небо)
+#   Старые имена (p1/p2, shop1/shop2, gen1/gen2) тоже работают; wait обязательна.
+# Захваченная точка даёт команде +1 очко в секунду (2 точки — +2 и т.д.). Цель — goal очков.
+# Монеты: 1 за убийство, 1 за захват точки (каждому из команды, кто стоял на точке). Тратятся у торговца.
+# После смерти остаются только купленные меч, кирка и броня; бетон, яблоки, TNT, фаерболы и стержни пропадают.
+# Прогресс команд — в двух боссбарах (очки до goal и число точек).
+display: '<#7fd4ff>SkyControl'
+version: "1.8"             # версия выбирается голосованием в ожидании
+arena-mode: skycontrol
+rounds: 1
+team-sizes:
+  - 2
+teams: 2
+players-suffix: '<gray>· {format}'
+arena-points:                   # обязательные точки арены (cp4…cp12 — по желанию)
+  - wait
+  - red
+  - blue
+  - red-shop
+  - blue-shop
+  - red-gen
+  - blue-gen
+  - cp1
+  - cp2
+  - cp3
+arena-point-aliases:            # старые имена точек
+  red: p1
+  blue: p2
+  red-shop: shop1
+  blue-shop: shop2
+  red-gen: gen1
+  blue-gen: gen2
+armor: {}
+items: {}
+rules:
+  build: true
+  break-placed-only: true       # ломаются только блоки игроков (бетон, мосты)
+  hunger: false
+  natural-regen: true
+  fall-damage: true
+  fireball: true                # огненный заряд — бросок фаербола (ПКМ)
+  auto-tnt: true                # поставленный TNT сразу поджигается
+  explosion-block-damage: placed
+  max-duration-seconds: 1200    # по истечении побеждает команда с бОльшим счётом
+
+skycontrol:
+  goal: 1200
+  score-per-point: 1            # очков в секунду за каждую захваченную точку
+  capture-seconds: 5            # сколько стоять на точке (сколько бы тиммейтов ни стояло)
+  respawn-seconds: 3
+  team-select-seconds: 15       # ожидание: выбор команды и версии PvP
+  max-wait-seconds: 300         # столько ждём недостающих игроков, потом игра отменяется
+  default-version: "1.8"        # при равных голосах
+  quick-start:
+    vote-fraction: 0.5          # голосов за быстрый старт (от числа игроков, минимум 2)
+  point-names:                 # подписи cp1…cp12
+    - A
+    - B
+    - C
+    - D
+    - E
+    - F
+    - G
+    - H
+    - I
+    - J
+    - K
+    - L
+  point-beacon: true            # маяк под каждой точкой: луч белый / красный / синий по владельцу
+  point-floor:                  # пол точки 3x3 по владельцу
+    neutral: WHITE_STAINED_GLASS
+    red: RED_STAINED_GLASS
+    blue: BLUE_STAINED_GLASS
+  base-damage:                  # чужая база: урон в радиусе от точки команды противника (gen1 / gen2)
+    radius: 5
+    damage: 2.0                 # 1 сердце в секунду
+  coins:
+    kill: 1
+    capture: 1
+  generator:
+    interval-ticks: 20          # раз в секунду — бетон своей команды в инвентарь стоящему на точке команды
+    amount: 1
+    max-items: 256              # не больше стольких блоков бетона в инвентаре (4 стака)
+  fireball:                     # фаербол (ломает только поставленные блоки; мощность взрыва — fireball.yield в modules/duels/config.yml)
+    radius: 4.0                 # кого откидывает
+    knockback: 1.3              # сила отброса в сторону
+    knockback-y: 0.75           # вверх
+  rod:                          # стержень молнии: ПКМ — молния в точку взгляда
+    range: 50
+    radius: 3.0
+    damage: 2.0
+    launch: 1.1                 # подкидывание вверх
+    push: 0.4
+    cooldown-ticks: 20
+  team-item:
+    material: WHITE_WOOL
+    name: '<#7fd4ff><b>Выбор команды</b> <gray>(ПКМ) · {team}'
+  team-menu:
+    title: '<dark_gray>SkyControl · выбор команды'
+  version-item:
+    material: PAPER
+    name: '<#ff9ecf><b>Версия PvP</b> <gray>(ПКМ) · {version}'
+    lore:
+      - '<gray>Голосуй: 1.8 или 1.9 — где больше голосов, то и будет'
+  start-item:
+    material: LIME_DYE
+    name: '<green><b>Быстрый старт</b> <gray>(ПКМ) · {votes}/{need}'
+    lore:
+      - '<gray>Начать, не дожидаясь остальных'
+  version-menu:
+    title: '<dark_gray>SkyControl · версия PvP'
+    legacy:
+      slot: 11
+      material: STONE_SWORD
+      hide-attributes: true
+      name: '<#ff9ecf><b>1.8</b> <gray>— быстрое {mine}'
+      lore:
+        - '<gray>Голосов: <white>{votes}'
+    modern:
+      slot: 15
+      material: GOLDEN_SWORD
+      hide-attributes: true
+      name: '<gold><b>1.9</b> <gray>— медленное {mine}'
+      lore:
+        - '<gray>Голосов: <white>{votes}'
+  menu-filler:
+    material: GRAY_STAINED_GLASS_PANE
+    name: ' '
+  shop:
+    npc-name: '<gold><b>Торговец</b> <gray>(ПКМ)'
+    title: '<dark_gray>Торговец <gray>· монет: {coins}'
+    rows: 4
+    info:
+      slot: 4
+      material: SUNFLOWER
+      name: '<gold><b>Монеты: {coins}</b>'
+      lore:
+        - '<gray>1 монета — за убийство'
+        - '<gray>1 монета — за захват точки'
+    # улучшения: tiers — по уровням (0 — стартовый). Всё снаряжение неломаемое.
+    upgrades:
+      speed:
+        slot: 19
+        price: 1
+        max: 5
+        icon:
+          material: SUGAR
+          name: '<aqua><b>Скорость</b> <gray>{level}/{max}'
+          lore:
+            - '<gray>Скорость +1 уровень'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+      jump:
+        slot: 20
+        price: 1
+        max: 5
+        icon:
+          material: RABBIT_FOOT
+          name: '<green><b>Прыгучесть</b> <gray>{level}/{max}'
+          lore:
+            - '<gray>Прыгучесть +1 уровень'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+      pickaxe:
+        slot: 21
+        price: 1
+        icon:
+          material: WOODEN_PICKAXE
+          hide-attributes: true
+          name: '<yellow><b>Кирка</b> <gray>{level}/{max}'
+          lore:
+            - '<gray>До алмазной на Эффективность III'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        tiers:
+          - WOODEN_PICKAXE
+          - WOODEN_PICKAXE efficiency 1
+          - WOODEN_PICKAXE efficiency 2
+          - STONE_PICKAXE
+          - STONE_PICKAXE efficiency 1
+          - STONE_PICKAXE efficiency 2
+          - IRON_PICKAXE
+          - IRON_PICKAXE efficiency 1
+          - IRON_PICKAXE efficiency 2
+          - DIAMOND_PICKAXE efficiency 2
+          - DIAMOND_PICKAXE efficiency 3
+      sword:
+        slot: 22
+        price: 1
+        icon:
+          material: WOODEN_SWORD
+          hide-attributes: true
+          name: '<red><b>Меч</b> <gray>{level}/{max}'
+          lore:
+            - '<gray>До алмазного на Остроту II'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        tiers:
+          - WOODEN_SWORD
+          - WOODEN_SWORD sharpness 1
+          - WOODEN_SWORD sharpness 2
+          - STONE_SWORD
+          - STONE_SWORD sharpness 1
+          - STONE_SWORD sharpness 2
+          - IRON_SWORD
+          - IRON_SWORD sharpness 1
+          - IRON_SWORD sharpness 2
+          - DIAMOND_SWORD sharpness 1
+          - DIAMOND_SWORD sharpness 2
+      armor:
+        slot: 23
+        price: 1
+        icon:
+          material: IRON_CHESTPLATE
+          hide-attributes: true
+          name: '<white><b>Броня</b> <gray>{level}/{max}'
+          lore:
+            - '<gray>До алмазной на Защиту II'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        tiers:                  # «МАТЕРИАЛ protection N» — весь комплект
+          - none
+          - LEATHER
+          - LEATHER protection 1
+          - LEATHER protection 2
+          - CHAINMAIL
+          - CHAINMAIL protection 1
+          - CHAINMAIL protection 2
+          - IRON
+          - IRON protection 1
+          - IRON protection 2
+          - DIAMOND
+          - DIAMOND protection 1
+          - DIAMOND protection 2
+    items:
+      gapple:
+        slot: 30
+        price: 1
+        icon:
+          material: GOLDEN_APPLE
+          name: '<gold><b>Золотое яблоко</b>'
+          lore:
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        give:
+          material: GOLDEN_APPLE
+      tnt:
+        slot: 31
+        price: 1
+        icon:
+          material: TNT
+          name: '<red><b>TNT</b>'
+          lore:
+            - '<gray>Поставил — сразу подожжён'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        give:
+          material: TNT
+      fireball:
+        slot: 32
+        price: 1
+        icon:
+          material: FIRE_CHARGE
+          name: '<gold><b>Фаербол</b>'
+          lore:
+            - '<gray>ПКМ — бросить'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        give:
+          material: FIRE_CHARGE
+      rod:
+        slot: 34
+        price: 1
+        icon:
+          material: LIGHTNING_ROD
+          name: '<yellow><b>Стержень молнии</b>'
+          lore:
+            - '<gray>ПКМ — молния в точку, куда смотришь:'
+            - '<gray>подкидывает врагов и немного ранит'
+            - '<gray>Цена: <gold>{price} монета'
+            - ''
+            - '{status}'
+        give:
+          material: LIGHTNING_ROD
+          name: '<yellow><b>Стержень молнии</b> <gray>(ПКМ)'

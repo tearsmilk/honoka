@@ -1,0 +1,265 @@
+# BoxPvP 1x4 / 2x4 / 3x4 / 4x4: мини-лобби → выбор класса (PvP только 1.9) → бой за квадрат 3x3.
+# Поставь все 9 блоков шерсти своего цвета и удержи их (boxpvp.hold-time в modules/duels/config.yml, по умолчанию 3 с).
+# Классы — ниже в classes (формат как у китов дуэлей: armor, items, effects, icon). Каждому дополнительно: 64 шерсти и ножницы.
+# effects: 'эффект:уровень(0 = I):длительность в тиках' — выдаются при каждом появлении.
+display: '<#5fd6c4>BoxPvP'
+version: "1.9"
+arena-mode: boxpvp        # режимы арены box-quatro / box-2x4 / box-3x4 / box-4x4
+rounds: 1
+# точки арены: p1..p4 — места появления в бою, pre1..pre4 — места в мини-лобби,
+# box — встань на ЦЕНТРАЛЬНЫЙ блок квадрата 3x3 (под ногами) и поставь точку
+# режимы: размер команды × 4 команды. 1 → 1x4 (каждый сам за себя), 2 → 2x4, 3 → 3x4, 4 → 4x4.
+# В командах один класс — только у одного игрока команды (взял напарник Мечника — тебе Мечник недоступен).
+# Точки те же для всех режимов: p1..p4, pre1..pre4 — по одной на команду (напарники появляются вместе), и box.
+# Режимы арены: box-quatro (1x4), box-2x4, box-3x4, box-4x4 — можно повесить все на одну арену.
+team-sizes:
+  - 1
+  - 2
+  - 3
+  - 4
+teams: 4
+players-suffix: '<gray>· {format}'
+player-points:
+  - pre
+extra-points:
+  - box
+rules:
+  build: true
+  break-placed-only: false
+  natural-regen: true
+  hunger: false
+  max-duration-seconds: 900   # по истечении побеждает тот, у кого больше своих блоков в квадрате
+
+classes:
+  swordsman:
+    display: '<#ff6b6b>Мечник'
+    icon:
+      material: DIAMOND_SWORD
+      hide-attributes: true
+      name: '<#ff6b6b><b>Мечник</b>'
+      lore:
+        - '<gray>Сильный ближний бой'
+        - '<gray>Алмазный меч (Острота II), щит'
+    armor:
+      helmet:
+        material: IRON_HELMET
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+      leggings:
+        material: IRON_LEGGINGS
+      boots:
+        material: IRON_BOOTS
+      offhand:
+        material: SHIELD
+    items:
+      0:
+        material: DIAMOND_SWORD
+        enchants:
+          sharpness: 2
+      3:
+        material: GOLDEN_APPLE
+        amount: 6
+      8:
+        material: COOKED_BEEF
+        amount: 32
+  archer:
+    display: '<#9be36b>Лучник'
+    icon:
+      material: BOW
+      hide-attributes: true
+      name: '<#9be36b><b>Лучник</b>'
+      lore:
+        - '<gray>Дальний бой и скорость'
+        - '<gray>Лук (Сила III, Отбрасывание I), Скорость I'
+    armor:
+      helmet:
+        material: CHAINMAIL_HELMET
+      chestplate:
+        material: CHAINMAIL_CHESTPLATE
+      leggings:
+        material: CHAINMAIL_LEGGINGS
+      boots:
+        material: CHAINMAIL_BOOTS
+    items:
+      0:
+        material: BOW
+        enchants:
+          power: 3
+          punch: 1
+          unbreaking: 3
+      1:
+        material: STONE_SWORD
+      3:
+        material: GOLDEN_APPLE
+        amount: 4
+      8:
+        material: COOKED_BEEF
+        amount: 32
+      9:
+        material: ARROW
+        amount: 64
+    effects:
+      - 'speed:0:1000000'
+  tank:
+    display: '<#8a9bff>Танк'
+    revision: 2
+    icon:
+      material: DIAMOND_CHESTPLATE
+      hide-attributes: true
+      name: '<#8a9bff><b>Танк</b>'
+      lore:
+        - '<gray>Много защиты, но медленный'
+        - '<gray>Алмазная броня (Защита II), +4 сердца, Медлительность I'
+    armor:
+      helmet:
+        material: DIAMOND_HELMET
+        enchants:
+          protection: 2
+      chestplate:
+        material: DIAMOND_CHESTPLATE
+        enchants:
+          protection: 2
+      leggings:
+        material: DIAMOND_LEGGINGS
+        enchants:
+          protection: 2
+      boots:
+        material: DIAMOND_BOOTS
+        enchants:
+          protection: 2
+    items:
+      0:
+        material: IRON_AXE
+      3:
+        material: GOLDEN_APPLE
+        amount: 4
+      8:
+        material: COOKED_BEEF
+        amount: 32
+    effects:
+      - 'health_boost:1:1000000'
+      - 'slowness:0:1000000'
+  support:
+    display: '<#ffd36b>Поддержка'
+    icon:
+      material: WIND_CHARGE
+      name: '<#ffd36b><b>Поддержка</b>'
+      lore:
+        - '<gray>Мешает врагам удерживать квадрат'
+        - '<gray>Взрывные зелья медлительности и слабости, заряды ветра'
+    armor:
+      helmet:
+        material: IRON_HELMET
+      chestplate:
+        material: IRON_CHESTPLATE
+      leggings:
+        material: CHAINMAIL_LEGGINGS
+      boots:
+        material: IRON_BOOTS
+    items:
+      0:
+        material: IRON_SWORD
+      1:
+        material: WIND_CHARGE
+        amount: 16
+      2:
+        material: SPLASH_POTION
+        potion: slowness
+        amount: 4
+        max-stack: 4
+      3:
+        material: SPLASH_POTION
+        potion: weakness
+        amount: 4
+        max-stack: 4
+      4:
+        material: GOLDEN_APPLE
+        amount: 4
+      8:
+        material: COOKED_BEEF
+        amount: 32
+    effects:
+      - 'speed:0:1000000'
+  healer:
+    display: '<#ff9ecf>Хиллер'
+    icon:
+      material: SPLASH_POTION
+      potion: strong_healing
+      hide-attributes: true
+      name: '<#ff9ecf><b>Хиллер</b>'
+      lore:
+        - '<gray>Долго живёт за счёт лечения'
+        - '<gray>Взрывные зелья лечения II, регенерация, золотые яблоки'
+    armor:
+      helmet:
+        material: GOLDEN_HELMET
+        enchants:
+          protection: 2
+      chestplate:
+        material: IRON_CHESTPLATE
+      leggings:
+        material: IRON_LEGGINGS
+      boots:
+        material: GOLDEN_BOOTS
+        enchants:
+          protection: 2
+    items:
+      0:
+        material: IRON_SWORD
+      1:
+        material: SPLASH_POTION
+        potion: strong_healing
+        amount: 8
+        max-stack: 8
+      2:
+        material: POTION
+        potion: regeneration
+        amount: 2
+        max-stack: 2
+      3:
+        material: GOLDEN_APPLE
+        amount: 8
+      8:
+        material: COOKED_BEEF
+        amount: 32
+  assassin:
+    display: '<#c9a7ff>Ассасин'
+    icon:
+      material: NETHERITE_SWORD
+      hide-attributes: true
+      name: '<#c9a7ff><b>Ассасин</b>'
+      lore:
+        - '<gray>Быстрый и опасный, но хрупкий'
+        - '<gray>Меч (Острота III), жемчуг, невидимость, Скорость II'
+    armor:
+      helmet:
+        material: LEATHER_HELMET
+        color: '#3b2a4d'
+      chestplate:
+        material: CHAINMAIL_CHESTPLATE
+      leggings:
+        material: LEATHER_LEGGINGS
+        color: '#3b2a4d'
+      boots:
+        material: LEATHER_BOOTS
+        color: '#3b2a4d'
+    items:
+      0:
+        material: DIAMOND_SWORD
+        enchants:
+          sharpness: 3
+      1:
+        material: ENDER_PEARL
+        amount: 3
+      2:
+        material: POTION
+        potion: invisibility
+        amount: 1
+      3:
+        material: GOLDEN_APPLE
+        amount: 3
+      8:
+        material: COOKED_BEEF
+        amount: 32
+    effects:
+      - 'speed:1:1000000'
